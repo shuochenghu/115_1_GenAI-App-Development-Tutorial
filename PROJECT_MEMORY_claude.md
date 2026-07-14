@@ -28,6 +28,8 @@
 - `生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_教師版.ipynb`：第 5 週教師版（**Codex 產出**）。
 - `生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_學生版.ipynb`：第 5 週學生版（**Codex 產出**）。
 - `生成式AI應用開發_第03週投影片.md`：第 3 週 Marp 投影片，25 頁，OpenAI 主線；內文不提第 4 週，結尾為「課後動手做」；含擴充的 Gemini / Claude API 差異介紹（對照總表 + 各自程式碼寫法 + 多輪對話差異 + 選用建議）。
+- `生成式AI應用開發_第06週_Structured_Outputs與資料抽取_教師版_Claude生成.ipynb`：第 6 週教師版（**Claude Code 產出**），31 cells，保留完整參考答案。
+- `生成式AI應用開發_第06週_Structured_Outputs與資料抽取_學生版_Claude生成.ipynb`：第 6 週學生版（**Claude Code 產出**），31 cells，8 個 cell 保留 TODO（含版本說明）。
 
 ## 已完成的重要決策
 
@@ -61,6 +63,10 @@
 - 第 5 週三題練習：A 主題聊天機器人（英文練習夥伴）、B 上下文長度實驗（max_turns=1 觀察遺忘）、C 選做累計整場 token 與估算成本。
 - 第 5 週兩版已通過 JSON 解析、cell id 無重複、code cell `ast` 語法、中文亂碼與 TODO 分離檢查；付費 API cells 尚未實際執行。
 - 第 3 週投影片內文的第 4 週前向指涉已全數移除（依需求「先不提第四周」），並擴充 Gemini / Claude API 差異段落。
+- 第 6 週主題為 Structured Outputs 與資料抽取，延續 OpenAI Responses API 主線；涵蓋純文字回覆的解析困境、JSON Schema 手動定義（`text.format` + `json_schema` + `strict`）、Pydantic 模型定義（`client.responses.parse()` + `text_format` + `response.output_parsed`）、巢狀模型與清單抽取、`ValidationError`/`try except` 錯誤處理、`extract_structured()` 共用抽取函式封裝。已用 WebFetch 對照 OpenAI 官方 Structured Outputs 與 Responses API 文件確認語法正確。
+- 第 6 週練習：A 履歷抽取（`ResumeInfo`）、B 訂單抽取（`OrderItem` + `OrderInfo` 巢狀清單並計算總額）、C 選做抽取失敗重試機制（`extract_with_retry()`）。
+- 第 6 週 TODO 設計採「模型/函式定義留空、demo 呼叫維持完整」原則：demo cell 一律用 `print(model)` 而非存取特定欄位，避免學生未完成 TODO 時下游 cell 因缺欄位 `AttributeError` 而整個中斷。
+- 第 6 週結尾预告 Week 7 為 Git 版本控制與 Streamlit 部署，與既有 `生成式AI應用開發_第07週_Git實作教材.md` 內容一致。
 
 ## 編輯與驗證原則
 
@@ -108,6 +114,7 @@ Claude 版與 Codex 版已完成詳細比較，主要差異如下：
 ## 下一步建議
 
 - **第 5 週**：決定是否整合兩版，或直接以 Claude 版為主並套入上述三項修正後推進
-- 實際上傳第 3–5 週學生版到 Colab 測試（串流顯示與 `input()` 聊天迴圈）
-- 產生第 4、5 週投影片
-- 接續製作第 6 週：Structured Outputs 與資料抽取（JSON Schema、欄位驗證、文字轉結構化資料）
+- 實際上傳第 3–6 週學生版到 Colab 測試（串流顯示、`input()` 聊天迴圈、Structured Outputs 付費 cells）
+- 產生第 4、5、6 週投影片
+- 第 6 週目前只有 Claude Code 版本，尚無 Codex 版本可比較；若 Codex 後續也產出第 6 週教材，可比照第 4、5 週流程做優缺點比較與整合
+- 接續製作第 7 週：Git 版本控制與 Streamlit 部署實作（已有 `生成式AI應用開發_第07週_Git實作教材.md` 講義可搭配）
