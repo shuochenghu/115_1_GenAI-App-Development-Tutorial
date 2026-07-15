@@ -1,0 +1,16 @@
+# API key 與環境變數（絕不上傳）
+.env
+*.env
+
+# Streamlit 本機 secrets
+.streamlit/secrets.toml
+
+# Python 暫存
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# 系統檔
+.DS_Store
+Thumbs.db

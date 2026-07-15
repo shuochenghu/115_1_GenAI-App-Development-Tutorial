@@ -30,6 +30,11 @@
 - `生成式AI應用開發_第03週投影片.md`：第 3 週 Marp 投影片，25 頁，OpenAI 主線；內文不提第 4 週，結尾為「課後動手做」；含擴充的 Gemini / Claude API 差異介紹（對照總表 + 各自程式碼寫法 + 多輪對話差異 + 選用建議）。
 - `生成式AI應用開發_第06週_Structured_Outputs與資料抽取_教師版_Claude生成.ipynb`：第 6 週教師版（**Claude Code 產出**），31 cells，保留完整參考答案。
 - `生成式AI應用開發_第06週_Structured_Outputs與資料抽取_學生版_Claude生成.ipynb`：第 6 週學生版（**Claude Code 產出**），31 cells，8 個 cell 保留 TODO（含版本說明）。
+- `生成式AI應用開發_第07週_Streamlit_Web_App入門_教師版_Claude生成.ipynb`：第 7 週教師版（**Claude Code 產出**），40 cells，完整可用程式與練習解答。
+- `生成式AI應用開發_第07週_Streamlit_Web_App入門_學生版_Claude生成.ipynb`：第 7 週學生版（**Claude Code 產出**），40 cells，6 個 code cell 保留 TODO（cell 13/16/19 三大核心技能 + 33/35/37 練習 A/B/C）。
+- `生成式AI應用開發_第07週_Streamlit_Web_App入門實作教材_學生版.ipynb` / `..._教師版.ipynb`：第 7 週（**Codex 產出**），各 40 cells，附 `week07_streamlit_app/` 專案資料夾。
+- `week07_streamlit_app_claude/`：第 7 週 Claude 版可部署 Streamlit 專案（app.py、requirements.txt、.gitignore、.env.example、README.md、.streamlit/config.toml + secrets.example.toml）。與 Codex 的 `week07_streamlit_app/` 並存不衝突。
+- `生成式AI應用開發_第07週_Git實作教材.md`：第 7 週 Git/GitHub/部署講義（既有，非 notebook）。
 
 ## 已完成的重要決策
 
@@ -67,6 +72,13 @@
 - 第 6 週練習：A 履歷抽取（`ResumeInfo`）、B 訂單抽取（`OrderItem` + `OrderInfo` 巢狀清單並計算總額）、C 選做抽取失敗重試機制（`extract_with_retry()`）。
 - 第 6 週 TODO 設計採「模型/函式定義留空、demo 呼叫維持完整」原則：demo cell 一律用 `print(model)` 而非存取特定欄位，避免學生未完成 TODO 時下游 cell 因缺欄位 `AttributeError` 而整個中斷。
 - 第 6 週結尾预告 Week 7 為 Git 版本控制與 Streamlit 部署，與既有 `生成式AI應用開發_第07週_Git實作教材.md` 內容一致。
+- 第 7 週主題為 Streamlit Web App 入門（OpenAI + Streamlit），涵蓋大綱要求的：Streamlit UI、表單（`st.form`）、檔案上傳（`st.file_uploader`）、session state、secrets 管理、串流回覆顯示（`st.write_stream`）。延續第 3–5 週 Responses API 與 `ask_ai_safe()` / streaming。
+- 第 7 週為課程從 Colab 過渡到 VS Code + 本機 Python + GitHub 的轉捩點；notebook 用 `%%writefile` 漸進產生 `app_1_hello.py` → `app_2_ai.py` → `app_3_stream.py` → `app_4_chat.py`，並提供 Colab localtunnel 備援執行方式。
+- 第 7 週 secrets 採雙軌：本機 `.env`（python-dotenv）＋雲端 `st.secrets`，用 `get_secret()` 統一。串流用 generator + `st.write_stream`，對話記憶用 `st.session_state.messages` + `st.chat_input` / `st.chat_message`。
+- 第 7 週三題練習：A 側邊欄自訂 system prompt（必做）、B 翻譯/分類表單（必做）、C 累計 token 與估算成本（選做，延伸第 5 週練習 C）。
+- 第 7 週學生版 TODO 落在三大核心技能（`ask_ai_safe` body、串流 generator 迴圈、聊天迴圈組裝）與三題練習，共 6 個 code cell；其餘 demo/說明兩版皆完整。
+- 第 7 週 Claude 版另附可部署專案 `week07_streamlit_app_claude/`；整合版 `app.py` 含側邊欄設定、串流聊天、摘要表單、檔案上傳與累計成本，`app.py` 已通過 `py_compile`。
+- 第 7 週兩版已通過 JSON 解析、cell id 無重複、`.py` code cell `ast` 語法（`%%writefile` 非 .py 檔如 .gitignore/requirements 不做語法檢查）、無亂碼與 TODO 分離檢查；付費 API / Streamlit 實跑尚未執行。
 
 ## 編輯與驗證原則
 
@@ -117,4 +129,6 @@ Claude 版與 Codex 版已完成詳細比較，主要差異如下：
 - 實際上傳第 3–6 週學生版到 Colab 測試（串流顯示、`input()` 聊天迴圈、Structured Outputs 付費 cells）
 - 產生第 4、5、6 週投影片
 - 第 6 週目前只有 Claude Code 版本，尚無 Codex 版本可比較；若 Codex 後續也產出第 6 週教材，可比照第 4、5 週流程做優缺點比較與整合
-- 接續製作第 7 週：Git 版本控制與 Streamlit 部署實作（已有 `生成式AI應用開發_第07週_Git實作教材.md` 講義可搭配）
+- 第 7 週 Claude 版已完成（notebook 兩版 + `week07_streamlit_app_claude/` 專案）；可比照第 4、5 週流程與 Codex 版（`..._實作教材_...` + `week07_streamlit_app/`）做優缺點比較與整合建議
+- 第 7 週建議實測：本機 `streamlit run app.py`（聊天/串流/表單/檔案上傳）、`.env` 未被 Git 追蹤、部署到 Streamlit Community Cloud
+- 產生第 4、5、6、7 週投影片

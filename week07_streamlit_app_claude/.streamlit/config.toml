@@ -1,0 +1,8 @@
+# Streamlit 介面主題設定（可自由調整）
+[theme]
+primaryColor = "#4F8BF9"
+base = "light"
+
+[server]
+# 上傳檔案大小上限（MB）
+maxUploadSize = 5
