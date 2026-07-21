@@ -1,4 +1,4 @@
-﻿# 專案工作記憶
+# 專案工作記憶
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
@@ -11,35 +11,46 @@
 目前 notebook 教材只保留「學生版」與「教師版」。原始版 notebook 已刪除，避免和教師版內容重複。
 
 - `生成式AI應用開發_16周課程大綱.md`：課程主大綱，目前實際規劃為 18 週，含 16 週授課與第 17、18 週自主學習。
-- `生成式AI應用開發_第02週_Python複習_學生版.ipynb`：第 2 週學生版，保留 TODO 骨架。
-- `生成式AI應用開發_第02週_Python複習_教師版.ipynb`：第 2 週教師版，保留完整參考答案。
-- `生成式AI應用開發_第03週_OpenAI_API入門_學生版.ipynb`：第 3 週 OpenAI API 學生版，保留 TODO 骨架。
-- `生成式AI應用開發_第03週_OpenAI_API入門_教師版.ipynb`：第 3 週 OpenAI API 教師版，保留完整參考答案。
-- `生成式AI應用開發_第03週_Gemini_API入門_學生版.ipynb`：第 3 週 Gemini API 學生版，保留 TODO 骨架。
-- `生成式AI應用開發_第03週_Gemini_API入門_教師版.ipynb`：第 3 週 Gemini API 教師版，保留完整參考答案。
-- `生成式AI應用開發_第03週_Claude_API入門_學生版.ipynb`：第 3 週 Claude API 學生版，保留 TODO 骨架。
-- `生成式AI應用開發_第03週_Claude_API入門_教師版.ipynb`：第 3 週 Claude API 教師版，保留完整參考答案。
-- `生成式AI應用開發_第04週_Prompt_Engineering_教師版.ipynb`：第 4 週 Prompt Engineering 教師版，保留完整參考答案（35 cells）。
-- `生成式AI應用開發_第04週_Prompt_Engineering_學生版.ipynb`：第 4 週 Prompt Engineering 學生版，四大功能與課堂練習保留 TODO 骨架。
-- `生成式AI應用開發_第04週_Prompt_Engineering實作教材_教師版.ipynb`：依原規劃重建的 40-cell 教師版，包含完整參考答案。
-- `生成式AI應用開發_第04週_Prompt_Engineering實作教材_學生版.ipynb`：依原規劃重建的 40-cell 學生版，三組綜合練習保留 TODO 骨架。
-- `生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_教師版.ipynb`：第 5 週 40-cell 教師版，包含完整聊天 session、Streaming 與三組練習答案。
-- `生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_學生版.ipynb`：第 5 週 40-cell 學生版，三組綜合練習保留 TODO 骨架。
-- `生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材_教師版.ipynb`：第 6 週 40-cell 教師版，包含 Structured Outputs、JSON Schema、資料抽取、Pydantic、巢狀模型、refusal handling 與練習答案。
-- `生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材_學生版.ipynb`：第 6 週 40-cell 學生版，保留 JSON Schema、Pydantic 與重試練習 TODO 骨架。
-- `生成式AI應用開發_第07週_Streamlit_Web_App入門實作教材_教師版.ipynb`：第 7 週 40-cell 教師版，主軸為 VS Code、本機 Python、Streamlit、OpenAI Responses API、session state、streaming、secrets、表單與檔案上傳。
-- `生成式AI應用開發_第07週_Streamlit_Web_App入門實作教材_學生版.ipynb`：第 7 週 40-cell 學生版，保留 Streamlit App、API helper、session state、streaming 與期中小專題規劃 TODO。
-- `week07_streamlit_app/`：第 7 週可直接用 VS Code 開啟的 Streamlit 範例專案，包含 `app.py`、`requirements.txt`、`.env.example`、`.gitignore`、`README.md` 與 `.streamlit/secrets.example.toml`。
+- `week02/生成式AI應用開發_第02週_Python複習_學生版.ipynb`：第 2 週學生版，保留 TODO 骨架。
+- `week02/生成式AI應用開發_第02週_Python複習_教師版.ipynb`：第 2 週教師版，保留完整參考答案。
+- `week03/生成式AI應用開發_第03週_OpenAI_API入門_學生版.ipynb`：第 3 週 OpenAI API 學生版，保留 TODO 骨架。
+- `week03/生成式AI應用開發_第03週_OpenAI_API入門_教師版.ipynb`：第 3 週 OpenAI API 教師版，保留完整參考答案。
+- `week03/生成式AI應用開發_第03週_Gemini_API入門_學生版.ipynb`：第 3 週 Gemini API 學生版，保留 TODO 骨架。
+- `week03/生成式AI應用開發_第03週_Gemini_API入門_教師版.ipynb`：第 3 週 Gemini API 教師版，保留完整參考答案。
+- `week03/生成式AI應用開發_第03週_Claude_API入門_學生版.ipynb`：第 3 週 Claude API 學生版，保留 TODO 骨架。
+- `week03/生成式AI應用開發_第03週_Claude_API入門_教師版.ipynb`：第 3 週 Claude API 教師版，保留完整參考答案。
+- `week04/生成式AI應用開發_第04週_Prompt_Engineering_教師版.ipynb`：第 4 週 Prompt Engineering 教師版，保留完整參考答案（35 cells）。
+- `week04/生成式AI應用開發_第04週_Prompt_Engineering_學生版.ipynb`：第 4 週 Prompt Engineering 學生版，四大功能與課堂練習保留 TODO 骨架。
+- `week04/生成式AI應用開發_第04週_Prompt_Engineering實作教材_教師版.ipynb`：依原規劃重建的 40-cell 教師版，包含完整參考答案。
+- `week04/生成式AI應用開發_第04週_Prompt_Engineering實作教材_學生版.ipynb`：依原規劃重建的 40-cell 學生版，三組綜合練習保留 TODO 骨架。
+- `week05/生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_教師版.ipynb`：第 5 週 40-cell 教師版，包含完整聊天 session、Streaming 與三組練習答案。
+- `week05/生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_學生版.ipynb`：第 5 週 40-cell 學生版，三組綜合練習保留 TODO 骨架。
+- `week06/生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材_教師版.ipynb`：第 6 週 40-cell 教師版，包含 Structured Outputs、JSON Schema、資料抽取、Pydantic、巢狀模型、refusal handling 與練習答案。
+- `week06/生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材_學生版.ipynb`：第 6 週 40-cell 學生版，保留 JSON Schema、Pydantic 與重試練習 TODO 骨架。
+- `week07/生成式AI應用開發_第07週_Streamlit_Web_App入門實作教材_教師版.ipynb`：第 7 週 40-cell 教師版，主軸為 VS Code、本機 Python、Streamlit、OpenAI Responses API、session state、streaming、secrets、表單與檔案上傳。
+- `week07/生成式AI應用開發_第07週_Streamlit_Web_App入門實作教材_學生版.ipynb`：第 7 週 40-cell 學生版，保留 Streamlit App、API helper、session state、streaming 與期中小專題規劃 TODO。
+- `week07/week07_streamlit_app/`：第 7 週可直接用 VS Code 開啟的 Streamlit 範例專案，包含 `app.py`、`requirements.txt`、`.env.example`、`.gitignore`、`README.md` 與 `.streamlit/secrets.example.toml`。
+- `week08/生成式AI應用開發_第08週_期中個人小專題_內容規劃.md`：第 8 週教材內容規劃，定位為期中個人小專題整合週；正式教材策略改採 Markdown 專題說明書 + `week08/week08_midterm_starter/` + 教師 demo 範例，不優先製作 notebook pair。
+- `week08/生成式AI應用開發_第08週_期中個人小專題_專題說明書.md`：第 8 週正式專題說明書，包含專題目標、繳交要求、設計表、starter 使用方式、檢核清單、README 規格、rubric、課堂流程與常見問題。
+- `week08/week08_midterm_starter/`：第 8 週學生 starter Streamlit 專案，保留 TODO，引導學生完成專題名稱、system prompt、JSON Schema、prompt builder、表單欄位、structured output 與結果顯示。
+- `week08/week08_midterm_example_summarizer/`：第 8 週教師 demo Streamlit 專案，提供完整 AI 摘要器，示範 OpenAI Responses API、Structured Outputs、錯誤處理、API key 安全管理與結果區塊化呈現。
 
 ## 最近工作進度（2026-07-15）
 
 - 進度紀錄點：第 6 週正式 40-cell 教師版與學生版已生成並完成 Claude 版本比較；正式版保留為主線，吸收 Claude 版的 Pydantic 欄位驗證表格、巢狀 `MeetingMinutes` 範例、`extract_structured()` wrapper 與 refusal handling 提醒。
 - 第 6 週正式版與 Claude 生成版比較結論：正式版教學節奏較完整，適合保留 JSON Schema first；Claude 版較偏 Pydantic-first，只吸收適合 App 開發的補強點，不取代正式教材架構。
 - 第 6 週學生版仍保留 TODO 分離；教師版提供完整答案。兩版皆維持 40 cells，付費 API cells 預設關閉。
-- 第 7 週教材已依課程大綱改為「Streamlit Web App 入門」，不是 Git 主題；現有 `生成式AI應用開發_第07週_Git實作教材.md` 保留作為 GitHub Desktop、GitHub 與 Streamlit Community Cloud 部署補充。
-- 第 7 週正式教材採 notebook 作為教材與步驟說明，實作成果改為本機 `week07_streamlit_app/` 專案；學生需在 VS Code 中執行 `streamlit run app.py`。
-- 第 7 週 notebook 與 `week07_streamlit_app/README.md` 已補上銜接對照表，明確標示每個 notebook 章節對應到 VS Code 專案中的 `app.py`、`requirements.txt`、`.env.example`、`.gitignore`、`README.md` 與 Streamlit 功能區塊。
+- 2026-07-21 已針對實際閱讀時不易理解的第 6 週內容補強說明：學生版與教師版皆新增「輸入文字／輸出規格／程式檢查」三層讀法、JSON Schema 閱讀順序、array `items` 巢狀資料提示、`(ok, result)` 錯誤處理心智模型、JSON Schema 與 Pydantic 對照表、課堂練習解題順序，以及關鍵 code cell 的 API 參數、refusal parsing、validation、Pydantic wrapper 與 retry 註解；兩版仍維持 40 cells、輸出清空、學生版 TODO 分離、教師版無 TODO。
+- 2026-07-21 依需求再次加深第 6 週 code cell 教學註解：學生版與教師版皆補強 setup fail-fast、API key 安全、`structured_response()` 職責分層、`text.format` 欄位契約、`response.output_text` 解析順序、一般 JSON prompt 的不穩定觀察、schema 欄位設計理由、巢狀 JSON 閱讀順序、程式端驗證同步、`(ok, result)` App 錯誤分流、批次測試結果判讀、schema registry 版本管理、`responses.parse()` / Pydantic 資料合約、wrapper 錯誤處理，以及練習 A/B/C 的解題提示；學生版仍只保留 TODO 引導，不填入教師版答案。
+- 2026-07-21 參考 `comment_sample.txt` 的註解範例，將第 6 週正式學生版與教師版的核心 helper 改成教學型 docstring 與分段註解：`structured_response()`、`_read_attr_or_key()`、`get_refusal_reason()`、`parse_output_text()`、`print_json()`、validation helpers、`extract_structured_safe()`、`run_event_batch_tests()`、schema registry helpers、`parse_with_pydantic()`、`extract_structured()`、`extract_with_retry()`，以及 Pydantic class 皆補上用途、情境、參數、回傳、可能錯誤與「情況一／情況二」式流程說明；學生版仍只保留 TODO 引導。
+- 第 7 週教材已依課程大綱改為「Streamlit Web App 入門」，不是 Git 主題；現有 `week07/生成式AI應用開發_第07週_Git實作教材.md` 保留作為 GitHub Desktop、GitHub 與 Streamlit Community Cloud 部署補充。
+- 第 7 週正式教材採 notebook 作為教材與步驟說明，實作成果改為本機 `week07/week07_streamlit_app/` 專案；學生需在 VS Code 中執行 `streamlit run app.py`。
+- 第 7 週 notebook 與 `week07/week07_streamlit_app/README.md` 已補上銜接對照表，明確標示每個 notebook 章節對應到 VS Code 專案中的 `app.py`、`requirements.txt`、`.env.example`、`.gitignore`、`README.md` 與 Streamlit 功能區塊。
 - 2026-07-15 已同步 Codex 長期記憶更新：第 7 週教材定位、notebook / VS Code 專案雙軌銜接、40-cell 狀態、TODO 分離與 Responses API + Streamlit streaming 主線。
+- 2026-07-21 已整合 Claude 第 8 週規劃與正式課程建議：第 8 週定位為「期中個人小專題」整合週，不新增大量 API；主教材優先產出 `week08/生成式AI應用開發_第08週_期中個人小專題_專題說明書.md`，再建立正式命名的 `week08/week08_midterm_starter/` 與教師 demo `week08/week08_midterm_example_summarizer/`，不使用 `_claude` 命名；starter 應延續第 7 週 Streamlit 專案結構與 helper，並保留學生 TODO。
+- 2026-07-21 已生成第 8 週正式教材：專題說明書、學生 starter 與教師摘要器 demo。兩個 Streamlit 專案皆包含 `app.py`、`requirements.txt`、`.env.example`、`.gitignore`、`README.md` 與 `.streamlit/secrets.example.toml`；程式註解依第 5、6 週準則補上用途、情境、參數、回傳、API 流程、錯誤處理、輸入限制、secrets 安全與 structured output 設計說明。
+- 2026-07-21 已建立 `week01/` 到 `week08/` 週次資料夾，並將所有根目錄 `生成式AI應用開發_第NN週...` 教材檔與 `week07_...`、`week08_...` companion project 資料夾移入對應週次資料夾；之後引用正式教材請使用 `weekNN/...` 路徑。
+- 2026-07-21 依 Claude 版第 8 週教材比較結果，已將正式 Week 8 吸收補強：說明書明列「真 structured output」硬性要求與 API key 外洩紅線；`week08/week08_midterm_starter/` 補 optional `stream_ai()` helper、快速開始指令與安全紅線；`week08/week08_midterm_example_summarizer/` 補 `.txt` / `.md` 檔案上傳與 optional streaming 摘要示範，但仍保留 JSON Schema + `strict` 作為正式主線，Pydantic 只列為進階選項。
 
 - 歷史紀錄點：第 4、5 週教材已完成建立、Claude 版本比較與優點整合，之後已接續完成第 6 週教材。
 - 已比較第 4 週 40-cell 教師版與 Claude 生成版本，決定保留 40-cell 實作教材為主線，吸收 Claude 版的參數化函式與 prompt 並排比較優點。
@@ -49,6 +60,7 @@
 - 第 5 週已完成多輪對話、手動 history、有限 context、簡易記憶、usage、reset、Streaming events、串流聊天 session、console chatbot 與三組練習。
 - 第 5 週已依 Claude 版本的優點再次補強：學習目標改為「能力／後續應用」對照表、加入 `history_size()`、預設關閉的 `max_turns=1` 遺忘實驗，以及 Streaming 部分輸出的內容審核提醒；教師版與學生版維持 40 cells 且 TODO 分離不變。
 - 第 5 週最終驗證結果：教師版與學生版皆為 40 cells、40 個唯一 cell IDs、26 個 Markdown cells、14 個 code cells，靜態語法與 JSON 解析通過，無執行輸出；教師版無 TODO，學生版只保留封面說明與原訂三組練習 TODO。
+- 2026-07-21 參考 `comment_sample.txt` 的註解範例，將第 5 週正式學生版與教師版的核心聊天與 streaming 程式改成教學型 docstring 與分段註解：`create_response()`、`history_size()`、`MinimalChatSession`、`ResponseChatSession`、`stream_response()`、`StreamingChatSession`、`run_console_chat()`、`CourseAdvisorSession`、`ask_with_chunk_count()`、`WindowedMemoryChat`、`run_chatbot_smoke_test()`、`run_forgetting_experiment()` 皆補上用途、情境、參數、回傳、可能錯誤與「情況一／情況二」式流程說明；學生版仍只保留 TODO 引導。實際第 5 週檔案目前為 42 cells，這次保留既有 cell 結構不強行改回舊紀錄的 40 cells。
 - 第 4、5 週的付費 API cells 尚未實際執行；目前已完成 JSON、cell ID、靜態語法、TODO 分離、教師／學生對齊與中文亂碼檢查。
 - 第 4、5、6 週的付費 API cells 尚未實際完整執行；可先將學生版上傳 Colab 做顯示與實際 API 測試。
 
@@ -87,15 +99,19 @@
 - 第 6 週 Structured Outputs helper 已加入 refusal / 空 `output_text` 檢查，避免模型拒答時直接 `json.loads()` 或寫入資料庫。
 - 第 6 週 Pydantic 補強欄位驗證技巧表格、`ReviewInsight`、`ActionItem`、`MeetingMinutes` 巢狀模型、`parse_with_pydantic()` 與 App 可重用的 `extract_structured()` wrapper。
 - 第 6 週學生版的 `ReviewInsight`、客服訊息 JSON Schema、收據資料 Pydantic 與 retry wrapper 保留 TODO；教師版提供完整答案。
+- 第 6 週教材後續若再修訂，應保留目前新增的可讀性橋接：先用三層讀法定位每段程式，再用 schema 欄位規格、array `items`、Pydantic class 對照與程式端驗證說明輔助學生閱讀。
 - 第 7 週延續 OpenAI Responses API 主線，Streamlit App 範例使用 `client.responses.create()`、`stream=True`、`response.output_text.delta`、`st.write_stream()`、`st.chat_input()`、`st.chat_message()`、`st.session_state` 與 `st.secrets`。
 - 第 7 週學生版 TODO 保留在 API key helper、OpenAI helper、session state、Chat UI、streaming、sidebar、表單、檔案上傳、README 與期中小專題規劃；教師版無 TODO。
+- 第 8 週正式採「專題說明書 + 學生 starter + 教師 demo」而非 notebook pair；學生 starter 保留 TODO 作為專題改造入口，教師 demo 只提供一個完整摘要器作為展示與完成度參考，避免學生直接複製多個完整答案。
 
 ## 編輯與驗證原則
 
+- 2026-07-21 已新增專案層 `.codex/config.toml`，預設 `sandbox_mode = "workspace-write"`、`approval_policy = "never"`，目標是減少教材修改流程中的重複確認；此設定主要影響之後從本 repo 開啟的新 Codex session，且仍受系統、管理政策與高風險操作限制。
 - 修改 notebook 時，優先用 Python `json` 模組讀寫 `.ipynb`。
 - 輸出 notebook 時使用 `json.dumps(..., ensure_ascii=False, indent=1)`，保留可讀的繁體中文；寫入後必須重新解析 JSON 並檢查常見亂碼特徵。
 - 修改學生版時，保留 TODO，不要把教師版完整答案貼回學生版。
 - 修改教師版時，可保留完整答案與課堂示範程式。
+- Codex 之後生成的正式教材檔案、專案資料夾與範例資料夾一律不加 `_claude` 或 `Claude生成` 後綴；這些後綴只保留給既有 Claude 產出的參考檔案，不用在 Codex 新產出上。
 - 之後生成或修改教材中的程式碼時，都要加入適當註解：用註解說明區塊目的、API 呼叫、狀態管理、錯誤處理與安全注意事項；避免逐行解釋顯而易見的語法。
 - 每次生成或修改完某一週教材後，必須同步更新本檔的教材狀態、最近工作進度、重要決策或下一步建議，避免專案記憶落後於實際檔案。
 - 第 3 週 notebook 的 markdown 風格已採用少量 emoji、HTML 提示框與 `<font color>` 重點標籤；後續新增章節時可沿用此風格，但避免過度使用顏色。
@@ -121,5 +137,5 @@
 - 產生第 4 週投影片或講義版 Markdown。
 - 上傳第 6 週學生版到 Colab 測試顯示，並實際執行 Structured Outputs 與 Pydantic parse API cells。
 - 產生第 6 週投影片或講義版 Markdown。
-- 上傳或本機開啟第 7 週教材，測試 `week07_streamlit_app` 是否能在 VS Code terminal 以 `streamlit run app.py` 啟動。
-- 可接續製作第 8 週期中個人小專題教材，要求學生基於第 7 週 Streamlit 專案完成一個小型 LLM Web App。
+- 上傳或本機開啟第 7 週教材，測試 `week07/week07_streamlit_app/` 是否能在 VS Code terminal 以 `streamlit run app.py` 啟動。
+- 第 8 週教材已完成初版；上課前可實際設定測試用 `OPENAI_API_KEY`，分別執行 `week08/week08_midterm_starter/` 與 `week08/week08_midterm_example_summarizer/` 的 `streamlit run app.py`，確認 API 回應、structured output 與畫面顯示符合預期。

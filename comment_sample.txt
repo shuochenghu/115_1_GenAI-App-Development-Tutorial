@@ -1,0 +1,36 @@
+原本：
+def _read_attr_or_key(obj, name, default=None):
+    """同時支援 SDK 物件與 dict，方便檢查回應內容。"""
+    # SDK 回傳物件在不同版本或測試替身中可能表現成 attribute 或 dict；這個小工具讓 refusal 檢查更穩。
+    if isinstance(obj, dict):
+        return obj.get(name, default)
+    return getattr(obj, name, default)
+
+加入說明與註解後：
+def readattr_or_key(obj, name, default=None):
+    """
+    同時支援「SDK 物件」與「dict（字典）」兩種資料型態的通用讀取工具。
+
+    在處理 API 回應時，回傳的內容有時是 SDK 封裝好的物件（用 obj.name 存取），
+    有時則是解析後的 dict（用 obj["name"] 存取）。這個函式把兩種情況統一起來，
+    讓呼叫端不必先判斷型態，就能安全地取出想要的欄位值。
+
+    參數 (Args):
+        obj:     要讀取的來源，可以是 dict 或任意 SDK 物件。
+        name:    想要讀取的欄位名稱 / 屬性名稱（字串）。
+        default: 當該欄位或屬性不存在時要回傳的預設值，預設為 None。
+
+    回傳 (Returns):
+        取到的欄位值；若不存在，則回傳 default。
+    """
+
+    # 情況一：obj 是字典（dict）
+    # 使用 dict.get(name, default)，找不到 key 時不會拋出例外，
+    # 而是安全地回傳預設值 default。
+    if isinstance(obj, dict):
+        return obj.get(name, default)
+
+    # 情況二：obj 是一般物件（例如 SDK 回傳的物件）
+    # 使用內建的 getattr(obj, name, default) 讀取屬性，
+    # 若該屬性不存在同樣回傳 default，避免 AttributeError。
+    return getattr(obj, name, default)

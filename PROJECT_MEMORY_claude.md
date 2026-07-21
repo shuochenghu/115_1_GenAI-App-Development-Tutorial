@@ -35,6 +35,13 @@
 - `生成式AI應用開發_第07週_Streamlit_Web_App入門實作教材_學生版.ipynb` / `..._教師版.ipynb`：第 7 週（**Codex 產出**），各 40 cells，附 `week07_streamlit_app/` 專案資料夾。
 - `week07_streamlit_app_claude/`：第 7 週 Claude 版可部署 Streamlit 專案（app.py、requirements.txt、.gitignore、.env.example、README.md、.streamlit/config.toml + secrets.example.toml）。與 Codex 的 `week07_streamlit_app/` 並存不衝突。
 - `生成式AI應用開發_第07週_Git實作教材.md`：第 7 週 Git/GitHub/部署講義（既有，非 notebook）。
+- **檔案結構已重整為 `week01/`…`week08/` 週資料夾**；各週教材與專案資料夾移入對應週資料夾（如 `week07/week07_streamlit_app/`）。上方列出的檔名現位於各自週資料夾內。
+- 第 8 週（期中個人小專題）產出，位於 `week08/`：
+  - `生成式AI應用開發_第08週_期中個人小專題_內容規劃.md`：規劃檔，第十一節七項決策已定案。
+  - `生成式AI應用開發_第08週_期中個人小專題_專題說明書.md`：**Codex 產出**說明書。
+  - `week08_midterm_starter/`、`week08_midterm_example_summarizer/`：**Codex 產出** starter 與範例（結構化輸出用原生 json_schema dict）。
+  - `生成式AI應用開發_第08週_期中個人小專題_專題說明書_Claude生成.md`：**Claude 產出**說明書（反映定案：部署加分、結構化硬性、安全一票否決、worksheet 內嵌）。
+  - `week08_midterm_starter_claude/`、`week08_midterm_example_summarizer_claude/`：**Claude 產出** starter 與範例（各含 app.py、requirements.txt、.env.example、.gitignore、README.md、.streamlit/secrets.example.toml）。結構化輸出改用 **Pydantic `responses.parse()` + `output_parsed`**；範例為完整可跑 AI 摘要器（含檔案上傳、串流）。
 
 ## 已完成的重要決策
 
@@ -79,6 +86,9 @@
 - 第 7 週學生版 TODO 落在三大核心技能（`ask_ai_safe` body、串流 generator 迴圈、聊天迴圈組裝）與三題練習，共 6 個 code cell；其餘 demo/說明兩版皆完整。
 - 第 7 週 Claude 版另附可部署專案 `week07_streamlit_app_claude/`；整合版 `app.py` 含側邊欄設定、串流聊天、摘要表單、檔案上傳與累計成本，`app.py` 已通過 `py_compile`。
 - 第 7 週兩版已通過 JSON 解析、cell id 無重複、`.py` code cell `ast` 語法（`%%writefile` 非 .py 檔如 .gitignore/requirements 不做語法檢查）、無亂碼與 TODO 分離檢查；付費 API / Streamlit 實跑尚未執行。
+- 第 8 週為期中個人小專題整合週（非新 API 教學），採「專題說明書 + starter 骨架 + 教師 demo 範例」形式，非 notebook 學生/教師雙版。
+- 第 8 週七項決策定案（2026-07-21）：①第 7 週對齊 Codex 版；②Claude 產出加 `_claude` 區分；③部署只列加分、期末才強制；④結構化輸出為硬性最低要求（Pydantic 或 json_schema，不接受純自由文字）；⑤三題目（摘要器/履歷助手/客服分類器）+ 開放自訂；⑥rubric 沿用 功能30/LLM25/UI20/安全10/README+Demo15，API key 外洩為一票否決紅線；⑦worksheet 內嵌為說明書「專題設計表」。
+- 第 8 週 Claude 版兩個 `app.py` 已通過 `py_compile`；helper 對齊 Codex week07（`get_secret`/`create_client`/`ask_ai`/`stream_ai`）；秘密檔僅 `.example`、`.gitignore` 已排除 `.env`/`secrets.toml`/`__pycache__`；付費 API 實跑尚未執行。
 
 ## 編輯與驗證原則
 
@@ -122,13 +132,23 @@ Claude 版與 Codex 版已完成詳細比較，主要差異如下：
 - `..._Claude生成.ipynb`：Claude Code（本工具）產出
 - `...實作教材_....ipynb`：Codex（其他 AI 工具）產出
 - CLAUDE.md 已更新此規則，且記憶檔入口已改為 `PROJECT_MEMORY_claude.md`
+- 例外：正式課程 starter / 範例專案（如第 8 週 `week08_midterm_starter/`）不加工具後綴。
+
+## 版本主線決策（重要，2026-07-21）
+
+- **第 5–7 週教材以 Codex 版為正式主線**（`..._實作教材_...` notebook 與 `week07_streamlit_app/` 專案），除非另外指定。
+- Claude 版（`..._Claude生成`、`week07_streamlit_app_claude/`）為比較／備援，非預設對齊對象。
+- 新教材延續時，以 Codex 版的檔案結構、helper 命名、函式簽名為基準。
+- 已確認課堂第 7 週使用 Codex 版 `week07_streamlit_app/`；其 helper：`get_secret()`（app.py:10）、`create_client()`（:22）、`ask_ai(user_input, system_prompt=...)`（:30）、`stream_ai(...)`（:42）。`extract_structured()` 非 week07 helper，源自第 6 週結構化輸出。
 
 ## 下一步建議
 
-- **第 5 週**：決定是否整合兩版，或直接以 Claude 版為主並套入上述三項修正後推進
+- **第 5 週**：正式主線已定為 Codex 版（見「版本主線決策」）；Claude 版三項修正僅在需要比較或另作備援版時套用
 - 實際上傳第 3–6 週學生版到 Colab 測試（串流顯示、`input()` 聊天迴圈、Structured Outputs 付費 cells）
 - 產生第 4、5、6 週投影片
 - 第 6 週目前只有 Claude Code 版本，尚無 Codex 版本可比較；若 Codex 後續也產出第 6 週教材，可比照第 4、5 週流程做優缺點比較與整合
 - 第 7 週 Claude 版已完成（notebook 兩版 + `week07_streamlit_app_claude/` 專案）；可比照第 4、5 週流程與 Codex 版（`..._實作教材_...` + `week07_streamlit_app/`）做優缺點比較與整合建議
 - 第 7 週建議實測：本機 `streamlit run app.py`（聊天/串流/表單/檔案上傳）、`.env` 未被 Git 追蹤、部署到 Streamlit Community Cloud
-- 產生第 4、5、6、7 週投影片
+- **第 8 週 Claude 版已完成**（說明書 + `week08_midterm_starter_claude/` + `week08_midterm_example_summarizer_claude/`）；可比照第 4、5 週流程與 Codex 版（`week08_midterm_starter/` + `..._example_summarizer/` + Codex 說明書）做優缺點比較與整合建議
+- 第 8 週建議實測：兩個 Claude 版專案本機 `streamlit run app.py`（starter TODO 骨架、範例摘要器的檔案上傳/串流/Pydantic 結構化輸出）、`.env` 未被 Git 追蹤
+- 產生第 4、5、6、7、8 週投影片

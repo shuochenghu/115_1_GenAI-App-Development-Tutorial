@@ -1,0 +1,9 @@
+# 秘密檔：絕對不要上傳到 GitHub
+.env
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
