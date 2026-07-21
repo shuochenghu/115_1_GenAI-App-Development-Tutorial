@@ -50,7 +50,7 @@
 - 2026-07-21 已整合 Claude 第 8 週規劃與正式課程建議：第 8 週定位為「期中個人小專題」整合週，不新增大量 API；主教材優先產出 `week08/生成式AI應用開發_第08週_期中個人小專題_專題說明書.md`，再建立正式命名的 `week08/week08_midterm_starter/` 與教師 demo `week08/week08_midterm_example_summarizer/`，不使用 `_claude` 命名；starter 應延續第 7 週 Streamlit 專案結構與 helper，並保留學生 TODO。
 - 2026-07-21 已生成第 8 週正式教材：專題說明書、學生 starter 與教師摘要器 demo。兩個 Streamlit 專案皆包含 `app.py`、`requirements.txt`、`.env.example`、`.gitignore`、`README.md` 與 `.streamlit/secrets.example.toml`；程式註解依第 5、6 週準則補上用途、情境、參數、回傳、API 流程、錯誤處理、輸入限制、secrets 安全與 structured output 設計說明。
 - 2026-07-21 已建立 `week01/` 到 `week08/` 週次資料夾，並將所有根目錄 `生成式AI應用開發_第NN週...` 教材檔與 `week07_...`、`week08_...` companion project 資料夾移入對應週次資料夾；之後引用正式教材請使用 `weekNN/...` 路徑。
-- 2026-07-21 依 Claude 版第 8 週教材比較結果，已將正式 Week 8 吸收補強：說明書明列「真 structured output」硬性要求與 API key 外洩紅線；`week08/week08_midterm_starter/` 補 optional `stream_ai()` helper、快速開始指令與安全紅線；`week08/week08_midterm_example_summarizer/` 補 `.txt` / `.md` 檔案上傳與 optional streaming 摘要示範，但仍保留 JSON Schema + `strict` 作為正式主線，Pydantic 只列為進階選項。
+- 2026-07-21 依 Claude 版第 8 週教材比較結果，已將正式 Week 8 吸收補強：說明書明列「真 structured output」硬性要求與 API key 外洩紅線；`week08/week08_midterm_starter/` 補 optional `stream_ai()` helper、快速開始指令與安全紅線；`week08/week08_midterm_example_summarizer/` 補 `.txt` / `.md` 檔案上傳與 optional streaming 摘要示範；`week08/生成式AI應用開發_第08週_期中個人小專題_內容規劃.md` 也已同步修正命名決策與 structured output 主線說法。正式 Week 8 仍保留 JSON Schema + `strict` 作為正式主線，Pydantic 只列為進階選項。
 
 - 歷史紀錄點：第 4、5 週教材已完成建立、Claude 版本比較與優點整合，之後已接續完成第 6 週教材。
 - 已比較第 4 週 40-cell 教師版與 Claude 生成版本，決定保留 40-cell 實作教材為主線，吸收 Claude 版的參數化函式與 prompt 並排比較優點。
