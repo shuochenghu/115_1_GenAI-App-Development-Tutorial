@@ -6,9 +6,13 @@ from openai import OpenAI
 import streamlit as st
 
 
+# 頁面設定放在第一個 Streamlit 畫面元件之前。
+# 教師 demo 的標題直接點出這是一個完整範例，而不是空白 starter。
 st.set_page_config(page_title="Week 8 AI Summarizer Demo", layout="centered")
 
 
+# 全域常數集中放在檔案前段，方便課堂講解「哪些設定會影響整個 App」。
+# MAX_INPUT_CHARS 是成本與等待時間的保護線；不是模型的精準 token 限制。
 MAX_INPUT_CHARS = 12000
 APP_TITLE = "AI 摘要與行動項目整理器"
 APP_DESCRIPTION = "將長文整理成摘要、重點、關鍵字與待辦事項，示範期中小專題的完整結構。"
@@ -24,9 +28,13 @@ SYSTEM_PROMPT = """
 """
 
 
+# SUMMARY_SCHEMA 是這個 demo 的 structured output 契約。
+# App 後面會直接讀 title / summary / key_points 等欄位，
+# 所以 schema 欄位名稱要和 render_summary() 的顯示邏輯一致。
 SUMMARY_SCHEMA = {
     "type": "object",
     "properties": {
+        # description 會提供給模型理解欄位用途，不是給使用者看的 UI label。
         "title": {
             "type": "string",
             "description": "適合顯示在結果區的短標題。",
@@ -51,11 +59,16 @@ SUMMARY_SCHEMA = {
             "items": {"type": "string"},
         },
     },
+    # required 讓畫面需要的欄位一定存在，降低 result["key_points"] 這類讀取失敗機率。
     "required": ["title", "summary", "key_points", "keywords", "action_items"],
+
+    # strict=True 搭配 additionalProperties=False，可避免模型自行加入未規劃欄位。
     "additionalProperties": False,
 }
 
 
+# 範例文字讓沒有準備資料的學生也能立刻測 demo。
+# 正式專題可改成自己的 demo case，方便展示「輸入 -> AI 分析 -> UI 呈現」。
 SAMPLE_TEXT = """
 本週專案會議確認期中小專題以 Streamlit Web App 作為主要成果。
 每位同學需要完成一個可以本機執行的 AI 應用，並將程式上傳到 GitHub。
@@ -113,6 +126,7 @@ def create_client():
 
     api_key = get_secret("OPENAI_API_KEY")
     if not api_key:
+        # 在建立 client 前就檢查 key，錯誤會比 SDK 低階訊息更適合課堂排除問題。
         raise RuntimeError("找不到 OPENAI_API_KEY，請先設定 `.env` 或 Streamlit Secrets。")
     return OpenAI(api_key=api_key)
 
@@ -174,6 +188,10 @@ def summarize_text(source_text, audience, style):
     model = get_secret("OPENAI_MODEL", "gpt-5.4-mini")
     prompt = build_summary_prompt(source_text, audience, style)
 
+    # Structured Outputs 的核心流程：
+    # 1. instructions 放系統角色與安全規則。
+    # 2. input 放本次任務 prompt。
+    # 3. text.format 放 JSON Schema，要求模型依固定資料結構回覆。
     response = client.responses.create(
         model=model,
         instructions=SYSTEM_PROMPT,
@@ -189,9 +207,11 @@ def summarize_text(source_text, audience, style):
     )
 
     if not response.output_text:
+        # 不要把空字串交給 json.loads()，先轉成可理解的 App 錯誤。
         raise RuntimeError("AI 沒有回傳摘要結果，請稍後再試或縮短輸入文字。")
 
     try:
+        # Responses API 回來的是 JSON 文字；Streamlit 顯示前先轉成 dict。
         return json.loads(response.output_text)
     except json.JSONDecodeError as exc:
         # Structured Outputs 正常情況下會遵守 schema。
@@ -225,6 +245,8 @@ def stream_ai(user_input, system_prompt=SYSTEM_PROMPT):
     )
 
     for event in stream:
+        # streaming 會有多種事件；這裡只處理文字增量。
+        # 完整產品可再補 completed / error 事件處理與中止策略。
         if getattr(event, "type", None) == "response.output_text.delta":
             yield event.delta
 
@@ -243,6 +265,8 @@ def render_summary(summary_data):
     st.subheader(summary_data["title"])
     st.write(summary_data["summary"])
 
+    # metric 不是必要元件，但能示範 structured output 的好處：
+    # 因為 key_points / keywords 是 list，程式可以直接計算數量並顯示成指標。
     col_left, col_right = st.columns(2)
     with col_left:
         st.metric("重點數", len(summary_data["key_points"]))
@@ -261,6 +285,7 @@ def render_summary(summary_data):
         st.markdown(f"- {item}")
 
     with st.expander("查看 structured output JSON"):
+        # 老師 demo 時可打開這裡，對照 SUMMARY_SCHEMA 與畫面顯示結果。
         st.json(summary_data)
 
 
@@ -279,6 +304,7 @@ def read_source_text():
     tab_text, tab_file = st.tabs(["貼上文字", "上傳檔案"])
 
     with tab_text:
+        # 貼上文字是最簡單的輸入路徑，適合先確認 prompt 與 schema 是否正常。
         pasted_text = st.text_area(
             "貼上要摘要的文字",
             height=260,
@@ -291,8 +317,12 @@ def read_source_text():
         if uploaded_file is not None:
             # 教學範例先假設文字檔以 UTF-8 為主；errors='ignore' 避免少數編碼問題讓 demo 中斷。
             file_text = uploaded_file.read().decode("utf-8", errors="ignore")
+
+            # 預覽只顯示前 2000 字，避免大檔案讓頁面變得難以掃讀。
             st.text_area("檔案內容預覽", file_text[:2000], height=180, disabled=True)
 
+    # 若兩種輸入都有資料，優先使用檔案內容。
+    # 這個選擇讓資料來源規則固定，避免使用者不確定 App 到底摘要哪一份文字。
     return (file_text or pasted_text).strip()
 
 
@@ -312,6 +342,8 @@ def main():
     st.caption(APP_DESCRIPTION)
 
     with st.sidebar:
+        # Sidebar 用來交代 demo 覆蓋哪些專題要求。
+        # 這些文字也能作為學生檢查自己專題功能完整度的參考。
         st.header("Demo 說明")
         st.markdown("此範例示範期中專題應具備的基本結構。")
         st.markdown("- Streamlit 表單")
@@ -326,12 +358,17 @@ def main():
         st.error("紅線：API key 只能放 `.env` 或 Secrets，絕不可寫死或推上 GitHub。")
 
     if not get_secret("OPENAI_API_KEY"):
+        # 只警告、不停止，讓學生可以先瀏覽 UI；真正按下產生摘要時才會進入 API 錯誤處理。
         st.warning("尚未設定 OPENAI_API_KEY。請建立 `.env` 或在 Streamlit Secrets 中設定。")
 
     with st.expander("範例輸入文字"):
+        # disabled=True 表示這裡只是展示文字，不會被當作輸入來源。
         st.text_area("可複製的 demo 文字", SAMPLE_TEXT.strip(), height=220, disabled=True)
 
     source_text = read_source_text()
+
+    # 這些控制項沒有放進 st.form，因為它們只改變本機狀態；
+    # API 呼叫仍由下面的「產生摘要」按鈕明確觸發。
     audience = st.selectbox("摘要讀者", ["修課同學", "授課教師", "專案主管", "一般讀者"])
     style = st.selectbox("摘要風格", ["條列清楚", "簡短正式", "適合簡報", "適合行動清單"])
     use_streaming = st.toggle("同時顯示一段式 streaming 摘要（加分示範）", value=False)
@@ -350,12 +387,14 @@ def main():
 
     try:
         with st.spinner("正在產生 structured summary..."):
+            # 主要結果使用 structured output，符合期中小專題「程式可讀欄位」要求。
             summary_data = summarize_text(source_text, audience, style)
         render_summary(summary_data)
 
         if use_streaming:
             st.divider()
             st.markdown("#### 一段式 streaming 摘要")
+            # streaming 摘要只是額外展示即時輸出效果，不取代上方的 structured result。
             st.write_stream(
                 stream_ai(f"請用約 100 字中文摘要以下內容，避免加入原文沒有的資訊：\n\n{source_text}")
             )

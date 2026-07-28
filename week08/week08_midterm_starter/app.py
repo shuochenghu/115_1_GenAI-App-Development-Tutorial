@@ -12,6 +12,9 @@ import streamlit as st
 st.set_page_config(page_title="Week 8 Midterm Starter", layout="centered")
 
 
+# 這三個常數是專題的「產品定位」。
+# 教學時可以請學生先口頭說出這三件事，再回來改程式；
+# 如果定位不清楚，後面的 prompt、schema 與畫面欄位通常也會變得鬆散。
 # TODO: 將下列三個常數改成你的專題設定。
 # 建議先把「使用者是誰、要解決什麼問題、AI 不應該做什麼」寫清楚，
 # 後面的 prompt、schema 與 UI 才會有一致的方向。
@@ -29,12 +32,17 @@ TODO：請改寫成你的 App 專用 system prompt。
 """
 
 
+# JSON Schema 是 App 和模型之間的資料合約。
+# 這份 starter 先給一個通用分析器結構，學生應依自己的專題改欄位，
+# 例如履歷健檢可改成 strengths / risks / rewrite_suggestions。
 # TODO: 將這份 schema 改成你的 structured output 設計。
 # Structured Outputs 的重點不是「讓 JSON 看起來漂亮」，
 # 而是讓程式能穩定讀取欄位。欄位名稱、型態與 required 都應該對應你的 App 功能。
 DEFAULT_SCHEMA = {
     "type": "object",
     "properties": {
+        # 每個 property 都是 App 之後可以穩定讀取的欄位。
+        # description 不是畫面文字，而是給模型看的欄位說明。
         "title": {
             "type": "string",
             "description": "本次分析結果的短標題。",
@@ -54,7 +62,12 @@ DEFAULT_SCHEMA = {
             "items": {"type": "string"},
         },
     },
+    # required 代表這些欄位一定要出現。
+    # 若畫面會固定讀取 result["summary"]，它就應該放進 required。
     "required": ["title", "summary", "key_points", "next_steps"],
+
+    # additionalProperties=False 搭配 strict=True，可以避免模型自行加欄位，
+    # 讓學生看到「AI 輸出也可以被程式規格約束」。
     "additionalProperties": False,
 }
 
@@ -106,6 +119,8 @@ def create_client():
 
     api_key = get_secret("OPENAI_API_KEY")
     if not api_key:
+        # 在 helper 內集中拋錯，UI 端只要用 try/except 顯示錯誤訊息。
+        # 這種分層比每個按鈕區塊都檢查 API key 更好維護。
         raise RuntimeError("找不到 OPENAI_API_KEY，請設定 .env 或 Streamlit Secrets。")
     return OpenAI(api_key=api_key)
 
@@ -163,6 +178,9 @@ def ask_ai(user_input, system_prompt=SYSTEM_PROMPT):
 
     client = create_client()
     model = get_secret("OPENAI_MODEL", "gpt-5.4-mini")
+
+    # 一般文字模式沒有要求固定欄位，適合快速比較 structured / unstructured 的差異。
+    # 期中專題正式要求仍建議走 extract_structured()。
     response = client.responses.create(
         model=model,
         instructions=system_prompt,
@@ -231,6 +249,8 @@ def extract_structured(user_input, schema=DEFAULT_SCHEMA, system_prompt=SYSTEM_P
     client = create_client()
     model = get_secret("OPENAI_MODEL", "gpt-5.4-mini")
 
+    # text.format 是 Structured Outputs 的關鍵設定。
+    # 這裡把 schema 包進 json_schema，並用 strict=True 要求模型遵守欄位契約。
     response = client.responses.create(
         model=model,
         instructions=system_prompt,
@@ -246,9 +266,11 @@ def extract_structured(user_input, schema=DEFAULT_SCHEMA, system_prompt=SYSTEM_P
     )
 
     if not response.output_text:
+        # 空回覆不適合直接 json.loads()，先轉成學生看得懂的錯誤。
         raise RuntimeError("AI 沒有回傳 structured output，請檢查 schema 或 prompt。")
 
     try:
+        # output_text 是 JSON 字串；App 要使用欄位前，必須先轉成 Python dict。
         return json.loads(response.output_text)
     except json.JSONDecodeError as exc:
         # 即使使用 Structured Outputs，也保留解析錯誤處理。
@@ -268,6 +290,8 @@ def render_project_form():
     """
 
     with st.form("midterm_form"):
+        # form 內的 widget 改值仍會 rerun 畫面，但不會進入 submitted=True 的 API 流程。
+        # 這是 Streamlit 專題控制成本的基本技巧。
         # TODO: 依你的專題修改欄位名稱與提示文字。
         source_text = st.text_area(
             "輸入資料",
@@ -283,6 +307,9 @@ def render_project_form():
             ["條列重點", "給初學者看的說明", "給主管看的摘要", "正式報告語氣"],
         )
         use_structured = st.toggle("使用 Structured Outputs", value=True)
+
+        # 只有這顆 submit button 被按下後，外面的 submitted 才會是 True。
+        # 因此 API 呼叫應放在 form 外面的 submitted 判斷之後。
         submitted = st.form_submit_button("產生結果")
 
     return source_text, task_goal, output_style, use_structured, submitted
@@ -302,6 +329,8 @@ def render_structured_result(result):
     st.subheader(result.get("title", "分析結果"))
     st.write(result.get("summary", ""))
 
+    # get(..., []) 可以避免缺欄位時整個 UI crash。
+    # 但若 schema 設計正確，這些欄位應該都會存在。
     st.markdown("#### 重點")
     for item in result.get("key_points", []):
         st.markdown(f"- {item}")
@@ -311,6 +340,7 @@ def render_structured_result(result):
         st.markdown(f"- {item}")
 
     with st.expander("查看原始 JSON"):
+        # 保留原始 JSON 很適合教學：學生能對照 schema 欄位與畫面呈現的關係。
         st.json(result)
 
 
@@ -331,6 +361,8 @@ def main():
     st.caption(PROJECT_DESCRIPTION)
 
     with st.sidebar:
+        # Sidebar 在這裡不是必要功能，而是專題檢核清單。
+        # 學生交作業前可逐項確認，老師 demo 時也能快速指出評分重點。
         st.header("專題檢核")
         st.markdown("- 已設定 App 名稱")
         st.markdown("- 已設計 system prompt")
@@ -341,6 +373,8 @@ def main():
         st.caption("提示：這個 sidebar 可改成你的專題設定或使用說明。")
 
     if not get_secret("OPENAI_API_KEY"):
+        # 這裡只警告，不直接停止整個 App。
+        # 讓學生即使還沒設定 key，也能先看到 UI 和 TODO 位置。
         st.warning("尚未設定 OPENAI_API_KEY。請建立 `.env` 或在 Streamlit Secrets 中設定。")
 
     st.info("請先完成 app.py 裡的 TODO，再把這個 starter 改造成你的期中小專題。")
@@ -363,9 +397,11 @@ def main():
     try:
         with st.spinner("AI 正在處理中..."):
             if use_structured:
+                # 主線流程：模型回傳 JSON 字串 -> json.loads() -> dict -> 依欄位顯示 UI。
                 result = extract_structured(prompt)
                 render_structured_result(result)
             else:
+                # 對照流程：一般文字回覆較容易開始，但程式無法穩定讀取欄位。
                 result_text = ask_ai(prompt)
                 st.subheader("AI 回覆")
                 st.write(result_text)
