@@ -1,0 +1,4 @@
+interface:
+  display_name: "課程教材製作"
+  short_description: "依專案慣例製作、驗證並同步生成式 AI 課程教材"
+  default_prompt: "Use $course-material-authoring to prepare the next teaching material while preserving the project conventions."

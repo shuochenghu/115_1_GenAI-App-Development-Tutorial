@@ -34,9 +34,14 @@
 - `week08/生成式AI應用開發_第08週_期中個人小專題_專題說明書.md`：第 8 週正式專題說明書，包含專題目標、繳交要求、設計表、starter 使用方式、檢核清單、README 規格、rubric、課堂流程與常見問題。
 - `week08/week08_midterm_starter/`：第 8 週學生 starter Streamlit 專案，保留 TODO，引導學生完成專題名稱、system prompt、JSON Schema、prompt builder、表單欄位、structured output 與結果顯示。
 - `week08/week08_midterm_example_summarizer/`：第 8 週教師 demo Streamlit 專案，提供完整 AI 摘要器，示範 OpenAI Responses API、Structured Outputs、錯誤處理、API key 安全管理與結果區塊化呈現。
+- `week09/生成式AI應用開發_第09週_文件處理與資料前處理實作教材_學生版.ipynb`：第 9 週 34-cell 學生版，涵蓋 PDF、DOCX、CSV、TXT／MD reader、文字清理、固定長度 chunking、文件品質檢查、選擇性 AI 摘要與 Streamlit 專案銜接；段落優先切割、文件品質報告與 App 改造規劃保留 TODO。
+- `week09/生成式AI應用開發_第09週_文件處理與資料前處理實作教材_教師版.ipynb`：第 9 週 34-cell 教師版，提供三組練習完整參考答案與觀察重點。
+- `week09/week09_document_processor/`：第 9 週可直接以 VS Code 開啟的 Streamlit 文件處理專案，支援 PDF、DOCX、CSV、TXT、MD 抽取、文字清理、可調 chunking、chunk 預覽與 JSON 下載；只有使用者明確按下按鈕才呼叫 OpenAI Responses API 產生摘要。
 
 ## 最近工作進度（2026-07-15）
 
+- 2026-07-30 已依 `$course-material-authoring` 與課程大綱完成第 9 週正式教材：學生版／教師版 Notebook 各 34 cells，並建立 `week09/week09_document_processor/` Streamlit 配套專案與無敏感資料範例文字。教學主線採「格式路由 → 文字抽取 → 清理 → chunking → 預覽／匯出 → 選擇性 AI 摘要」，明確銜接第 8 週檔案上傳與第 10 週 Embedding。已通過 Notebook JSON、cell ID 唯一性、輸出清空、code cell AST、`.py` 編譯、中文 replacement character、疑似 API key、學生／教師配對、TODO 分離與純函式邊界測試；教師版無待完成 TODO。由於目前 Python 環境未安裝 `python-docx` 等專案依賴，PDF／DOCX／CSV reader、Streamlit 啟動與付費 API 尚未完整實跑，需在安裝 `requirements.txt` 後以測試檔與測試用 API key 驗證。
+- 2026-07-30 已建立專案型 Codex skill：`skills/course-material-authoring/`。技能將本專案長期沿用的教材製作習慣整理為可重複工作流程，涵蓋專案記憶讀取、正式版本選擇、學生版／教師版分離、Notebook 與 Streamlit 教學設計、靜態驗證、秘密保護及完成後同步更新 `PROJECT_MEMORY.md`。詳細慣例置於 `references/conventions.md`，並提供 `agents/openai.yaml` 介面資訊。原預定放入 `.codex/skills/`，但該目錄在目前環境為唯讀，因此改放可版控的專案根目錄 `skills/`；官方 `quick_validate.py` 因環境缺少 PyYAML 未能執行，已改做 frontmatter、必要欄位、reference、metadata、預設 prompt 與 TODO 殘留的等價結構檢查。
 - 進度紀錄點：第 6 週正式 40-cell 教師版與學生版已生成並完成 Claude 版本比較；正式版保留為主線，吸收 Claude 版的 Pydantic 欄位驗證表格、巢狀 `MeetingMinutes` 範例、`extract_structured()` wrapper 與 refusal handling 提醒。
 - 第 6 週正式版與 Claude 生成版比較結論：正式版教學節奏較完整，適合保留 JSON Schema first；Claude 版較偏 Pydantic-first，只吸收適合 App 開發的補強點，不取代正式教材架構。
 - 第 6 週學生版仍保留 TODO 分離；教師版提供完整答案。兩版皆維持 40 cells，付費 API cells 預設關閉。
@@ -111,6 +116,7 @@
 - 第 7 週延續 OpenAI Responses API 主線，Streamlit App 範例使用 `client.responses.create()`、`stream=True`、`response.output_text.delta`、`st.write_stream()`、`st.chat_input()`、`st.chat_message()`、`st.session_state` 與 `st.secrets`。
 - 第 7 週學生版 TODO 保留在 API key helper、OpenAI helper、session state、Chat UI、streaming、sidebar、表單、檔案上傳、README 與期中小專題規劃；教師版無 TODO。
 - 第 8 週正式採「專題說明書 + 學生 starter + 教師 demo」而非 notebook pair；學生 starter 保留 TODO 作為專題改造入口，教師 demo 只提供一個完整摘要器作為展示與完成度參考，避免學生直接複製多個完整答案。
+- 第 9 週回到 Notebook 學生／教師雙版本並搭配 VS Code Streamlit 專案。文件抽取、清理與 chunking 採本機確定性處理；AI 摘要為使用者主動觸發的後段選項。基礎 chunking 先用字元滑動視窗與 overlap 建立可測試的心智模型，段落優先切割列為必做練習，Embedding、向量資料庫與語意搜尋留到第 10 週。
 
 ## 編輯與驗證原則
 
@@ -147,3 +153,4 @@
 - 產生第 6 週投影片或講義版 Markdown。
 - 上傳或本機開啟第 7 週教材，測試 `week07/week07_streamlit_app/` 是否能在 VS Code terminal 以 `streamlit run app.py` 啟動。
 - 第 8 週教材已完成初版；上課前可實際設定測試用 `OPENAI_API_KEY`，分別執行 `week08/week08_midterm_starter/` 與 `week08/week08_midterm_example_summarizer/` 的 `streamlit run app.py`，確認 API 回應、structured output 與畫面顯示符合預期。
+- 安裝 `week09/week09_document_processor/requirements.txt` 後，以文字型 PDF、掃描 PDF、含表格 DOCX、UTF-8／CP950 CSV 各做一次 reader 與錯誤訊息測試；再啟動 Streamlit，確認 chunk 參數、預覽、JSON 下載及按鈕式 AI 摘要。付費 API 測試需使用測試用 key，並檢查摘要是否只根據抽取文字。
