@@ -14,7 +14,23 @@
 
 ## 安裝
 
+請先在本專案資料夾建立虛擬環境，讓第 8 週 demo 的套件和其他週次專案分開管理。
+
+Windows PowerShell：
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+macOS / Linux：
+
 ```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 

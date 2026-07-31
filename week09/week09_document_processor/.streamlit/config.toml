@@ -1,0 +1,3 @@
+# Keep Streamlit's upload limit aligned with MAX_FILE_BYTES in app.py.
+[server]
+maxUploadSize = 8

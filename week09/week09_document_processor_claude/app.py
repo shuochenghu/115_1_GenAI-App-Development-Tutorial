@@ -1,4 +1,8 @@
-"""Week 9 Streamlit document processing and summarization app."""
+"""第 9 週｜文件處理與資料前處理 Streamlit App（Claude 版）。
+
+流程：上傳檔案 → 本機抽取／清理／chunking（不花錢）→ 預覽與下載
+     → 只有使用者按下按鈕時，才呼叫 OpenAI Responses API 產生摘要。
+"""
 
 from __future__ import annotations
 
@@ -14,16 +18,18 @@ from document_utils import SUPPORTED_EXTENSIONS, chunk_text, clean_text, extract
 
 st.set_page_config(page_title="Week 9 文件處理工具", page_icon="📄", layout="wide")
 
-MAX_FILE_BYTES = 8 * 1024 * 1024
-MAX_AI_INPUT_CHARS = 12000
+# 檔案與 AI 輸入的安全上限。
+MAX_FILE_BYTES = 8 * 1024 * 1024      # 8 MB
+MAX_AI_INPUT_CHARS = 12000            # 送給模型前先截斷，控制成本與延遲
+
 SYSTEM_PROMPT = (
-    "你是嚴謹的文件整理助理。只能根據使用者提供的文件內容整理；"
+    "你是嚴謹的文件整理助理。只能根據使用者提供的文件內容整理，"
     "若擷取文字可能不完整，必須明確說明，不得補寫文件中沒有的事實。"
 )
 
 
 def get_secret(name: str, default: str | None = None) -> str | None:
-    """Read a setting from Streamlit Secrets first, then local environment."""
+    """先讀 Streamlit Secrets（雲端），再讀本機 .env / 環境變數。"""
     try:
         if name in st.secrets:
             return st.secrets[name]
@@ -34,7 +40,7 @@ def get_secret(name: str, default: str | None = None) -> str | None:
 
 
 def summarize_document(text: str) -> str:
-    """Call the Responses API only after the user explicitly requests a summary."""
+    """只有在使用者明確要求時，才呼叫 Responses API 產生摘要。"""
     api_key = get_secret("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("找不到 OPENAI_API_KEY，請先設定 `.env` 或 Streamlit Secrets。")
@@ -46,7 +52,9 @@ def summarize_document(text: str) -> str:
         instructions=SYSTEM_PROMPT,
         input=(
             "請用繁體中文輸出：\n"
-            "1. 兩到四句摘要\n2. 五個重點\n3. 文件資料限制或擷取風險\n\n"
+            "1. 兩到四句摘要\n"
+            "2. 五個重點（條列）\n"
+            "3. 文件資料限制或擷取風險\n\n"
             f"文件內容：\n{text[:MAX_AI_INPUT_CHARS]}"
         ),
     )
@@ -56,21 +64,20 @@ def summarize_document(text: str) -> str:
 
 
 def render_sidebar() -> tuple[int, int]:
-    """Render chunk controls and safety reminders, then return chunk settings."""
+    """側邊欄：chunking 參數與安全提醒；回傳 (chunk_size, overlap)。"""
     with st.sidebar:
-        st.header("Chunking 設定")
+        st.header("⚙️ Chunking 設定")
         chunk_size = st.slider("chunk_size（字元）", 200, 2000, 800, 100)
         overlap = st.slider("overlap（字元）", 0, min(400, chunk_size - 1), 120, 20)
         st.divider()
         st.markdown("**處理管線**")
-        st.markdown("上傳 → 抽取 → 清理 → chunking → 預覽 → 選擇性 AI 摘要")
+        st.markdown("上傳 → 抽取 → 清理 → chunking → 預覽 →（選擇性）AI 摘要")
         st.info("上傳、抽取、清理與切塊都在本機完成，不會自動呼叫 AI。")
         st.error("不要上傳機密、個資或未授權文件；API key 不可寫入程式碼。")
     return chunk_size, overlap
 
 
 def main() -> None:
-    """Render upload, local preprocessing, preview, export, and optional AI summary."""
     st.title("📄 Week 9 文件處理與資料前處理")
     st.caption("PDF／Word／CSV／文字讀取 → 清理 → chunking → 預覽 → 選擇性 AI 摘要")
 
@@ -82,8 +89,8 @@ def main() -> None:
     )
     if uploaded is None:
         st.markdown(
-            "先選擇不含敏感資料的測試文件。PDF 必須具有文字層；掃描 PDF 需要 OCR，"
-            "不在本週基礎範圍。"
+            "先選擇一份**不含敏感資料**的測試文件。PDF 必須有文字層；"
+            "掃描 PDF 需要 OCR，不在本週基礎範圍。"
         )
         return
 
@@ -91,6 +98,7 @@ def main() -> None:
         st.error(f"檔案超過 {MAX_FILE_BYTES // (1024 * 1024)} MB，請縮小後再試。")
         return
 
+    # 本機資料管線：任何一步失敗都給明確訊息，不讓整個 App 崩潰。
     try:
         raw_text = extract_text(uploaded.name, uploaded.getvalue())
         cleaned_text = clean_text(raw_text)
@@ -98,7 +106,7 @@ def main() -> None:
     except (ValueError, UnicodeError) as exc:
         st.error(str(exc))
         return
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - 對使用者顯示友善訊息
         st.error(f"文件處理失敗：{exc}")
         return
 
@@ -107,7 +115,8 @@ def main() -> None:
     col_b.metric("Chunk 數", len(chunks))
     col_c.metric("檔案大小", f"{uploaded.size / 1024:.1f} KB")
 
-    preview_tab, chunks_tab, export_tab = st.tabs(["文字預覽", "Chunks", "匯出"])
+    preview_tab, chunks_tab, export_tab = st.tabs(["📃 文字預覽", "🧩 Chunks", "⬇️ 匯出"])
+
     with preview_tab:
         st.text_area("抽取與清理結果（前 8,000 字）", cleaned_text[:8000], height=420)
 
@@ -145,17 +154,15 @@ def main() -> None:
         )
 
     st.divider()
-    st.subheader("選擇性 AI 摘要")
-    st.caption(
-        f"只有按下按鈕才會呼叫 API；最多送出前 {MAX_AI_INPUT_CHARS:,} 字。"
-    )
+    st.subheader("🤖 選擇性 AI 摘要")
+    st.caption(f"只有按下按鈕才會呼叫 API；最多送出前 {MAX_AI_INPUT_CHARS:,} 字。")
     if st.button("產生 AI 摘要", type="primary"):
         try:
             with st.spinner("正在整理文件..."):
                 st.markdown(summarize_document(cleaned_text))
         except RuntimeError as exc:
             st.error(str(exc))
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             st.error(f"API 呼叫失敗：{exc}")
 
 

@@ -10,6 +10,7 @@
 - 調整 `chunk_size` 與 `overlap`。
 - 預覽任一 chunk，並下載含來源位置的 JSON。
 - 明確按下按鈕後才產生 AI 摘要。
+- App 與 Streamlit 設定都限制單檔上傳大小為 8 MB。
 - 支援本機 `.env` 與 Streamlit Secrets。
 
 ## 安裝與執行
@@ -20,6 +21,18 @@ streamlit run app.py
 ```
 
 未設定 API key 時，本機文件抽取、清理、切塊、預覽與下載仍可使用。
+
+## 檔案結構
+
+| 檔案 | 內容 |
+|---|---|
+| `app.py` | Streamlit UI、API key 讀取、按鈕式 AI 摘要 |
+| `document_utils.py` | 格式路由、reader、文字清理、chunking；全都在本機執行 |
+| `requirements.txt` | Streamlit、OpenAI SDK 與文件 reader 相關套件 |
+| `.env.example` | 本機 API key 設定範本；真正的 `.env` 不可上傳 |
+| `.streamlit/secrets.example.toml` | Streamlit Community Cloud Secrets 範本 |
+| `.streamlit/config.toml` | Streamlit 專案設定，目前限制上傳檔案大小為 8 MB |
+| `sample_data/course_notes.txt` | 無敏感資料的測試文件 |
 
 ## API 設定
 

@@ -16,7 +16,23 @@
 
 ## 快速開始
 
+請先在你的專題資料夾建立虛擬環境，讓這個 Streamlit 專案使用自己的套件版本。
+
+Windows PowerShell：
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+macOS / Linux：
+
 ```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -63,9 +79,11 @@ streamlit run app.py
 ## 繳交前檢查
 
 - [ ] App 可以用 `streamlit run app.py` 執行。
+- [ ] 已建立並啟用虛擬環境，例如 `.venv`。
 - [ ] 至少一個功能會呼叫 OpenAI API。
 - [ ] 至少一個功能使用真 structured output，不是只在 prompt 中要求「請用 JSON 回答」。
 - [ ] `.env` 沒有上傳到 GitHub。
+- [ ] `.gitignore` 有排除 `.env`、`.streamlit/secrets.toml`、`.venv/` 與 `__pycache__/`。
 - [ ] README 說明專題目的、安裝方式、執行方式、輸出格式與限制。
 
 ## 安全紅線

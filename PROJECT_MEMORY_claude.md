@@ -42,6 +42,11 @@
   - `week08_midterm_starter/`、`week08_midterm_example_summarizer/`：**Codex 產出** starter 與範例（結構化輸出用原生 json_schema dict）。
   - `生成式AI應用開發_第08週_期中個人小專題_專題說明書_Claude生成.md`：**Claude 產出**說明書（反映定案：部署加分、結構化硬性、安全一票否決、worksheet 內嵌）。
   - `week08_midterm_starter_claude/`、`week08_midterm_example_summarizer_claude/`：**Claude 產出** starter 與範例（各含 app.py、requirements.txt、.env.example、.gitignore、README.md、.streamlit/secrets.example.toml）。結構化輸出改用 **Pydantic `responses.parse()` + `output_parsed`**；範例為完整可跑 AI 摘要器（含檔案上傳、串流）。
+- 第 9 週（文件處理與資料前處理）產出，位於 `week09/`：
+  - `生成式AI應用開發_第09週_文件處理與資料前處理實作教材_學生版.ipynb` / `..._教師版.ipynb`：**Codex 產出**，各 34 cells，附 `week09_document_processor/` 專案。
+  - `生成式AI應用開發_第09週_文件處理與資料前處理_教師版_Claude生成.ipynb`：**Claude 產出**教師版，36 cells（15 code），完整參考答案。
+  - `生成式AI應用開發_第09週_文件處理與資料前處理_學生版_Claude生成.ipynb`：**Claude 產出**學生版，36 cells，6 個 code cell 保留 TODO（`clean_text`、`chunk_text`、`summarize_document` 三大核心技能 + 練習 A `chunk_by_paragraph`/B `build_document_report`/C `challenge_plan`）。
+  - `week09_document_processor_claude/`：**Claude 產出**可部署專案（`app.py`、`document_utils.py`、requirements.txt、.env.example、.gitignore、README.md、.streamlit/config.toml + secrets.example.toml、sample_data/course_notes.txt）。helper 對齊 Codex：`extract_text`/`clean_text`/`chunk_text`/`decode_text_bytes`/`get_secret`/`summarize_document`。與 Codex 的 `week09_document_processor/` 並存不衝突。
 
 ## 已完成的重要決策
 
@@ -89,6 +94,11 @@
 - 第 8 週為期中個人小專題整合週（非新 API 教學），採「專題說明書 + starter 骨架 + 教師 demo 範例」形式，非 notebook 學生/教師雙版。
 - 第 8 週七項決策定案（2026-07-21）：①第 7 週對齊 Codex 版；②Claude 產出加 `_claude` 區分；③部署只列加分、期末才強制；④結構化輸出為硬性最低要求（Pydantic 或 json_schema，不接受純自由文字）；⑤三題目（摘要器/履歷助手/客服分類器）+ 開放自訂；⑥rubric 沿用 功能30/LLM25/UI20/安全10/README+Demo15，API key 外洩為一票否決紅線；⑦worksheet 內嵌為說明書「專題設計表」。
 - 第 8 週 Claude 版兩個 `app.py` 已通過 `py_compile`；helper 對齊 Codex week07（`get_secret`/`create_client`/`ask_ai`/`stream_ai`）；秘密檔僅 `.example`、`.gitignore` 已排除 `.env`/`secrets.toml`/`__pycache__`；付費 API 實跑尚未執行。
+- 第 9 週主題為文件處理與資料前處理（OpenAI Responses API + 本機檔案處理），涵蓋大綱要求：PDF/Word/CSV/TXT/MD 讀取、文字清理、chunking 基本概念。核心心智模型為「六層管線：輸入→格式路由→文字抽取→清理→chunking→應用」；抽取/清理/chunking 皆本機確定性、不花錢，AI 只接管線後段（`summarize_document`）且僅在按鈕觸發。
+- 第 9 週 Claude 版 helper 對齊 Codex week09：`decode_text_bytes`（utf-8-sig/utf-8/cp950 fallback）、`extract_pdf_text`（保留 `[第 N 頁]` 來源標記）、`extract_docx_text`（段落+表格）、`extract_csv_text`（保留欄名、限 200 列）、`extract_text`（副檔名路由）、`clean_text`（統一換行、行內空白合併、保留段落）、`chunk_text`（滑動視窗 + overlap，回傳含 chunk_id/start/end/text 的 dict）。
+- 第 9 週三題練習：A `chunk_by_paragraph`（段落優先切割，必做）、B `build_document_report`（文件品質報告：字元數/chunk 數/平均長度/是否需 OCR，必做）、C Streamlit 功能改造（挑戰，先寫 `challenge_plan` dict 再改 `app.py`）。
+- 第 9 週學生版 TODO 採graceful degradation：`clean_text` stub 回傳 passthrough、`chunk_text`/`chunk_by_paragraph` 回傳 `[]`、`build_document_report` 回傳 `{}`，避免未完成 TODO 時下游 demo cell 崩潰；`run_local_checks()` 為自我檢查，完成 TODO 後才會通過（AssertionError 即預期回饋）。付費 `summarize_document` 由 `RUN_PAID_API=False` 旗標守門。
+- 第 9 週兩版已通過 JSON 解析、cell id 無重複、code cell `ast` 語法、無亂碼、TODO 分離檢查；教師版本機（非 API）程式已實際執行通過（`extract_text`/`clean_text`/`chunk_text`/`run_local_checks`/練習 A/B 全部正確），`app.py` + `document_utils.py` 已通過 `py_compile`；付費 API / Streamlit 實跑尚未執行。
 
 ## 編輯與驗證原則
 
@@ -151,4 +161,6 @@ Claude 版與 Codex 版已完成詳細比較，主要差異如下：
 - 第 7 週建議實測：本機 `streamlit run app.py`（聊天/串流/表單/檔案上傳）、`.env` 未被 Git 追蹤、部署到 Streamlit Community Cloud
 - **第 8 週 Claude 版已完成**（說明書 + `week08_midterm_starter_claude/` + `week08_midterm_example_summarizer_claude/`）；可比照第 4、5 週流程與 Codex 版（`week08_midterm_starter/` + `..._example_summarizer/` + Codex 說明書）做優缺點比較與整合建議
 - 第 8 週建議實測：兩個 Claude 版專案本機 `streamlit run app.py`（starter TODO 骨架、範例摘要器的檔案上傳/串流/Pydantic 結構化輸出）、`.env` 未被 Git 追蹤
-- 產生第 4、5、6、7、8 週投影片
+- **第 9 週 Claude 版已完成**（notebook 兩版 + `week09_document_processor_claude/` 專案）；可比照第 4、5 週流程與 Codex 版（`..._實作教材_...` + `week09_document_processor/`）做優缺點比較與整合建議
+- 第 9 週建議實測：本機 `streamlit run app.py`（上傳 PDF/DOCX/CSV/TXT、清理與 chunking 預覽、chunks JSON 下載、按鈕觸發 AI 摘要）、掃描 PDF 的 OCR 提示、`.env` 未被 Git 追蹤
+- 產生第 4、5、6、7、8、9 週投影片
