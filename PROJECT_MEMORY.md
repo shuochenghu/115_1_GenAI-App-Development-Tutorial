@@ -42,6 +42,8 @@
 
 - 2026-07-30 已依 `$course-material-authoring` 與課程大綱完成第 9 週正式教材：學生版／教師版 Notebook 各 34 cells，並建立 `week09/week09_document_processor/` Streamlit 配套專案與無敏感資料範例文字。教學主線採「格式路由 → 文字抽取 → 清理 → chunking → 預覽／匯出 → 選擇性 AI 摘要」，明確銜接第 8 週檔案上傳與第 10 週 Embedding。已通過 Notebook JSON、cell ID 唯一性、輸出清空、code cell AST、`.py` 編譯、中文 replacement character、疑似 API key、學生／教師配對、TODO 分離與純函式邊界測試；教師版無待完成 TODO。由於目前 Python 環境未安裝 `python-docx` 等專案依賴，PDF／DOCX／CSV reader、Streamlit 啟動與付費 API 尚未完整實跑，需在安裝 `requirements.txt` 後以測試檔與測試用 API key 驗證。
 - 2026-07-31 已完成第 9 週正式教材與 Claude 生成版比較後的小幅吸收：正式 `week09/week09_document_processor/README.md` 補上檔案結構表與 8 MB 上傳限制說明，新增 `.streamlit/config.toml` 將 Streamlit `maxUploadSize` 設為 8 MB，並將 `app.py` 的 sidebar 控制區拆成 `render_sidebar()` 以利教學閱讀；Claude 版 notebook 因文字 cell 使用非標準 `cell_type: "md"`，仍只保留為比較參考，不取代正式教材。
+- 2026-08-04 已補強第 9 週正式教材的程式註解與 docstring：學生版／教師版 notebook 以及 `week09/week09_document_processor/app.py`、`document_utils.py` 皆統一採繁體中文教學型註解，補足目的、參數、回傳、可能錯誤、格式路由、編碼備援選項、本機前處理、chunk 中繼資料、Streamlit rerun、secrets、成本與 API 觸發邊界說明；學生版保留 TODO scaffold，教師版維持完整答案。已通過 notebook JSON、cell ID、輸出清空、code cell AST、TODO 分離、中文亂碼、舊英文 docstring 殘留掃描、`.py` 編譯與 `git diff --check`；尚未執行 Streamlit UI、PDF／DOCX 真檔 reader 與付費 API 實測。
+- 2026-08-04 依 `week09/生成式AI應用開發_第09週_文件處理_Claude與Codex版比較.md` 再次整合第 9 週教材建議：正式版仍保留 Codex 主線，不用 Claude 版取代；比較檔已校正 Codex 版已有 `.streamlit/config.toml`、正式 docstring 已繁中結構化、TODO 統計應區分 raw TODO 與核心練習任務；正式 notebook 少量吸收 Claude callout 優點，於 OCR/安全、API 成本與進階挑戰處加入醒目提醒；README 快速開始補上 `cd week09/week09_document_processor`。練習 stub 仍保留 `NotImplementedError`，App 友善錯誤處理作為教師補充觀念。
 - 2026-07-31 已補強第 8 週正式專題說明書、`week08/week08_midterm_starter/README.md` 與 `week08/week08_midterm_example_summarizer/README.md` 的虛擬環境教學步驟：學生與教師 demo 皆先在專案資料夾建立 `.venv`、啟用環境、升級 pip、再安裝 `requirements.txt`，並在檢核清單與 README 範本中提醒虛擬環境需求；既有 `.gitignore` 已排除 `.venv/` 與 `venv/`，未修改程式邏輯。
 - 2026-07-30 已建立專案型 Codex skill：`skills/course-material-authoring/`。技能將本專案長期沿用的教材製作習慣整理為可重複工作流程，涵蓋專案記憶讀取、正式版本選擇、學生版／教師版分離、Notebook 與 Streamlit 教學設計、靜態驗證、秘密保護及完成後同步更新 `PROJECT_MEMORY.md`。詳細慣例置於 `references/conventions.md`，並提供 `agents/openai.yaml` 介面資訊。原預定放入 `.codex/skills/`，但該目錄在目前環境為唯讀，因此改放可版控的專案根目錄 `skills/`；官方 `quick_validate.py` 因環境缺少 PyYAML 未能執行，已改做 frontmatter、必要欄位、reference、metadata、預設 prompt 與 TODO 殘留的等價結構檢查。
 - 進度紀錄點：第 6 週正式 40-cell 教師版與學生版已生成並完成 Claude 版本比較；正式版保留為主線，吸收 Claude 版的 Pydantic 欄位驗證表格、巢狀 `MeetingMinutes` 範例、`extract_structured()` wrapper 與 refusal handling 提醒。
@@ -119,6 +121,7 @@
 - 第 7 週學生版 TODO 保留在 API key helper、OpenAI helper、session state、Chat UI、streaming、sidebar、表單、檔案上傳、README 與期中小專題規劃；教師版無 TODO。
 - 第 8 週正式採「專題說明書 + 學生 starter + 教師 demo」而非 notebook pair；學生 starter 保留 TODO 作為專題改造入口，教師 demo 只提供一個完整摘要器作為展示與完成度參考，避免學生直接複製多個完整答案。
 - 第 9 週回到 Notebook 學生／教師雙版本並搭配 VS Code Streamlit 專案。文件抽取、清理與 chunking 採本機確定性處理；AI 摘要為使用者主動觸發的後段選項。基礎 chunking 先用字元滑動視窗與 overlap 建立可測試的心智模型，段落優先切割列為必做練習，Embedding、向量資料庫與語意搜尋留到第 10 週。
+- 第 10 週正式教材已建立 Notebook 學生／教師雙版本並搭配 `week10/week10_semantic_search_app/` Streamlit 專案。主線採 `list[dict]` + NumPy + cosine similarity 建立最小語意搜尋索引，先讓學生看懂 embedding、query embedding、chunk embedding、metadata 與 retrieval 排序，再把 OpenAI Embeddings API 作為主動開啟的付費模式。已補入 ChromaDB preview 選讀 cell，示範 `EphemeralClient()`、`collection.add()`、`collection.query()` 與 metadata 查詢結果整理；但 ChromaDB 與 FAISS 仍不作為第 10 週必要依賴，Claude 生成版保留為 ChromaDB-first 參考資料。
 
 ## 編輯與驗證原則
 
@@ -156,3 +159,4 @@
 - 上傳或本機開啟第 7 週教材，測試 `week07/week07_streamlit_app/` 是否能在 VS Code terminal 以 `streamlit run app.py` 啟動。
 - 第 8 週教材已完成初版；上課前可實際設定測試用 `OPENAI_API_KEY`，分別執行 `week08/week08_midterm_starter/` 與 `week08/week08_midterm_example_summarizer/` 的 `streamlit run app.py`，確認 API 回應、structured output 與畫面顯示符合預期。
 - 安裝 `week09/week09_document_processor/requirements.txt` 後，以文字型 PDF、掃描 PDF、含表格 DOCX、UTF-8／CP950 CSV 各做一次 reader 與錯誤訊息測試；再啟動 Streamlit，確認 chunk 參數、預覽、JSON 下載及按鈕式 AI 摘要。付費 API 測試需使用測試用 key，並檢查摘要是否只根據抽取文字。
+- 安裝 `week10/week10_semantic_search_app/requirements.txt` 後，先用 `sample_data/ai_course_faq.md` 跑離線索引與 top-k 搜尋，再使用測試用 `OPENAI_API_KEY` 關閉離線模式測試真實 Embeddings API；若要示範 ChromaDB preview，需另外 `pip install chromadb` 並執行 notebook 選讀 cell。上課前應確認 chunk 大小、overlap、top-k 與分數門檻的示範問題都能產生可解釋結果。

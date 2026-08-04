@@ -29,10 +29,11 @@ Do not create new `_claude` or `Claude生成` names for formal outputs. Keep exi
 1. Confirm the week’s prerequisites, learning outcomes, three-hour flow, and next-week bridge.
 2. Progress from a minimal working example to guided practice and then integrated exercises.
 3. Explain non-obvious concepts before the code that uses them.
-4. Add teaching-oriented comments for block purpose, API flow, state, errors, validation, cost, and secrets.
-5. Avoid comments that merely restate obvious syntax.
-6. Default paid API execution to off or clearly guarded.
-7. Never write API keys, passwords, student data, or other secrets into materials.
+4. Write all code comments and docstrings for official teaching materials in Traditional Chinese by default.
+5. Add teaching-oriented comments with enough detail for students to understand block purpose, API flow, state transitions, branch logic, errors, validation, cost, and secrets.
+6. Avoid comments that merely restate obvious syntax; comments should explain why the code is structured that way and what students should notice.
+7. Default paid API execution to off or clearly guarded.
+8. Never write API keys, passwords, student data, or other secrets into materials.
 
 For student editions, retain useful scaffolding and TODOs without exposing full answers. For teacher editions, provide complete reference implementations and expected observations.
 

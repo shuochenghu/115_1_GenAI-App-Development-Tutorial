@@ -16,6 +16,7 @@
 ## 安裝與執行
 
 ```bash
+cd week09/week09_document_processor
 pip install -r requirements.txt
 streamlit run app.py
 ```

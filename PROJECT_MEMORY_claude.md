@@ -47,6 +47,11 @@
   - `生成式AI應用開發_第09週_文件處理與資料前處理_教師版_Claude生成.ipynb`：**Claude 產出**教師版，36 cells（15 code），完整參考答案。
   - `生成式AI應用開發_第09週_文件處理與資料前處理_學生版_Claude生成.ipynb`：**Claude 產出**學生版，36 cells，6 個 code cell 保留 TODO（`clean_text`、`chunk_text`、`summarize_document` 三大核心技能 + 練習 A `chunk_by_paragraph`/B `build_document_report`/C `challenge_plan`）。
   - `week09_document_processor_claude/`：**Claude 產出**可部署專案（`app.py`、`document_utils.py`、requirements.txt、.env.example、.gitignore、README.md、.streamlit/config.toml + secrets.example.toml、sample_data/course_notes.txt）。helper 對齊 Codex：`extract_text`/`clean_text`/`chunk_text`/`decode_text_bytes`/`get_secret`/`summarize_document`。與 Codex 的 `week09_document_processor/` 並存不衝突。
+- 第 10 週（Embedding 與語意搜尋）產出，位於 `week10/`：
+  - `生成式AI應用開發_第10週_Embedding與語意搜尋_教師版_Claude生成.ipynb`：**Claude 產出**教師版，31 cells（12 code），完整參考答案。
+  - `生成式AI應用開發_第10週_Embedding與語意搜尋_學生版_Claude生成.ipynb`：**Claude 產出**學生版，31 cells，6 個 code cell 保留 TODO（`cosine_similarity`、`get_embedding` 真 API 分支、`search_chunks` 三核心 + 練習 A `build_chroma_collection`/B `query_chroma`/C `challenge_plan`）。
+  - `week10_semantic_search_claude/`：**Claude 產出**可部署專案（`app.py`、`document_utils.py`〔沿用第 9 週〕、`embedding_utils.py`、requirements.txt〔含 numpy/chromadb〕、.env.example、.gitignore、README.md、.streamlit/config.toml + secrets.example.toml、sample_data/ai_course_faq.md）。
+  - **Codex 版尚未產出**，但已有 Codex 計劃（平行檔名 `..._實作教材_...`、專案 `week10_semantic_search_app/`、utils `embedding_utils.py`）。Claude 版已對齊其函式命名以利對照。
 
 ## 已完成的重要決策
 
@@ -99,6 +104,12 @@
 - 第 9 週三題練習：A `chunk_by_paragraph`（段落優先切割，必做）、B `build_document_report`（文件品質報告：字元數/chunk 數/平均長度/是否需 OCR，必做）、C Streamlit 功能改造（挑戰，先寫 `challenge_plan` dict 再改 `app.py`）。
 - 第 9 週學生版 TODO 採graceful degradation：`clean_text` stub 回傳 passthrough、`chunk_text`/`chunk_by_paragraph` 回傳 `[]`、`build_document_report` 回傳 `{}`，避免未完成 TODO 時下游 demo cell 崩潰；`run_local_checks()` 為自我檢查，完成 TODO 後才會通過（AssertionError 即預期回饋）。付費 `summarize_document` 由 `RUN_PAID_API=False` 旗標守門。
 - 第 9 週兩版已通過 JSON 解析、cell id 無重複、code cell `ast` 語法、無亂碼、TODO 分離檢查；教師版本機（非 API）程式已實際執行通過（`extract_text`/`clean_text`/`chunk_text`/`run_local_checks`/練習 A/B 全部正確），`app.py` + `document_utils.py` 已通過 `py_compile`；付費 API / Streamlit 實跑尚未執行。
+- 第 10 週主題為 Embedding 與語意搜尋（OpenAI Embeddings + ChromaDB）。範圍界定：只做到「找到最相近片段」，完整 RAG 生成式問答與來源引用留第 11 週。銜接第 9 週 chunks → embedding → 向量索引 → top-k 搜尋 → 第 11 週 RAG。
+- 第 10 週 helper 對齊 Codex 計劃：`get_embedding(text, offline=)`（單筆）、`embed_texts`（批次）、`cosine_similarity`（numpy）、`search_chunks(query, chunks, top_k, offline=)`、`build_chroma_collection`、`query_chroma`；沿用 `get_secret`。Embeddings 已用官方文件確認語法：`client.embeddings.create(model=, input=)` → `resp.data[i].embedding`；預設模型 `text-embedding-3-small`（1536 維），可用 `OPENAI_EMBED_MODEL` 覆蓋。ChromaDB 用 `EphemeralClient` + `create_collection(metadata={"hnsw:space":"cosine"})`，相似度 ≈ 1 − distance。
+- 第 10 週向量庫決策：**ChromaDB 為主 + FAISS 只作選讀補充**（不列主 requirements、不設課堂必跑；Windows 電腦教室較穩，且 ChromaDB 綁原文+metadata 天然支援第 11 週引用）。理由與比較已寫入 notebook 與 README。
+- 第 10 週 Claude 版差異化：**離線假 embedding `local_demo_embed()`**（字元 + bigram + 空白斷詞雜湊，中文無空格也能產生字面重疊）。`RUN_PAID_API=False` 或 App「離線示範模式」時用它，讓沒有 API key 也能跑完整搜尋管線並通過 `run_local_checks`；明確標註「只驗證邏輯、非真語意」。Codex 計劃無此設計。
+- 第 10 週三題練習：A `build_chroma_collection`（建 ChromaDB 索引，必做）、B `query_chroma`（top-k + 顯示來源 metadata + 相似度，必做，即 RAG 檢索階段）、C Streamlit App 改造（挑戰，先寫 `challenge_plan` 再改 `app.py`）。
+- 第 10 週兩版已通過 JSON 解析、cell id 無重複、`ast` 語法、無亂碼、TODO 分離；教師版離線（非 API、非 chroma）程式實跑通過（`cosine_similarity`/`search_chunks`/`run_local_checks` 正確，離線搜尋能正確把「向量資料庫」chunk 排第一）；`app.py`/`embedding_utils.py`/`document_utils.py` 通過 `py_compile`，`embedding_utils` 離線搜尋煙霧測試通過。付費 Embeddings API 與 ChromaDB cells（需裝 `chromadb`）/`streamlit run` 尚未實跑；ChromaDB API 以官方文件確認。
 
 ## 編輯與驗證原則
 
@@ -163,4 +174,6 @@ Claude 版與 Codex 版已完成詳細比較，主要差異如下：
 - 第 8 週建議實測：兩個 Claude 版專案本機 `streamlit run app.py`（starter TODO 骨架、範例摘要器的檔案上傳/串流/Pydantic 結構化輸出）、`.env` 未被 Git 追蹤
 - **第 9 週 Claude 版已完成**（notebook 兩版 + `week09_document_processor_claude/` 專案）；可比照第 4、5 週流程與 Codex 版（`..._實作教材_...` + `week09_document_processor/`）做優缺點比較與整合建議
 - 第 9 週建議實測：本機 `streamlit run app.py`（上傳 PDF/DOCX/CSV/TXT、清理與 chunking 預覽、chunks JSON 下載、按鈕觸發 AI 摘要）、掃描 PDF 的 OCR 提示、`.env` 未被 Git 追蹤
-- 產生第 4、5、6、7、8、9 週投影片
+- **第 10 週 Claude 版已完成**（notebook 兩版 + `week10_semantic_search_claude/` 專案）；Codex 版尚未產出，待 Codex 產出後可比照做優缺點比較與整合建議
+- 第 10 週建議實測：`pip install chromadb` 後跑 notebook 練習 A/B（ChromaDB 建索引/查詢）、本機 `streamlit run app.py`（離線示範模式先驗證流程，再用真 API 看語意搜尋、觀察 top-k 與來源顯示）、`.env` 未被 Git 追蹤
+- 產生第 4、5、6、7、8、9、10 週投影片
