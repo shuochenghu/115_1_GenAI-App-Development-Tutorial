@@ -52,6 +52,12 @@
   - `生成式AI應用開發_第10週_Embedding與語意搜尋_學生版_Claude生成.ipynb`：**Claude 產出**學生版，31 cells，6 個 code cell 保留 TODO（`cosine_similarity`、`get_embedding` 真 API 分支、`search_chunks` 三核心 + 練習 A `build_chroma_collection`/B `query_chroma`/C `challenge_plan`）。
   - `week10_semantic_search_claude/`：**Claude 產出**可部署專案（`app.py`、`document_utils.py`〔沿用第 9 週〕、`embedding_utils.py`、requirements.txt〔含 numpy/chromadb〕、.env.example、.gitignore、README.md、.streamlit/config.toml + secrets.example.toml、sample_data/ai_course_faq.md）。
   - **Codex 版尚未產出**，但已有 Codex 計劃（平行檔名 `..._實作教材_...`、專案 `week10_semantic_search_app/`、utils `embedding_utils.py`）。Claude 版已對齊其函式命名以利對照。
+- 第 11 週（RAG 基礎與改良）產出，位於 `week11/`：
+  - `生成式AI應用開發_第11週_RAG基礎與改良_教師版_Claude生成.ipynb`：**Claude 產出**教師版，32 cells（13 code），完整參考答案。
+  - `生成式AI應用開發_第11週_RAG基礎與改良_學生版_Claude生成.ipynb`：**Claude 產出**學生版，32 cells，5 個 TODO（核心 `build_context`/`answer_with_rag` 用 graceful degradation + 練習 A `evaluate_rag`/B `check_citations`/C `challenge_plan` 用 `NotImplementedError` + 註解 demo）。
+  - `week11_rag_qa_claude/`：**Claude 產出**可部署專案（`app.py`、`document_utils.py`〔第 9 週〕、`embedding_utils.py`〔第 10 週〕、`rag_utils.py`〔新〕、requirements〔含 numpy/chromadb〕、.env.example、.gitignore、README.md、.streamlit/config.toml + secrets.example.toml、sample_data/ai_course_faq.md）。
+  - **Codex 版第 11 週已於此期間出現**：`..._RAG基礎與文件問答實作教材_教師/學生版.ipynb` + 專案 `week11_rag_app/`（app.py、document_utils.py、embedding_utils.py、rag_utils.py、sample_data/course_handbook.md）。
+  - **helper 命名已對齊 Codex（2026-08-11 依使用者裁示 (a)）**：Claude 版 `rag_utils.py` 改為與 Codex 相同 API — `build_rag_context`(→str)/`build_rag_prompt`/`generate_rag_answer`/`format_sources`(→list)/`evaluate_rag_answer`/`answer_from_hits`，常數 `DEFAULT_GENERATION_MODEL`/`INSUFFICIENT_EVIDENCE_MESSAGE`；hits 改為**扁平結構**（頂層含 source/chunk_id/start/end/score/text）。`embedding_utils.query_chroma` 改回傳扁平 hits 並加 `min_score` 參數（函式名仍保留 Claude 的 `build_chroma_collection`/`query_chroma`，未改成 Codex 的 `build_chroma_index`/`query_chroma_index`——那層屬第 10 週，未在本次對齊範圍）。notebook 與 `app.py` 已同步改用對齊後 API。
 
 ## 已完成的重要決策
 
@@ -110,6 +116,11 @@
 - 第 10 週 Claude 版差異化：**離線假 embedding `local_demo_embed()`**（字元 + bigram + 空白斷詞雜湊，中文無空格也能產生字面重疊）。`RUN_PAID_API=False` 或 App「離線示範模式」時用它，讓沒有 API key 也能跑完整搜尋管線並通過 `run_local_checks`；明確標註「只驗證邏輯、非真語意」。Codex 計劃無此設計。
 - 第 10 週三題練習：A `build_chroma_collection`（建 ChromaDB 索引，必做）、B `query_chroma`（top-k + 顯示來源 metadata + 相似度，必做，即 RAG 檢索階段）、C Streamlit App 改造（挑戰，先寫 `challenge_plan` 再改 `app.py`）。
 - 第 10 週兩版已通過 JSON 解析、cell id 無重複、`ast` 語法、無亂碼、TODO 分離；教師版離線（非 API、非 chroma）程式實跑通過（`cosine_similarity`/`search_chunks`/`run_local_checks` 正確，離線搜尋能正確把「向量資料庫」chunk 排第一）；`app.py`/`embedding_utils.py`/`document_utils.py` 通過 `py_compile`，`embedding_utils` 離線搜尋煙霧測試通過。付費 Embeddings API 與 ChromaDB cells（需裝 `chromadb`）/`streamlit run` 尚未實跑；ChromaDB API 以官方文件確認。
+- 第 11 週主題為 RAG 基礎與改良（OpenAI Responses API + 第 10 週 ChromaDB 檢索）。管線：問題→檢索 top-k→組 context（帶 `[來源 N]` 標籤）→grounded prompt（只依資料、找不到就 abstain、標來源）→生成→顯示答案+可展開來源。降低幻覺＝相似度門檻 `min_score` + abstain（無片段不呼叫生成 API）。銜接第 10 週檢索→第 12 週 Vision。
+- 第 11 週 TODO 策略（採用第 9 週整合建議的折衷版）：2 核心（`build_context`/`answer_with_rag`，graceful degradation 回 `("",[])`/placeholder dict）+ 3 練習（A `evaluate_rag` 檢索命中率、B `check_citations` 引用正確性、C `challenge_plan`；A/B 用 `raise NotImplementedError` + 註解 demo，同 Codex 風格）；docstring 改用 Codex 結構化格式（參數/回傳/可能錯誤/教學重點）；callout 只放安全/成本/幻覺紅線。Notebook 自足（內嵌精簡 week10 helper + 離線假 embedding，用 cosine 檢索；專案版用 ChromaDB）。
+- 第 11 週 `build_context` 修正：只對「實際保留」的非空片段連續編號（原 `enumerate` 會因空片段跳號成 [來源 1]/[來源 3]）；notebook 與 `rag_utils.py` 均已修正。
+- 第 11 週 helper 對齊 Codex 後，核心 TODO 改為 `build_rag_context`（graceful 回 `""`）與 `answer_from_hits`（graceful 回 placeholder dict）；練習改為 A `evaluate_retrieval`（檢索命中率）、B `filter_hits_by_score`（門檻過濾）、C `challenge_plan`（A/B 用 `NotImplementedError` + 註解 demo）；`format_sources`/`evaluate_rag_answer`/`build_rag_prompt`/`generate_rag_answer` 為 given。
+- 第 11 週兩版（對齊後）已通過 JSON 解析、cell id 無重複、`ast` 語法（無 SyntaxWarning）、無亂碼、TODO 分離；教師版離線程式**全數實跑 0 錯誤**（`build_rag_context` 產出 Codex 式區塊、`run_local_checks` ✅、`evaluate_retrieval` hit_rate 1.0、`filter_hits_by_score` 4→2/→0、`evaluate_rag_answer` 正確）；4 個 .py 通過 `py_compile`，`rag_utils` 對齊後離線煙霧測試通過（含 build_rag_prompt/format_sources/abstain）。付費 Responses API/ChromaDB/`streamlit run` 未實跑；Responses API 語法沿用第 9 週已確認版本。
 
 ## 編輯與驗證原則
 
@@ -120,9 +131,11 @@
 - 第 3 週 notebook 的 markdown 風格已採用少量 emoji、HTML 提示框與 `<font color>` 重點標籤；後續新增章節時可沿用此風格，但避免過度使用顏色。
 - 每次修改 notebook 後，至少檢查：
   - JSON 可正常解析。
-  - code cell 靜態語法檢查通過。
+  - **每個 cell 的 `cell_type` 必須是 `"markdown"` 或 `"code"`（不可是 `"md"`）**——Jupyter/Colab 只認合法值；曾因 builder 寫成 `"md"` 導致第 9–11 週 Claude notebook cell_type 全部無效（2026-08-11 已修，builder 改為 `"markdown" if t=='md' else "code"`）。
+  - code cell 靜態語法檢查通過（含無 SyntaxWarning）。
   - 沒有大量 `?` 亂碼 cell。
   - 學生版主要練習仍保留 TODO。
+  - **學生版「Run All」不會中斷**：自我檢查 `run_local_checks()` 在學生版要「註解掉、附說明」（完成 TODO 後再取消註解），不可自動執行導致 AssertionError 中斷（2026-08-11 已於第 9–11 週學生版修正）。
 
 ## 模型與環境變數
 
@@ -176,4 +189,8 @@ Claude 版與 Codex 版已完成詳細比較，主要差異如下：
 - 第 9 週建議實測：本機 `streamlit run app.py`（上傳 PDF/DOCX/CSV/TXT、清理與 chunking 預覽、chunks JSON 下載、按鈕觸發 AI 摘要）、掃描 PDF 的 OCR 提示、`.env` 未被 Git 追蹤
 - **第 10 週 Claude 版已完成**（notebook 兩版 + `week10_semantic_search_claude/` 專案）；Codex 版尚未產出，待 Codex 產出後可比照做優缺點比較與整合建議
 - 第 10 週建議實測：`pip install chromadb` 後跑 notebook 練習 A/B（ChromaDB 建索引/查詢）、本機 `streamlit run app.py`（離線示範模式先驗證流程，再用真 API 看語意搜尋、觀察 top-k 與來源顯示）、`.env` 未被 Git 追蹤
-- 產生第 4、5、6、7、8、9、10 週投影片
+- **第 11 週 Claude 版已完成且 helper 已對齊 Codex**（notebook 兩版 + `week11_rag_qa_claude/`）；**Codex 版第 11 週已存在**（`..._RAG基礎與文件問答實作教材_...` + `week11_rag_app/`）。兩版 `rag_utils` API 現一致，可互換對照。可比照第 9 週流程做兩版優缺點比較。
+- 第 11 週選項（未做）：若要 week11 Claude 專案成為 Codex 完全複本，可再把 `embedding_utils` 也改名對齊（`build_chroma_index`/`query_chroma_index`、build 回傳 (client, collection)、query 加 model 參數）——目前刻意未做，以免破壞與第 10 週 Claude `embedding_utils` 的一致性。
+- **第 11 週品質修正（2026-08-11，回應使用者回報 5 項）**：①第 9–11 週所有 Claude notebook 的 `cell_type` 由無效的 `"md"` 修正為 `"markdown"`（builder 修正並全部重建）；②第 9–11 週學生版 `run_local_checks()` 改為註解＋說明，避免 Run All 中斷；③`app.py` 索引簽章改用 `hashlib.sha256(file_bytes)` 內容雜湊（原只用檔名+大小，同名同大小異內容會誤用舊索引）；④`app.py` 改為「按『建立／更新索引』按鈕才建索引」（原調 slider 會自動重建，線上模式產生非預期 Embeddings 費用），index 就緒才顯示問答框；⑤README 更新（移除「Codex 版尚未產出」、函式名改為對齊後的 `build_rag_context`/`answer_from_hits` 等、補充建索引按鈕與內容雜湊說明）。app.py 通過 py_compile。
+- 第 11 週建議實測：`pip install chromadb` 後本機 `streamlit run app.py`（離線模式先驗證檢索+context，再用真 API 看 grounded 答案+來源引用、問文件沒有的問題確認 abstain）、`.env` 未被 Git 追蹤
+- 產生第 4、5、6、7、8、9、10、11 週投影片

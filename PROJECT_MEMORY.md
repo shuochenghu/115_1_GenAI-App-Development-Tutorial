@@ -34,12 +34,18 @@
 - `week08/生成式AI應用開發_第08週_期中個人小專題_專題說明書.md`：第 8 週正式專題說明書，包含專題目標、繳交要求、設計表、starter 使用方式、檢核清單、README 規格、rubric、課堂流程與常見問題。
 - `week08/week08_midterm_starter/`：第 8 週學生 starter Streamlit 專案，保留 TODO，引導學生完成專題名稱、system prompt、JSON Schema、prompt builder、表單欄位、structured output 與結果顯示。
 - `week08/week08_midterm_example_summarizer/`：第 8 週教師 demo Streamlit 專案，提供完整 AI 摘要器，示範 OpenAI Responses API、Structured Outputs、錯誤處理、API key 安全管理與結果區塊化呈現。
-- `week09/生成式AI應用開發_第09週_文件處理與資料前處理實作教材_學生版.ipynb`：第 9 週 34-cell 學生版，涵蓋 PDF、DOCX、CSV、TXT／MD reader、文字清理、固定長度 chunking、文件品質檢查、選擇性 AI 摘要與 Streamlit 專案銜接；段落優先切割、文件品質報告與 App 改造規劃保留 TODO。
-- `week09/生成式AI應用開發_第09週_文件處理與資料前處理實作教材_教師版.ipynb`：第 9 週 34-cell 教師版，提供三組練習完整參考答案與觀察重點。
+- `week09/生成式AI應用開發_第09週_文件處理與資料前處理實作教材_學生版.ipynb`：第 9 週 36-cell 學生版，涵蓋 PDF、DOCX、CSV、TXT／MD reader、文字清理、固定長度 chunking、文件品質檢查、選擇性 AI 摘要與 Streamlit 專案銜接；段落優先切割、文件品質報告與 App 改造規劃保留 TODO。
+- `week09/生成式AI應用開發_第09週_文件處理與資料前處理實作教材_教師版.ipynb`：第 9 週 36-cell 教師版，提供三組練習完整參考答案與觀察重點。
 - `week09/week09_document_processor/`：第 9 週可直接以 VS Code 開啟的 Streamlit 文件處理專案，支援 PDF、DOCX、CSV、TXT、MD 抽取、文字清理、可調 chunking、chunk 預覽與 JSON 下載；只有使用者明確按下按鈕才呼叫 OpenAI Responses API 產生摘要。
+- `week11/生成式AI應用開發_第11週_RAG基礎與文件問答實作教材_學生版.ipynb`：第 11 週 40-cell 學生版，從 ChromaDB 正式索引銜接 context、prompt contract、證據不足拒答、來源顯示、基本引用評估與完整 RAG pipeline；五組核心函式保留 TODO scaffold。
+- `week11/生成式AI應用開發_第11週_RAG基礎與文件問答實作教材_教師版.ipynb`：第 11 週 40-cell 教師版，提供 ChromaDB、context、prompt、來源、基本評估與可注入假檢索／假生成的完整參考實作，付費 Responses API 示範預設關閉。
+- `week11/week11_rag_app/`：第 11 週正式 Streamlit 文件問答專案，支援 PDF、DOCX、CSV、TXT、MD 前處理、離線／OpenAI embeddings、ChromaDB in-memory 索引、top-k 與分數門檻、受限 context、Responses API 生成、來源片段顯示與基本引用檢查。
 
 ## 最近工作進度（2026-07-15）
 
+- 2026-08-11 已依 Claude 品質修正版的再次比較，補強第 11 週正式 Codex Notebook 的「檢索層評估」：學生版／教師版仍各維持 40 cells，在既有練習 D 中新增可注入 `retrieve_fn` 的 `evaluate_retrieval()`，以小型測試題檢查預期關鍵字是否被取回，並加入多組 `min_score` 的門檻敏感度觀察；同時保留 `evaluate_rag_answer()` 作為生成層引用檢查，明確區分 Retrieval 與 Generation 的錯誤來源。學生版保留兩個評估函式 TODO，教師版提供完整實作；學習目標、完成檢核與課後任務已同步。`week11/生成式AI應用開發_第11週_RAG_Claude與Codex版比較.md` 已更新 Claude 修正狀態、App 現況及正式整合結果；Claude 參考檔未修改。
+- 2026-08-11 已依 `$course-material-authoring` 完成第 11 週正式教材：學生版／教師版 Notebook 各 40 cells，並建立 `week11/week11_rag_app/`。教學主線為「文件前處理 → embeddings → ChromaDB → top-k／門檻 → context → Responses API → 答案／來源／基本評估」，ChromaDB 從第 10 週 preview 提升為正式必要依賴，FAISS 仍留作延伸。所有正式程式註解與 docstring 採繁體中文教學型說明；學生版保留五組練習，教師版無 TODO。已通過 Notebook JSON、cell ID、輸出清空、code cell AST、學生／教師 TODO 分離、中文亂碼、疑似 API key、Python docstring 語言、`.py` 編譯與假 collection 純函式測試。OpenAI Responses API 與 Embeddings API 語法已依 2026-08-11 官方文件確認；正式預設仍採課程既有 `gpt-5.4-mini` 與 `text-embedding-3-small`，並可由環境變數覆蓋。現有 `week11/week11_rag_qa_claude/` 未修改，只視為替代版本。由於執行環境只有 Python 3.14 且禁止連線 PyPI，無法安裝 `chromadb`、`pypdf`、`python-docx`，因此 ChromaDB、文件 reader、Streamlit UI 與付費 API 尚未實跑；上課前應在 Python 3.11 或 3.12 虛擬環境安裝 requirements 後完成測試。
+- 2026-08-05 已補齊 Python type hints 先備橋接：第 2 週學生版／教師版 Python 複習教材新增「函式型別註記（Type Hints）快速讀法」，放在預設參數後，說明 `text: str`、`chunk_size: int = 800`、`-> str`、`list[str]`、`dict`、`list[dict]` 與「提示不等於執行期防呆」；兩版目前各 54 cells。第 9 週學生版／教師版新增「快速複習：函式型別註記怎麼讀」，放在文件處理管線後、第一個 reader 函式前，專門解讀 `chunk_by_paragraph(text: str, chunk_size: int = 800) -> list[dict]`，讓 `chunk_text()`、`chunk_by_paragraph()` 與文件報告函式的簽名不再是未說明先備；兩版目前各 36 cells。
 - 2026-07-30 已依 `$course-material-authoring` 與課程大綱完成第 9 週正式教材：學生版／教師版 Notebook 各 34 cells，並建立 `week09/week09_document_processor/` Streamlit 配套專案與無敏感資料範例文字。教學主線採「格式路由 → 文字抽取 → 清理 → chunking → 預覽／匯出 → 選擇性 AI 摘要」，明確銜接第 8 週檔案上傳與第 10 週 Embedding。已通過 Notebook JSON、cell ID 唯一性、輸出清空、code cell AST、`.py` 編譯、中文 replacement character、疑似 API key、學生／教師配對、TODO 分離與純函式邊界測試；教師版無待完成 TODO。由於目前 Python 環境未安裝 `python-docx` 等專案依賴，PDF／DOCX／CSV reader、Streamlit 啟動與付費 API 尚未完整實跑，需在安裝 `requirements.txt` 後以測試檔與測試用 API key 驗證。
 - 2026-07-31 已完成第 9 週正式教材與 Claude 生成版比較後的小幅吸收：正式 `week09/week09_document_processor/README.md` 補上檔案結構表與 8 MB 上傳限制說明，新增 `.streamlit/config.toml` 將 Streamlit `maxUploadSize` 設為 8 MB，並將 `app.py` 的 sidebar 控制區拆成 `render_sidebar()` 以利教學閱讀；Claude 版 notebook 因文字 cell 使用非標準 `cell_type: "md"`，仍只保留為比較參考，不取代正式教材。
 - 2026-08-04 已補強第 9 週正式教材的程式註解與 docstring：學生版／教師版 notebook 以及 `week09/week09_document_processor/app.py`、`document_utils.py` 皆統一採繁體中文教學型註解，補足目的、參數、回傳、可能錯誤、格式路由、編碼備援選項、本機前處理、chunk 中繼資料、Streamlit rerun、secrets、成本與 API 觸發邊界說明；學生版保留 TODO scaffold，教師版維持完整答案。已通過 notebook JSON、cell ID、輸出清空、code cell AST、TODO 分離、中文亂碼、舊英文 docstring 殘留掃描、`.py` 編譯與 `git diff --check`；尚未執行 Streamlit UI、PDF／DOCX 真檔 reader 與付費 API 實測。
@@ -51,7 +57,7 @@
 - 第 6 週學生版仍保留 TODO 分離；教師版提供完整答案。兩版皆維持 40 cells，付費 API cells 預設關閉。
 - 2026-07-21 已針對實際閱讀時不易理解的第 6 週內容補強說明：學生版與教師版皆新增「輸入文字／輸出規格／程式檢查」三層讀法、JSON Schema 閱讀順序、array `items` 巢狀資料提示、`(ok, result)` 錯誤處理心智模型、JSON Schema 與 Pydantic 對照表、課堂練習解題順序，以及關鍵 code cell 的 API 參數、refusal parsing、validation、Pydantic wrapper 與 retry 註解；兩版仍維持 40 cells、輸出清空、學生版 TODO 分離、教師版無 TODO。
 - 2026-07-21 依需求再次加深第 6 週 code cell 教學註解：學生版與教師版皆補強 setup fail-fast、API key 安全、`structured_response()` 職責分層、`text.format` 欄位契約、`response.output_text` 解析順序、一般 JSON prompt 的不穩定觀察、schema 欄位設計理由、巢狀 JSON 閱讀順序、程式端驗證同步、`(ok, result)` App 錯誤分流、批次測試結果判讀、schema registry 版本管理、`responses.parse()` / Pydantic 資料合約、wrapper 錯誤處理，以及練習 A/B/C 的解題提示；學生版仍只保留 TODO 引導，不填入教師版答案。
-- 2026-07-28 已補強第 2 週學生版與教師版 Python 複習教材：在例外處理與 API key 管理之間新增 `with` / context manager 小節，說明 `with open(...)` 的自動關閉、`with st.sidebar:` / `with st.form(...)` 的 Streamlit 容器心智模型，以及其作為第 7 週 Streamlit 與第 9 週文件處理的先備橋接；兩版目前各 52 cells。
+- 2026-07-28 已補強第 2 週學生版與教師版 Python 複習教材：在例外處理與 API key 管理之間新增 `with` / context manager 小節，說明 `with open(...)` 的自動關閉、`with st.sidebar:` / `with st.form(...)` 的 Streamlit 容器心智模型，以及其作為第 7 週 Streamlit 與第 9 週文件處理的先備橋接；2026-08-05 另補 type hints 快速讀法；兩版目前各 54 cells。
 - 2026-07-21 參考 `comment_sample.txt` 的註解範例，將第 6 週正式學生版與教師版的核心 helper 改成教學型 docstring 與分段註解：`structured_response()`、`_read_attr_or_key()`、`get_refusal_reason()`、`parse_output_text()`、`print_json()`、validation helpers、`extract_structured_safe()`、`run_event_batch_tests()`、schema registry helpers、`parse_with_pydantic()`、`extract_structured()`、`extract_with_retry()`，以及 Pydantic class 皆補上用途、情境、參數、回傳、可能錯誤與「情況一／情況二」式流程說明；學生版仍只保留 TODO 引導。
 - 2026-07-22 依需求補強第 6 週 Pydantic 說明：學生版與教師版皆在「Schema 改版紀錄與進階路線」加入 ReviewInsight / MeetingMinutes 的實際 schema 版本演進例子，明確連到後續 Pydantic code cell；「Pydantic 進階」章節新增 Pydantic 是資料驗證與資料模型工具、不是 AI 模型或資料庫的介紹，並補上最小 class 範例、JSON Schema / Pydantic 對照、BaseModel / Field / Literal / Optional / list[Model] / ValidationError 用途，以及讀下一個 code cell 的三層讀法。
 - 2026-07-22 補第 6 週 schema registry 實際取用範例：學生版與教師版皆在 `get_schema(registry, name)` 定義後呼叫 `get_schema(schema_registry, selected_schema_name)`，列印 registry key 與 `selected_schema["properties"]` 欄位，避免 helper 只被定義但未示範用途；已修正 raw schema 沒有 `name` / `schema` 外層 key 的錯誤。
@@ -82,7 +88,7 @@
 
 ## 已完成的重要決策
 
-- 第 2 週定位為 API 開發前的 Python 快速複習，內容包含函式、f-string、list / dict、JSON、例外處理、API key 管理與公開 API 呼叫。
+- 第 2 週定位為 API 開發前的 Python 快速複習，內容包含函式、f-string、list / dict、type hints、JSON、例外處理、API key 管理與公開 API 呼叫。
 - 第 2 週已加入 `with` 語法橋接，採入門說明即可：把它視為「縮排內程式在特定情境中執行，離開後自動收尾」，用 `with open(...)` 示範檔案自動關閉，並預告後續 Streamlit 的 `with st.sidebar:` / `with st.form(...)` 容器用法；不需在第 2 週深入 `__enter__()` / `__exit__()`。
 - 第 2 週已分成學生版與教師版；學生版不直接提供主要練習答案。
 - 第 2 週第六節已補上 Colab Secrets、環境變數設定、PowerShell、`setx`、macOS / Linux `export` 等 API key 設定方式。
@@ -120,8 +126,9 @@
 - 第 7 週延續 OpenAI Responses API 主線，Streamlit App 範例使用 `client.responses.create()`、`stream=True`、`response.output_text.delta`、`st.write_stream()`、`st.chat_input()`、`st.chat_message()`、`st.session_state` 與 `st.secrets`。
 - 第 7 週學生版 TODO 保留在 API key helper、OpenAI helper、session state、Chat UI、streaming、sidebar、表單、檔案上傳、README 與期中小專題規劃；教師版無 TODO。
 - 第 8 週正式採「專題說明書 + 學生 starter + 教師 demo」而非 notebook pair；學生 starter 保留 TODO 作為專題改造入口，教師 demo 只提供一個完整摘要器作為展示與完成度參考，避免學生直接複製多個完整答案。
-- 第 9 週回到 Notebook 學生／教師雙版本並搭配 VS Code Streamlit 專案。文件抽取、清理與 chunking 採本機確定性處理；AI 摘要為使用者主動觸發的後段選項。基礎 chunking 先用字元滑動視窗與 overlap 建立可測試的心智模型，段落優先切割列為必做練習，Embedding、向量資料庫與語意搜尋留到第 10 週。
+- 第 9 週回到 Notebook 學生／教師雙版本並搭配 VS Code Streamlit 專案。文件抽取、清理與 chunking 採本機確定性處理；AI 摘要為使用者主動觸發的後段選項。基礎 chunking 先用字元滑動視窗與 overlap 建立可測試的心智模型，段落優先切割列為必做練習；第 9 週會先複習第 2 週 type hints 讀法，再進入 `chunk_text()` 與 `chunk_by_paragraph()`；Embedding、向量資料庫與語意搜尋留到第 10 週。
 - 第 10 週正式教材已建立 Notebook 學生／教師雙版本並搭配 `week10/week10_semantic_search_app/` Streamlit 專案。主線採 `list[dict]` + NumPy + cosine similarity 建立最小語意搜尋索引，先讓學生看懂 embedding、query embedding、chunk embedding、metadata 與 retrieval 排序，再把 OpenAI Embeddings API 作為主動開啟的付費模式。已補入 ChromaDB preview 選讀 cell，示範 `EphemeralClient()`、`collection.add()`、`collection.query()` 與 metadata 查詢結果整理；但 ChromaDB 與 FAISS 仍不作為第 10 週必要依賴，Claude 生成版保留為 ChromaDB-first 參考資料。
+- 第 11 週正式教材以 ChromaDB 作為必要向量資料庫，集中教 Retrieval、context 組合、來源引用、證據不足拒答與基本評估；使用 `EphemeralClient()` 避免持久化設定干擾三小時課堂。App 的索引與生成分成兩個明確操作，並以 session state 保存索引與最後回答；文件內容一律視為不可信任資料。FAISS、持久化索引、hybrid search、reranking 與語意型評估留到自主學習或進階 RAG。
 
 ## 編輯與驗證原則
 
@@ -160,3 +167,4 @@
 - 第 8 週教材已完成初版；上課前可實際設定測試用 `OPENAI_API_KEY`，分別執行 `week08/week08_midterm_starter/` 與 `week08/week08_midterm_example_summarizer/` 的 `streamlit run app.py`，確認 API 回應、structured output 與畫面顯示符合預期。
 - 安裝 `week09/week09_document_processor/requirements.txt` 後，以文字型 PDF、掃描 PDF、含表格 DOCX、UTF-8／CP950 CSV 各做一次 reader 與錯誤訊息測試；再啟動 Streamlit，確認 chunk 參數、預覽、JSON 下載及按鈕式 AI 摘要。付費 API 測試需使用測試用 key，並檢查摘要是否只根據抽取文字。
 - 安裝 `week10/week10_semantic_search_app/requirements.txt` 後，先用 `sample_data/ai_course_faq.md` 跑離線索引與 top-k 搜尋，再使用測試用 `OPENAI_API_KEY` 關閉離線模式測試真實 Embeddings API；若要示範 ChromaDB preview，需另外 `pip install chromadb` 並執行 notebook 選讀 cell。上課前應確認 chunk 大小、overlap、top-k 與分數門檻的示範問題都能產生可解釋結果。
+- 在 Python 3.11 或 3.12 建立 `week11/week11_rag_app/.venv` 並安裝 requirements，先用 `sample_data/course_handbook.md` 測試離線 embedding、ChromaDB 建索引、文件內有答案／無答案／提示注入三種問題，再用測試用 `OPENAI_API_KEY` 實跑 OpenAI Embeddings 與 Responses API。確認不同 top-k、最低分數與 context 上限下，回答中的 `[來源 n]` 能對應到 UI 顯示的實際 chunk；完成後再評估 Streamlit Community Cloud 的 ChromaDB 安裝與記憶體限制。
