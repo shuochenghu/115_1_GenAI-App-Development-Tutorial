@@ -1,3 +1,4 @@
-streamlit
-openai
-python-dotenv
+# 課堂直接依賴固定版本；完整 Windows / Python 3.12 快照與驗證見課程環境指南。
+streamlit==1.63.0
+openai==2.49.0
+python-dotenv==1.2.3

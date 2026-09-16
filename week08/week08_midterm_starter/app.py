@@ -227,6 +227,28 @@ def stream_ai(user_input, system_prompt=SYSTEM_PROMPT):
             yield event.delta
 
 
+def get_refusal_reason(response):
+    """從 Responses API 的 output/content 找出拒答原因；未拒答時回傳 None。"""
+
+    # 拒答是獨立的 content 項目，不一定會出現在 output_text；
+    # 同時支援 SDK 物件與課堂離線測試用的 dict。
+    for output_item in getattr(response, "output", []) or []:
+        content = (
+            output_item.get("content", [])
+            if isinstance(output_item, dict)
+            else getattr(output_item, "content", [])
+        )
+        for content_item in content or []:
+            refusal = (
+                content_item.get("refusal")
+                if isinstance(content_item, dict)
+                else getattr(content_item, "refusal", None)
+            )
+            if refusal:
+                return refusal
+    return None
+
+
 def extract_structured(user_input, schema=DEFAULT_SCHEMA, system_prompt=SYSTEM_PROMPT):
     """
     呼叫 OpenAI Responses API，要求模型依 JSON Schema 回傳結構化結果。
@@ -243,7 +265,7 @@ def extract_structured(user_input, schema=DEFAULT_SCHEMA, system_prompt=SYSTEM_P
         Python dict，欄位會依 schema 對齊。
 
     可能錯誤 (Raises):
-        RuntimeError: API 沒有回傳內容或 JSON 解析失敗時拋出。
+        RuntimeError: 模型拒答、回應未完成、沒有文字或 JSON 解析失敗時拋出。
     """
 
     client = create_client()
@@ -264,6 +286,24 @@ def extract_structured(user_input, schema=DEFAULT_SCHEMA, system_prompt=SYSTEM_P
             }
         },
     )
+
+    # 先分流拒答與未完成回應；這兩種情況不能當成符合 schema 的資料。
+    refusal = get_refusal_reason(response)
+    if refusal:
+        raise RuntimeError(f"AI 拒絕處理這次請求，未產生 structured output：{refusal}")
+
+    status = getattr(response, "status", None)
+    if status == "incomplete":
+        details = getattr(response, "incomplete_details", None)
+        reason = details.get("reason") if isinstance(details, dict) else getattr(details, "reason", None)
+        if reason == "max_output_tokens":
+            raise RuntimeError("AI 回應因輸出長度限制而未完成，請縮短輸入或調整輸出長度。")
+        if reason == "content_filter":
+            raise RuntimeError("AI 回應因內容過濾而未完成，請調整輸入內容。")
+        raise RuntimeError("AI 回應未完成，請稍後再試或檢查輸入內容。")
+    if status not in (None, "completed"):
+        # SDK 的 status 欄位可能為 None；若明確回傳其他狀態，就不要解析部分文字。
+        raise RuntimeError(f"AI 回應未成功（狀態：{status}），請稍後再試。")
 
     if not response.output_text:
         # 空回覆不適合直接 json.loads()，先轉成學生看得懂的錯誤。

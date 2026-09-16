@@ -1,8 +1,9 @@
-streamlit>=1.60.0,<2
-openai>=2.49.0,<3
-python-dotenv
-numpy
-chromadb>=1.0.0,<2
-pypdf
-python-docx
-pandas
+# 課堂直接依賴固定版本；完整 Windows / Python 3.12 快照與驗證見課程環境指南。
+streamlit==1.63.0
+openai==2.49.0
+python-dotenv==1.2.3
+numpy==2.5.3
+chromadb==1.5.9
+pypdf==6.18.1
+python-docx==1.2.0
+pandas==3.0.5

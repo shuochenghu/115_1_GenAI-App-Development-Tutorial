@@ -71,7 +71,12 @@ chunk_size, overlap, top_k, offline_mode, model = render_sidebar()
 st.title("🔎 Week 10 文件語意搜尋")
 st.caption("上傳文件 → chunk → embedding → cosine similarity → 找出最相近片段")
 
-uploaded = st.file_uploader("上傳 PDF、DOCX、CSV、TXT 或 MD", type=list(SUPPORTED_EXTENSIONS))
+# 元件明訂上限，讓不同啟動目錄的上傳限制一致；下方仍檢查收到的檔案。
+uploaded = st.file_uploader(
+    "上傳 PDF、DOCX、CSV、TXT 或 MD",
+    type=list(SUPPORTED_EXTENSIONS),
+    max_upload_size=MAX_FILE_BYTES // (1024 * 1024),
+)
 if uploaded is None:
     st.markdown(
         "請先上傳不含敏感資料的文件，或使用 `sample_data/ai_course_faq.md` 測試。"

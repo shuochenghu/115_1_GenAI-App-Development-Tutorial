@@ -184,7 +184,7 @@ def build_chroma_collection(indexed_chunks: list[dict], name: str = "week10_docs
     try:
         import chromadb
     except ImportError as exc:
-        raise RuntimeError("尚未安裝 chromadb；若要跑選讀示範，請先 `pip install chromadb`。") from exc
+        raise RuntimeError("尚未安裝 chromadb；若要跑選讀示範，請先 `python -m pip install -r requirements-chroma.txt`。") from exc
 
     client = chromadb.EphemeralClient()
     try:
@@ -192,7 +192,11 @@ def build_chroma_collection(indexed_chunks: list[dict], name: str = "week10_docs
     except Exception:
         pass
 
-    collection = client.create_collection(name, metadata={"hnsw:space": "cosine"})
+    # 距離空間屬於 collection 的索引設定；來源資訊才放在下方每筆 metadatas。
+    collection = client.create_collection(
+        name,
+        configuration={"hnsw": {"space": "cosine"}},
+    )
     collection.add(
         ids=[str(chunk["chunk_id"]) for chunk in indexed_chunks],
         documents=[chunk["text"] for chunk in indexed_chunks],

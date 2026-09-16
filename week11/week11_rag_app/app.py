@@ -164,7 +164,12 @@ initialize_state()
 st.title("Week 11 RAG 文件問答")
 st.caption("ChromaDB 檢索、受限 context、文件依據回答與可核對來源")
 
-uploaded = st.file_uploader("上傳 PDF、DOCX、CSV、TXT 或 MD", type=list(SUPPORTED_EXTENSIONS))
+# 元件明訂上限，讓不同啟動目錄的上傳限制一致；下方仍檢查收到的檔案。
+uploaded = st.file_uploader(
+    "上傳 PDF、DOCX、CSV、TXT 或 MD",
+    type=list(SUPPORTED_EXTENSIONS),
+    max_upload_size=MAX_FILE_BYTES // (1024 * 1024),
+)
 if uploaded is None:
     st.info("請上傳文件，或使用 `sample_data/course_handbook.md`。")
     st.stop()

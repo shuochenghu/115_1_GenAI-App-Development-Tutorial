@@ -7,6 +7,9 @@ import streamlit as st
 # 否則執行時可能出現「set_page_config 必須先呼叫」的錯誤。
 st.set_page_config(page_title="Week 7 AI App", page_icon="🤖", layout="centered")
 
+# 第 5 週已教過有限對話視窗；這裡只帶入最近五輪，避免聊天越久越昂貴。
+MAX_CHAT_HISTORY_MESSAGES = 10
+
 
 def get_secret(name, default=None):
     """
@@ -61,7 +64,28 @@ def create_client():
     return OpenAI(api_key=api_key)
 
 
-def ask_ai(user_input, system_prompt="你是有幫助的 AI 助理。"):
+def build_chat_input(user_input, chat_history=None):
+    """把畫面紀錄轉成模型可讀的對話輸入；固定任務仍只送本次文字。
+
+    Args:
+        user_input: 本輪問題或固定任務 prompt。
+        chat_history: 已完成的 user／assistant 訊息；None 代表一次性任務。
+
+    Returns:
+        聊天時回傳最近五輪加本輪 user 訊息；固定任務回傳原字串。
+    """
+    if chat_history is None:
+        return user_input
+
+    # session_state 是畫面紀錄；只有送進 input，模型才真的知道前文。
+    recent_messages = chat_history[-MAX_CHAT_HISTORY_MESSAGES:]
+    return [
+        {"role": message["role"], "content": message["content"]}
+        for message in recent_messages
+    ] + [{"role": "user", "content": user_input}]
+
+
+def ask_ai(user_input, system_prompt="你是有幫助的 AI 助理。", chat_history=None):
     """
     呼叫 OpenAI Responses API，取得一次性完整回覆。
 
@@ -73,6 +97,7 @@ def ask_ai(user_input, system_prompt="你是有幫助的 AI 助理。"):
     Args:
         user_input: 使用者輸入或程式組好的任務 prompt。
         system_prompt: 放在 instructions 的角色與任務規則。
+        chat_history: 聊天區已完成的對話；摘要與檔案工具保持 None。
 
     Returns:
         模型產生的文字回覆。
@@ -80,20 +105,20 @@ def ask_ai(user_input, system_prompt="你是有幫助的 AI 助理。"):
     client = create_client()
     model = get_secret("OPENAI_MODEL", "gpt-5.4-mini")
 
-    # Responses API 的三個核心欄位：
-    # model 決定使用哪個模型；instructions 放系統規則；input 放本次任務內容。
+    # 每輪重送 instructions；input 在聊天時包含有限前文，固定任務仍是單次文字。
     response = client.responses.create(
         model=model,
         instructions=system_prompt,
-        input=user_input,
+        input=build_chat_input(user_input, chat_history),
     )
 
-    # 這個教學範例只處理文字輸出，因此直接讀 output_text。
-    # 若之後加入 structured output，這裡會改成解析 JSON 或 Pydantic model。
+    # 不把空回覆或未完成回覆寫入正式聊天紀錄。
+    if getattr(response, "status", "completed") != "completed" or not response.output_text:
+        raise RuntimeError("AI 回覆未完成，請重試。")
     return response.output_text
 
 
-def stream_ai(user_input, system_prompt="你是有幫助的 AI 助理。"):
+def stream_ai(user_input, system_prompt="你是有幫助的 AI 助理。", chat_history=None):
     """
     呼叫 OpenAI Responses API 的串流模式，逐段產生文字。
 
@@ -104,6 +129,7 @@ def stream_ai(user_input, system_prompt="你是有幫助的 AI 助理。"):
     Args:
         user_input: 使用者輸入的聊天訊息。
         system_prompt: 放在 instructions 的角色與任務規則。
+        chat_history: 聊天區已完成的對話；不包含正在輸入的本輪問題。
 
     Yields:
         模型輸出的文字片段，交給 st.write_stream() 即時顯示。
@@ -115,14 +141,22 @@ def stream_ai(user_input, system_prompt="你是有幫助的 AI 助理。"):
     stream = client.responses.create(
         model=model,
         instructions=system_prompt,
-        input=user_input,
+        input=build_chat_input(user_input, chat_history),
         stream=True,
     )
+    completed = False
     for event in stream:
-        # Responses API streaming 會送出多種事件，例如開始、文字增量、完成與錯誤。
-        # 這個範例只把「文字 delta」交給畫面，其他事件先略過，降低初學負擔。
-        if getattr(event, "type", None) == "response.output_text.delta":
+        event_type = getattr(event, "type", None)
+        if event_type == "response.output_text.delta":
             yield event.delta
+        elif event_type == "response.completed":
+            completed = True
+        elif event_type in {"error", "response.failed", "response.incomplete"}:
+            raise RuntimeError("串流回覆中斷，這輪沒有加入聊天紀錄；請重試。")
+
+    # st.write_stream() 只負責顯示文字；generator 結束不代表 API 一定成功。
+    if not completed:
+        raise RuntimeError("串流回覆未收到完成事件，這輪沒有加入聊天紀錄；請重試。")
 
 
 def init_messages():
@@ -193,23 +227,31 @@ with tab_chat:
     # st.chat_input 在沒有新輸入時會回傳 None；使用者送出後才進入 if prompt 區塊。
     prompt = st.chat_input("請輸入問題")
     if prompt:
-        # 先把 user 訊息寫入紀錄，再立即畫到畫面上，讓使用者確認送出的內容。
-        add_message("user", prompt)
+        # 先畫出本輪問題；成功前不改正式紀錄，避免失敗後留下半輪對話。
         with st.chat_message("user"):
             st.write(prompt)
 
-        with st.chat_message("assistant"):
-            if use_streaming:
-                # st.write_stream() 會一邊接收 generator 的文字片段，一邊更新畫面；
-                # 執行完成後，它會回傳完整字串，方便放回聊天紀錄。
-                answer = st.write_stream(stream_ai(prompt, system_prompt))
-            else:
-                # 非串流模式適合用來對照：畫面會等 API 回傳完整答案後才一次顯示。
-                answer = ask_ai(prompt, system_prompt)
-                st.write(answer)
-
-        # assistant 回覆完成後才存入紀錄，避免串流中斷時留下不完整內容。
-        add_message("assistant", answer)
+        try:
+            with st.chat_message("assistant"):
+                if use_streaming:
+                    # generator 只有收到 response.completed 才算成功。
+                    answer = st.write_stream(
+                        stream_ai(prompt, system_prompt, st.session_state.messages)
+                    )
+                else:
+                    answer = ask_ai(prompt, system_prompt, st.session_state.messages)
+                    st.write(answer)
+            if not answer:
+                raise RuntimeError("AI 沒有回傳文字，這輪沒有加入聊天紀錄；請重試。")
+        except RuntimeError as exc:
+            st.error(str(exc))
+        except Exception:
+            # SDK 錯誤內容可能帶有請求細節；對使用者只顯示可操作的提醒。
+            st.error("呼叫 API 失敗，這輪沒有加入聊天紀錄；請檢查網路或稍後重試。")
+        else:
+            # 成功後一次存入完整 user／assistant 配對，下一輪才有可靠前文。
+            add_message("user", prompt)
+            add_message("assistant", answer)
 
 with tab_summary:
     # 表單適合固定任務：使用者填完欄位後再一次送出。

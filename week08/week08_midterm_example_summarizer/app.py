@@ -165,6 +165,28 @@ def build_summary_prompt(source_text, audience, style):
 """
 
 
+def get_refusal_reason(response):
+    """從 Responses API 的 output/content 找出拒答原因；未拒答時回傳 None。"""
+
+    # 拒答不一定有 output_text；先讀 content，避免把拒答當成摘要 JSON。
+    # dict 分支讓教師可以不用付費 API，就示範假的回應與錯誤分流。
+    for output_item in getattr(response, "output", []) or []:
+        content = (
+            output_item.get("content", [])
+            if isinstance(output_item, dict)
+            else getattr(output_item, "content", [])
+        )
+        for content_item in content or []:
+            refusal = (
+                content_item.get("refusal")
+                if isinstance(content_item, dict)
+                else getattr(content_item, "refusal", None)
+            )
+            if refusal:
+                return refusal
+    return None
+
+
 def summarize_text(source_text, audience, style):
     """
     呼叫 OpenAI Responses API，取得符合 `SUMMARY_SCHEMA` 的摘要結果。
@@ -181,7 +203,7 @@ def summarize_text(source_text, audience, style):
         dict，包含 title、summary、key_points、keywords、action_items。
 
     可能錯誤 (Raises):
-        RuntimeError: API 無回應或 JSON 解析失敗。
+        RuntimeError: 模型拒答、回應未完成、無文字或 JSON 解析失敗。
     """
 
     client = create_client()
@@ -205,6 +227,24 @@ def summarize_text(source_text, audience, style):
             }
         },
     )
+
+    # 拒答與未完成回應不保證符合 schema；先分流，再解析摘要資料。
+    refusal = get_refusal_reason(response)
+    if refusal:
+        raise RuntimeError(f"AI 拒絕處理這次摘要請求，未產生摘要資料：{refusal}")
+
+    status = getattr(response, "status", None)
+    if status == "incomplete":
+        details = getattr(response, "incomplete_details", None)
+        reason = details.get("reason") if isinstance(details, dict) else getattr(details, "reason", None)
+        if reason == "max_output_tokens":
+            raise RuntimeError("AI 摘要因輸出長度限制而未完成，請縮短原文或調整輸出長度。")
+        if reason == "content_filter":
+            raise RuntimeError("AI 摘要因內容過濾而未完成，請調整原文內容。")
+        raise RuntimeError("AI 摘要未完成，請稍後再試或檢查原文內容。")
+    if status not in (None, "completed"):
+        # status 為 None 時維持 SDK 相容性；明確的其他狀態不可當成完成的摘要。
+        raise RuntimeError(f"AI 回應未成功（狀態：{status}），請稍後再試。")
 
     if not response.output_text:
         # 不要把空字串交給 json.loads()，先轉成可理解的 App 錯誤。

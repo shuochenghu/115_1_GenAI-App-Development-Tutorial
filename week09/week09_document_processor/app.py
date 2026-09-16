@@ -19,7 +19,7 @@ from document_utils import SUPPORTED_EXTENSIONS, chunk_text, clean_text, extract
 st.set_page_config(page_title="Week 9 文件處理工具", page_icon="📄", layout="wide")
 
 # 這兩個上限是課堂示範用的安全護欄：
-# - MAX_FILE_BYTES 對齊 .streamlit/config.toml，避免大檔拖慢本機與雲端環境。
+# - MAX_FILE_BYTES 同時用於上傳元件與收檔後檢查，並對齊 .streamlit/config.toml。
 # - MAX_AI_INPUT_CHARS 控制送進模型的文字長度，讓成本與延遲更容易預估。
 MAX_FILE_BYTES = 8 * 1024 * 1024
 MAX_AI_INPUT_CHARS = 12000
@@ -114,9 +114,11 @@ def main() -> None:
 
     chunk_size, overlap = render_sidebar()
 
+    # 元件明訂上限，讓不同啟動目錄的上傳限制一致；下方仍檢查收到的檔案。
     uploaded = st.file_uploader(
         "上傳 PDF、DOCX、CSV、TXT 或 MD",
         type=list(SUPPORTED_EXTENSIONS),
+        max_upload_size=MAX_FILE_BYTES // (1024 * 1024),
     )
     if uploaded is None:
         st.markdown(

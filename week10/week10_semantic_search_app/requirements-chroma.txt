@@ -1,0 +1,3 @@
+# 選讀 ChromaDB preview；第 10 週正式 App 的必要套件仍以 requirements.txt 為準。
+-r requirements.txt
+chromadb==1.5.9

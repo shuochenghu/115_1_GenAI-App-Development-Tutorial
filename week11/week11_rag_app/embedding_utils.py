@@ -107,9 +107,10 @@ def build_chroma_index(
     texts = [str(chunk.get("text", "")) for chunk in chunks]
     vectors = embed_texts(texts, offline=offline, model=model)
     client = chromadb.EphemeralClient()
+    # cosine 設定的是 collection 的距離函式；下方 metadatas 保存各 chunk 的來源。
     collection = client.create_collection(
         name="week11_documents",
-        metadata={"hnsw:space": "cosine"},
+        configuration={"hnsw": {"space": "cosine"}},
     )
     collection.add(
         ids=[str(chunk.get("chunk_id", index)) for index, chunk in enumerate(chunks)],

@@ -1,0 +1,4 @@
+# 教室重建環境與 Python 產物；各 App 原有忽略規則仍保留。
+.venv-classroom/
+**/__pycache__/
+*.py[cod]
