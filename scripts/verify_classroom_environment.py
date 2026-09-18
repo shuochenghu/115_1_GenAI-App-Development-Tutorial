@@ -1,4 +1,4 @@
-"""第 7–11 週課堂環境的離線檢核；在課程 repo 根目錄執行。
+"""第 7–12 週課堂環境的離線檢核；在課程 repo 根目錄執行。
 
 使用同一個 Python 逐一開新程序，避免不同週次同名 helper 互相干擾。
 測試不讀取真實金鑰、不呼叫付費 API；AppTest 不等於瀏覽器或雲端部署驗證。
@@ -29,6 +29,7 @@ APPS = (
     "week09/week09_document_processor",
     "week10/week10_semantic_search_app",
     "week11/week11_rag_app",
+    "week12/week12_vision_app",
 )
 
 
@@ -94,12 +95,33 @@ def check_app(app_dir: Path) -> None:
         assert not app.exception, [e.message for e in app.exception]
         # 第 9 週側欄固定用 st.error 顯示安全提醒，不能誤判為執行失敗。
         baseline_errors = [e.value for e in app.error]
-        if app_dir.parent.name not in {"week09", "week10", "week11"}:
+        if app_dir.parent.name not in {"week09", "week10", "week11", "week12"}:
             return
         assert app.file_uploader[0].proto.max_upload_size_mb == 8
-        check_readers()
 
         limit = 8 * 1024 * 1024
+        if app_dir.parent.name == "week12":
+            from PIL import Image
+
+            buffer = BytesIO()
+            Image.new("RGB", (320, 180), "white").save(buffer, format="PNG")
+            image_bytes = buffer.getvalue()
+            # PNG 結尾後的 padding 不影響解碼，可精準測試 byte 上限。
+            boundary_image = image_bytes + b" " * (limit - len(image_bytes))
+            app.file_uploader[0].set_value(
+                ("boundary.png", boundary_image, "image/png")
+            ).run()
+            assert not app.exception and [e.value for e in app.error] == baseline_errors
+            assert len(app.metric) >= 2
+            app.file_uploader[0].set_value(
+                ("too_large.png", boundary_image + b"x", "image/png")
+            ).run()
+            assert not app.exception
+            assert any("8 MB" in e.value for e in app.error), "超限圖片應被拒絕"
+            return
+
+        check_readers()
+
         # 大量尾端空白會在前處理移除，讓邊界測試不產生數萬個 chunks。
         content = b"Classroom boundary" + b" " * (limit - len(b"Classroom boundary"))
         app.file_uploader[0].set_value(("boundary.txt", content, "text/plain")).run()
@@ -215,7 +237,7 @@ def main() -> None:
     for app in APPS:
         for cwd in ("repo", "app"):
             subprocess.run([sys.executable, str(Path(__file__).resolve()), "--worker", app, "--cwd", cwd], check=True)
-    print("PASS: 六個 App、兩種工作目錄的離線檢核完成；尚未驗證瀏覽器、Colab、付費 API 或雲端。")
+    print("PASS: 七個 App、兩種工作目錄的離線檢核完成；尚未驗證瀏覽器、Colab、付費 API 或雲端。")
 
 
 if __name__ == "__main__":

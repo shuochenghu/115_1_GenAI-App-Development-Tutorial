@@ -61,6 +61,13 @@
 
 ## 已完成的重要決策
 
+- 第 12 週（多模態應用：Vision API 與圖片理解）產出，位於 `week12/`：
+  - **Codex 版（2026-09-16 產出，尚未 commit）**：`..._Vision_API與圖片理解實作教材_教師/學生版.ipynb`（各 40 cells，22 code；學生版 4 個 TODO：A `validate_upload`、B `choose_detail`、C `normalize_receipt`、D `evaluate_vision_answer`）+ 專案 `week12_vision_app/`（app.py、vision_utils.py、sample_data/create_demo_receipt.py、固定套件版本）。Codex 同日另修改了 `PROJECT_MEMORY.md`、`docs/課堂環境與部署指南.md`、`scripts/verify_classroom_environment.py`（Claude 未動）。
+  - `生成式AI應用開發_第12週_多模態應用_Vision_API與圖片理解_教師版_Claude生成.ipynb`：**Claude 產出**教師版，40 cells（17 code），完整參考答案。
+  - `生成式AI應用開發_第12週_多模態應用_Vision_API與圖片理解_學生版_Claude生成.ipynb`：**Claude 產出**學生版，40 cells，6 個 TODO cell（核心 `validate_image`/`build_task_prompt` graceful degradation + 練習 A `choose_detail`/B `normalize_receipt`/C `evaluate_vision_answer` 用 `NotImplementedError` + 註解 demo + D `challenge_plan`）。
+  - `week12_vision_app_claude/`：**Claude 產出**可部署專案（`app.py`、`vision_utils.py`、requirements〔openai/streamlit/python-dotenv/pillow〕、.env.example、.gitignore、README.md、.streamlit/config.toml + secrets.example.toml、sample_data/create_demo_receipt.py〔產清楚版 + 模糊旋轉版，PNG 已 gitignore〕）。
+  - `生成式AI應用開發_第12週_Vision_Claude與Codex版比較.md`：兩版比較（結構、TODO、專案、對齊處、建議吸收項目、驗證狀態）。
+  - **helper 命名一開始就對齊 Codex 專案 `vision_utils.py`**：`detect_image_mime`/`validate_image`/`image_to_data_url`/`build_task_prompt(mode, question)`/`get_refusal_reason`/`require_completed_response`/`analyze_image(file_bytes, *, mode, question, detail, model)`/`RECEIPT_SCHEMA`/`get_secret`/`create_client`。Notebook 的 given helper 由 builder 以 `inspect.getsource` 直接從專案取出，保證兩者一致（Codex 版 Notebook 與專案函式名不一致：`validate_upload`/`analyze_image_bytes`/`extract_receipt` vs `validate_image`/`analyze_image`）。
 - 第 2 週定位為 API 開發前的 Python 快速複習，內容包含函式、f-string、list / dict、JSON、例外處理、API key 管理與公開 API 呼叫。
 - 第 2 週已分成學生版與教師版；學生版不直接提供主要練習答案。
 - 第 2 週第六節已補上 Colab Secrets、環境變數設定、PowerShell、`setx`、macOS / Linux `export` 等 API key 設定方式。
@@ -121,6 +128,9 @@
 - 第 11 週 `build_context` 修正：只對「實際保留」的非空片段連續編號（原 `enumerate` 會因空片段跳號成 [來源 1]/[來源 3]）；notebook 與 `rag_utils.py` 均已修正。
 - 第 11 週 helper 對齊 Codex 後，核心 TODO 改為 `build_rag_context`（graceful 回 `""`）與 `answer_from_hits`（graceful 回 placeholder dict）；練習改為 A `evaluate_retrieval`（檢索命中率）、B `filter_hits_by_score`（門檻過濾）、C `challenge_plan`（A/B 用 `NotImplementedError` + 註解 demo）；`format_sources`/`evaluate_rag_answer`/`build_rag_prompt`/`generate_rag_answer` 為 given。
 - 第 11 週兩版（對齊後）已通過 JSON 解析、cell id 無重複、`ast` 語法（無 SyntaxWarning）、無亂碼、TODO 分離；教師版離線程式**全數實跑 0 錯誤**（`build_rag_context` 產出 Codex 式區塊、`run_local_checks` ✅、`evaluate_retrieval` hit_rate 1.0、`filter_hits_by_score` 4→2/→0、`evaluate_rag_answer` 正確）；4 個 .py 通過 `py_compile`，`rag_utils` 對齊後離線煙霧測試通過（含 build_rag_prompt/format_sources/abstain）。付費 Responses API/ChromaDB/`streamlit run` 未實跑；Responses API 語法沿用第 9 週已確認版本。
+- 第 12 週主題為多模態應用（OpenAI Responses API + `input_image`，Base64 data URL）。四種任務模式：圖片描述、圖片問答、截圖檢查、收據／表單抽取（JSON Schema strict，欄位允許 null）。錯誤分流：refusal → incomplete（max_output_tokens/content_filter）→ status 異常 → 空輸出。`store=False` 不代表圖片沒傳送。上限 8 MB、2,000 萬像素、非動態 GIF；格式依 magic bytes 判斷而非副檔名。銜接第 6 週 schema、第 9～11 週輸入驗證與只依證據回答 → 第 13 週 Function Calling。
+- 第 12 週 Claude 版差異化（Codex 無）：①**離線示範模式** `analyze_image(..., offline=True)` 跑完驗證與 prompt 後回傳標註「不是模型分析結果」的固定樣本（`OFFLINE_DEMO_NOTICE`），App 側邊欄可勾選；②`build_request` + `preview_request` 印出將送出的 request（data URL 截短、schema 略）；③模糊旋轉版收據示範 null/warnings；④`choose_detail`/`normalize_receipt`/`evaluate_vision_answer` 放進專案並在 App 使用（detail 依模式給建議值、抽取結果先正規化再顯示）；⑤Claude API 圖片輸入對照表（markdown 選讀，不加依賴）。App 用保守控制項（radio/selectbox/form），結果存 session_state，API 只在送出表單後呼叫。
+- 第 12 週 Claude 版驗證（2026-09-16）：兩版通過 JSON 解析、`cell_type` 合法、cell id 無重複、`ast` 無 SyntaxWarning、無亂碼、TODO 分離、學生版 `run_local_checks()` 為註解；**教師版與學生版全部 code cell 依序離線執行 0 錯誤**；3 個 .py 通過 `py_compile`，`vision_utils` 離線煙霧測試通過（5 種驗證負例、refusal/incomplete 分流）；Streamlit `AppTest`（1.64）初始畫面、模式切換、離線切換無例外。付費 Vision API 與 `streamlit run` 未正式實跑。**注意：本機環境已設定 `OPENAI_API_KEY`，測試時曾意外真實呼叫一次 `analyze_image`（單張小圖、描述模式，成功）；之後測試一律把金鑰清空。附帶確認 `input_image` + data URL 在 openai 3.14 SDK 可用。**
 
 ## 編輯與驗證原則
 
@@ -193,4 +203,7 @@ Claude 版與 Codex 版已完成詳細比較，主要差異如下：
 - 第 11 週選項（未做）：若要 week11 Claude 專案成為 Codex 完全複本，可再把 `embedding_utils` 也改名對齊（`build_chroma_index`/`query_chroma_index`、build 回傳 (client, collection)、query 加 model 參數）——目前刻意未做，以免破壞與第 10 週 Claude `embedding_utils` 的一致性。
 - **第 11 週品質修正（2026-08-11，回應使用者回報 5 項）**：①第 9–11 週所有 Claude notebook 的 `cell_type` 由無效的 `"md"` 修正為 `"markdown"`（builder 修正並全部重建）；②第 9–11 週學生版 `run_local_checks()` 改為註解＋說明，避免 Run All 中斷；③`app.py` 索引簽章改用 `hashlib.sha256(file_bytes)` 內容雜湊（原只用檔名+大小，同名同大小異內容會誤用舊索引）；④`app.py` 改為「按『建立／更新索引』按鈕才建索引」（原調 slider 會自動重建，線上模式產生非預期 Embeddings 費用），index 就緒才顯示問答框；⑤README 更新（移除「Codex 版尚未產出」、函式名改為對齊後的 `build_rag_context`/`answer_from_hits` 等、補充建索引按鈕與內容雜湊說明）。app.py 通過 py_compile。
 - 第 11 週建議實測：`pip install chromadb` 後本機 `streamlit run app.py`（離線模式先驗證檢索+context，再用真 API 看 grounded 答案+來源引用、問文件沒有的問題確認 abstain）、`.env` 未被 Git 追蹤
-- 產生第 4、5、6、7、8、9、10、11 週投影片
+- **第 12 週 Claude 版已完成且 helper 一開始即對齊 Codex**（notebook 兩版 + `week12_vision_app_claude/` + 比較文件）。Codex 版與 Claude 版皆**尚未 commit**（`week12/` 整個目錄為 untracked）；commit 前確認 `sample_data/*.png` 未被追蹤。
+- 第 12 週建議 Codex 版吸收：Notebook 與專案函式名統一、模糊版測試圖片、練習 helper 放進專案（見比較文件第五節）。
+- 第 12 週建議實測：`python sample_data/create_demo_receipt.py` 後本機 `streamlit run app.py`（先離線模式走完流程與 request 預覽，再用真 API 跑清楚版與模糊版抽取，觀察 null/warnings；改副檔名的文字檔確認被擋）、`.env` 未被 Git 追蹤。
+- 產生第 4、5、6、7、8、9、10、11、12 週投影片

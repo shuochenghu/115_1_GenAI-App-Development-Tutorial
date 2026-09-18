@@ -1,0 +1,8 @@
+.env
+.streamlit/secrets.toml
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+sample_data/demo_receipt.png
+sample_data/demo_receipt_blurry.png
