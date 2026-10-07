@@ -9,7 +9,7 @@ Follow the project’s established teaching sequence, file conventions, student/
 
 ## Start with project context
 
-1. Read `PROJECT_MEMORY.md` completely and treat it as the current source of truth.
+1. Read `PROJECT_MEMORY.md` completely and treat it as the current source of truth. Apply its「講義製作原則」section to every new lesson and revision, and check each applicable principle before handoff; explicit user instructions take precedence.
 2. Read `PROJECT_MEMORY_claude.md` only when comparing Claude-produced variants or tracing older decisions.
 3. Inspect the target week, related preceding-week materials, and the course outline before editing.
 4. Prefer the formal Codex track unless the user explicitly names another variant.

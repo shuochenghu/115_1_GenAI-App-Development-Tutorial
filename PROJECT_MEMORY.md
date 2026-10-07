@@ -46,6 +46,14 @@
 
 ## 最近工作進度
 
+- 2026-10-06 依使用者最新要求對照第四周精簡第五周細節選讀，兩版由75減為63 cells（36 Markdown／27 code，26普通Python）；刪12個重複或非必要語法cells，保留**request、history副本與reset、usage／假client的新需求說明及A/B任務。已教getattr／or、集合、函式物件／解包改前週回查；基礎環境、字串、型別、迴圈及CLI不另設長選讀，類別整併對照表。保留程式AST一致，靜態／離線順序、配對TODO、教師五項契約與七個活動假API（15次請求）通過，其他教材未變更，未驗證真實API／Colab。本次取代前次「全面展開語法」的呈現方式，講義原則第4項同步改為主動盤點但只補必要新選讀。
+
+- 2026-10-06 已全面盤點第五周150分鐘學生／教師教材的非基礎Python語法：補條件運算式／短路／None、參數預設與例外鏈、生成器／列表與字典生成式、enumerate／餘數／bool與int、print／join／set、tuple回傳／解包、SimpleNamespace／閉包／**kwargs、assert／try-else／JSON副本及CLI／class-self選讀；每組連回正式code，新增4個有註解的離線示範。兩版各75 cells（43 Markdown、32 code），31個普通Python語法與離線順序執行、新示範、教師五項契約及七項假API開關通過，固定真實活動請求數仍15（以假API驗證）；原始版及其他週次保留，未呼叫真實API／Colab／班級試教。後續教材製作必須主動全面盤點語法缺口，已納入講義原則第4項。
+
+- 2026-10-06 第五周150分鐘學生／教師修訂版第一部分新增`**request`細節選讀與有註解的離線參數展開示範，對照create_response建立字典、條件加入previous_response_id及API呼叫；解釋key限制、參數重複及與定義端`**kwargs`收集的差別。兩版各64 cells（36 Markdown／28 code），27個普通Python cells語法與無金鑰順序執行通過，新示範與教師五項離線契約通過；正式函式行為與API請求數不變，原始版保留，未驗證真實API／Colab。
+
+- 2026-10-06 已確認上述「講義製作原則」為後續各週製作與修訂的共同要求，並在教材製作skill入口加入明確讀取／核對指引。第四周150分鐘學生／教師修訂版各72 cells（43 Markdown、29 code），第五周各63 cells（36 Markdown、27 code）；補強文字／程式對照、離線語法示範註解、TODO規格及繳交檢查。第四周A5含items／函式物件／外層版本與內層測試語法選讀；第五周七個真實API旗標移到使用cell，串流示範與B分格，單筆假串流先於五項契約檢查。原始版及其他週次保留。靜態與離線檢查通過；第五周假API固定活動仍15次請求。未執行真實API、Colab或150分鐘班級試教。詳細歷次紀錄見 `week04/第04週_150分鐘修訂版_修訂與驗證紀錄.md`、`week05/第05週_150分鐘修訂版_修訂與驗證紀錄.md`。過去「不修改PROJECT_MEMORY.md」僅描述當時保留原檔的操作，使用者本次已明確要求將原則記入本檔。
+
 - 2026-09-22 已補齊第 2 週 lambda 先備教學：學生／教師 Notebook 各新增 6 cells（現為各 63 cells），於 List／Dict 後加入「3-3 用函式指定排序規則與 lambda」，規劃 10～15 分鐘，依序示範 def、函式傳入與呼叫的區別、sorted／key、降冪與切片，以及 lambda 等價寫法；加入離線使用量排序練習，學生保留 TODO、教師提供完整答案，兩種正確寫法均接受。練習 C 增加銜接提示與 def 對照，明訂字數為字元數；同步學習目標與小結。第 5 週雙版本補 callback 的建立／呼叫時機，第 10 週雙版本補 sort／sorted 差別與 top-k 排序複習。六份 Notebook 的 JSON、唯一 cell ID、亂碼掃描與 130 個普通 Python code cells 靜態語法檢查通過；新增排序範例離線執行、教師練習 C 假 HTTP 資料的排序／缺 body／空列表檢查通過，git diff --check 通過。保留使用者原有第 2 週修改及教師版 18 個已執行或含輸出的 cells；新增 cells 均清空輸出。本次未執行真實 HTTP／LLM API 或 Colab 顯示驗證。
 
 - 2026-09-16 已依課綱與 `$course-material-authoring` 完成第 12 週正式教材：學生版／教師版 Notebook 各 40 cells（18 Markdown、22 code），並建立 `week12/week12_vision_app/`。教學主線為「圖片 bytes → signature／Pillow 本機驗證 → Base64 data URL → Responses API `input_image` → 文字或 strict JSON → 人工核對」，涵蓋圖片描述、圖片問答、截圖理解與收據／表單抽取；圖片 API 使用 `store=False`，但教材明確說明圖片仍會傳送與處理，禁止個資、機密、醫療影像、未授權內容與 CAPTCHA。官方文件已確認 `gpt-5.4-mini` 支援 image input 與 Responses API；App 使用目前 Streamlit 1.63.0 的 `max_upload_size`、`width`、`st.segmented_control`、`st.form` 與 session state 寫法。兩份 Notebook 已通過 JSON、唯一 cell ID、輸出清空、普通 Python AST、學生／教師 TODO 分離與離線順序執行；App 三個 `.py` 可編譯，Pillow signature／動態 GIF／8 MB 邊界、Base64、prompt、假 Responses API request、AppTest、兩種工作目錄的 CLI 設定與伺服器健康檢核通過。這些第 12 週實跑使用現有 Windows／Python 3.14 `.venv`；課堂指定的 Python 3.12 乾淨環境尚未建立。`docs/課堂環境與部署指南.md` 與 `scripts/verify_classroom_environment.py` 已擴充到第 12 週；完整七 App 回歸嘗試在第 9 週因目前 `.venv` 缺少 `python-docx` 中止，第 7、8 週重跑通過，第 7–11 週仍沿用先前 Python 3.12 驗證紀錄。未執行真實 OpenAI Vision API、瀏覽器互動、Colab、Community Cloud 或 macOS／Linux 驗證。
@@ -154,6 +162,23 @@
 - 第 10 週正式教材已建立 Notebook 學生／教師雙版本並搭配 `week10/week10_semantic_search_app/` Streamlit 專案。主線採 `list[dict]` + NumPy + cosine similarity 建立最小語意搜尋索引，先讓學生看懂 embedding、query embedding、chunk embedding、metadata 與 retrieval 排序，再把 OpenAI Embeddings API 作為主動開啟的付費模式。已補入 ChromaDB preview 選讀 cell，示範 `EphemeralClient()`、`collection.add()`、`collection.query()` 與 metadata 查詢結果整理；但 ChromaDB 與 FAISS 仍不作為第 10 週必要依賴，Claude 生成版保留為 ChromaDB-first 參考資料。
 - 第 11 週正式教材以 ChromaDB 作為必要向量資料庫，集中教 Retrieval、context 組合、來源引用、證據不足拒答與基本評估；使用 `EphemeralClient()` 避免持久化設定干擾三小時課堂。App 的索引與生成分成兩個明確操作，並以 session state 保存索引與最後回答；文件內容一律視為不可信任資料。FAISS、持久化索引、hybrid search、reranking 與語意型評估留到自主學習或進階 RAG。
 - 第 12 週回到 Notebook 學生／教師雙版本並搭配 `week12/week12_vision_app/`。正式主線使用 Responses API `input_image` 與 Base64 data URL，不另走舊版 Vision 專用端點；本機先依 signature 與 Pillow 驗證格式、尺寸、像素量與非動態 GIF，再由表單按鈕觸發 API。一般圖片回文字，收據／表單沿用第 6 週 JSON Schema strict structured output；detail 只提供 `auto`、`low`、`high`，教學上強調成本與品質需依模型／圖片實測，且所有文字、數字、計數與重要決策都要人工回看原圖。
+
+## 講義製作原則（2026-10-06確認，後續製作與修訂必須沿用）
+
+適用本專案各週Notebook、實作講義與學生／教師教材。開始工作時先讀本節，規劃與交付前逐項核對；使用者當次明確指示優先。第四、第五周150分鐘修訂版為本次做法的參考，應依各週目標調整，不機械複製題型或cell數量。
+
+1. **先確認課程銜接與時間安排。** 檢視前周先備、本周目標、後續應用與實際教材；150分鐘包含講解、示範、實作、除錯與討論，明確區分必做、擇一、選讀與延伸，不把所有內容列為必做。
+2. **依理解與操作順序編排。** 採「概念→完整示範→引導練習→學生實作→結果檢查→反思」；新概念先解釋再使用，練習緊接相關主題。完整示範不依賴學生尚未完成的TODO；若有依賴，須明確標示先備及可用替代示範。
+3. **文字cell與code cell緊密對應。** 程式前交代目的、輸入、回傳值、資料流與責任；程式後交代預期結果、判讀與常見錯誤。長程式依責任拆格，維持清楚的定義與執行順序，不為湊數增加cells。
+4. **語法／細節選讀必須連回正式程式。** 新增或修訂教材時主動盤點兩版所有code cells中的非基礎Python語法，先對照前週實際教材確認已教內容；只有本週新出現、對完成核心任務有必要且難以從簡短註解理解的語法才新增選讀，不等使用者逐一指出。已教語法以一兩句用途提示或前週回查處理，基礎語法不另加長選讀；共用語法集中解釋，避免每種語法都變成獨立選讀或小示範。 指明對應函式、變數與原程式片段，提供「離線小示範→正式程式」對照、逐步讀法、預期觀察與限制；讀完能回到指定code cell理解用途。不要只孤立介紹Python語法，也不要用選讀示範揭露整題學生答案。
+5. **程式註解解釋目的與原因。** 使用繁體中文，說明區塊責任、API與資料流、函式傳入／執行時機、狀態更新與錯誤處理。語法選讀配套code cells也必須有註解，標明正式程式的對應位置；避免只翻譯明顯語法或只在文字cell解釋。
+6. **每項TODO都有具體規格。** 列出情境、已提供內容、學生負責項目、輸入型別、回傳值、結果保存變數、執行順序與完成條件；編號與說明逐項對應。指出哪些helper、資料及固定測試器不需修改。區分return、print、回傳物件與副作用，避免學生只顯示結果卻未保存。
+7. **學生版與教師版同步製作。** 同章節、活動、程式責任及執行順序；學生版保留必要骨架、提示與TODO，教師版提供完整實作、預期結果及判讀標準。共用helper與固定測試器直接提供，練習集中在本周學習目標；未完成處明確提示，不以空值冒充完成。
+8. **實驗與檢查條件明確。** 比較時固定資料與規則，指出操弄因素，測試題不混入few-shot範例。區分格式／標籤合法、答案正確、契約錯誤與API／回應失敗；不預設few-shot一定改善，也不以偶然回答證明記憶或reset。說清楚程式檢查、人工核對與測試限制。
+9. **執行開關放在使用位置。** 真實API旗標與對應if操作放在同一code cell，預設False；同格標示先備、開啟方式與請求數。不同活動可獨立開啟與重跑，避免集中在環境cell宣告。互動CLI預設不啟動，先提供離線示範與檢查；新增解說不應無故增加付費呼叫。
+10. **驗證、繳交與紀錄一致。** 列明交件、實際input／輸出、測試證據與反思；交付前檢查JSON、唯一ID、輸出、語法、執行順序、版本分工及必要的成功／失敗行為。區分靜態、離線、真實API、Colab與試教，未執行項目明確標記；假回應不能充當真實成果。保留原始教材，首次修訂另存，後續在使用者指定修訂版繼續修改；同步修訂紀錄及本專案記憶，不自動改動其他週次。
+
+後續交付自查：學生是否知道改哪裡、傳入什麼、回傳／保存什麼、依序執行哪格、如何證明完成？選讀是否指出正式程式位置？API開關是否緊鄰活動？教師答案與學生規格是否一致？
 
 ## 編輯與驗證原則
 
