@@ -2,6 +2,7 @@
 import json
 import textwrap
 from pathlib import Path
+from update_colab_runtime_guidance import runtime_guide, change_setup
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = '生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材'
@@ -57,14 +58,8 @@ def build(teacher):
     100–110分讀共用Pydantic示範，110–130分做選題，130–135分檢查。
     首次接觸資料模型建議選B；已能讀懂list與巢狀欄位者可選C。選B直接跳過C的作業Schema與訂單區。
     ''')
-    md('setup-guide', '''
-    ## 1. 環境與執行方式
-    安裝格會連線下載套件，但不呼叫模型；已安裝可跳過。金鑰只放Colab Secrets或環境變數。
-    定義格依順序跑完，每個活動的旗標放在使用格，預設False；只開啟當前活動並重跑該格。
-    沒有金鑰時client為None，離線流程可繼續，付費入口才快速回報缺金鑰。
-    課前確認教學帳號可用模型；沿用OPENAI_MODEL設定，不因文件範例自動更換課堂模型。
-    ''')
-    code('install', '# 套件安裝需連線；Pydantic使用v2介面。\n%pip install -q --upgrade openai "pydantic>=2,<3"')
+    md('setup-guide', runtime_guide(6))
+    code('install', '# %pip安裝至目前kernel；已安裝可跳過，升級已匯入套件後須重啟。\n# 套件安裝需連線；Pydantic使用v2介面。\n%pip install -q --upgrade openai "pydantic>=2,<3"')
     code('setup', '''
     import json
     import os
@@ -935,6 +930,12 @@ def build(teacher):
     for cell in cells:
         for before, after in corrections.items():
             cell['source'] = [line.replace(before, after) for line in cell['source']]
+        if cell['id'] == 'w06r-setup':
+            cell['source'] = change_setup(''.join(cell['source']), 6).splitlines(keepends=True)
+        if cell['id'] == 'w06r-handoff':
+            cell['source'].append('\n**語音銜接（概念預告）**：後續可用本週Schema抽取已確認的逐字稿；格式通過仍要核對人名、日期、金額與原錄音。本週不新增錄音或語音API。\n')
+        if cell['id'] == 'w06r-sources':
+            cell['source'].append('\n- [OpenAI官方Python SDK說明](https://developers.openai.com/api/reference/python)：timeout與max_retries。\n- [IPython %pip](https://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-pip)：目前kernel的套件安裝。\n- [Colab FAQ](https://research.google.com/colaboratory/faq.html)：runtime與執行狀態。\n')
     original['cells'] = cells
     original['metadata'].update({'language_info': {'name': 'python'}, 'kernelspec': {'display_name': 'Python 3', 'language': 'python', 'name': 'python3'}})
     edition = '教師版' if teacher else '學生版'
