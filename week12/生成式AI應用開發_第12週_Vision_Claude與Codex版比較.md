@@ -1,7 +1,7 @@
 # 第 12 週教材比較：Claude 版 vs Codex 版
 
 **主題**：多模態應用：Vision API 與圖片理解（圖片驗證 → Base64 → Responses API `input_image` → prompt 設計 → Structured Outputs 抽取 → 錯誤分流 → Streamlit 圖片理解工具）
-**更新日期**：2026-09-16（Claude 版首次產出，Codex 版同日產出、尚未 commit）
+**更新日期**：2026-09-16（Claude 版首次產出，Codex 版同日產出；兩版已於 2026-09-18 提交 `ed000e8`「完成第12周」）
 
 比較對象：
 

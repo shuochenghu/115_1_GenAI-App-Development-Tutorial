@@ -21,12 +21,19 @@ def run_offline(path):
         ["git", "show", f"HEAD:{path.relative_to(ROOT).as_posix()}"],
         cwd=ROOT, check=True, capture_output=True,
     ).stdout.decode("utf-8"))
-    assert [(c["id"], c["cell_type"]) for c in nb["cells"]] == [(c["id"], c["cell_type"]) for c in before["cells"]]
+    # 第5週新增真實測試前的文字指引；既有cell須保持順序與類型。
+    before_by_id = {c["id"]: c for c in before["cells"]}
+    retained = [c for c in nb["cells"] if c["id"] in before_by_id]
+    assert [(c["id"], c["cell_type"]) for c in retained] == [(c["id"], c["cell_type"]) for c in before["cells"]]
+    added = [c for c in nb["cells"] if c["id"] not in before_by_id]
+    assert all(c["id"] == "w05r-live-check-guide" and c["cell_type"] == "markdown"
+               and path.parent.name == "week05" for c in added)
     ids = [c["id"] for c in nb["cells"]]
     assert len(ids) == len(set(ids))
     changed_code = []
     ordinary = 0
-    for index, (new, old) in enumerate(zip(nb["cells"], before["cells"])):
+    for index, new in enumerate(nb["cells"]):
+        old = before_by_id.get(new["id"])
         source = "".join(new["source"])
         assert '**語音' not in source
         assert not re.search(r"\?{4,}|\ufffd|sk-[A-Za-z0-9_-]{20,}", source)
@@ -40,8 +47,12 @@ def run_offline(path):
             continue
         ast.parse(source)
         ordinary += 1
-    # 只有安裝／環境格可修改程式；所有學生答案與正式練習維持原樣。
-    assert set(changed_code) <= {5, 6}, changed_code
+    # 安裝／環境與第5週已授權的CLI中斷處理可修改；A／B及測試器維持原樣。
+    allowed_code = {5, 6}
+    if path.parent.name == "week05":
+        allowed_code.update(i for i, c in enumerate(nb["cells"])
+                            if "".join(c["source"]).startswith("def run_console_chat():"))
+    assert set(changed_code) <= allowed_code, changed_code
     assert nb["metadata"] == before["metadata"]
     constructors = []
     sdk = types.ModuleType("openai")
@@ -115,6 +126,68 @@ def check_timeout(env, week):
     return len(calls)
 
 
+def check_cli_interrupts(env):
+    """以假輸入與假串流驗證CLI結束；不監聽鍵盤、不呼叫真實API。"""
+    results = []
+
+    def run_case(inputs, interrupt_second=False):
+        original_new_state = env["new_chat_state"]
+        state = original_new_state()
+        calls = []
+        snapshots = []
+        captured = []
+
+        def new_state():
+            # 只擷取CLI最初的state；reset仍須取得全新的空白狀態。
+            if not captured:
+                captured.append(state)
+                return state
+            return original_new_state()
+
+        def interrupted_events():
+            yield types.SimpleNamespace(type="response.output_text.delta", delta="未完成片段")
+            raise KeyboardInterrupt()
+
+        def create(**kwargs):
+            calls.append(kwargs)
+            snapshots.append(copy.deepcopy(state))
+            if interrupt_second and len(calls) == 2:
+                return interrupted_events()
+            return env["make_fake_events"]()
+
+        fake = types.SimpleNamespace(responses=types.SimpleNamespace(create=create))
+        output = io.StringIO()
+        with patch.dict(env, {"new_chat_state": new_state, "client": fake}), \
+                patch("builtins.input", side_effect=inputs), contextlib.redirect_stdout(output):
+            env["run_console_chat"]()
+        return state, calls, snapshots, output.getvalue()
+
+    for interrupt, message in ((KeyboardInterrupt(), "已收到停止要求"),
+                               (EOFError(), "輸入已結束")):
+        state, calls, _, output = run_case([interrupt])
+        assert not calls and state == env["new_chat_state"]() and message in output
+    results.append("PASS：等待輸入時中斷／EOF結束，不呼叫API")
+
+    _, calls, _, output = run_case(["/exit"])
+    assert not calls and "對話已結束" in output
+    results.append("PASS：/exit保留正常結束行為")
+
+    state, calls, _, output = run_case(["你好", "/reset", "/exit"])
+    assert len(calls) == 1 and state == env["new_chat_state"]() and "本機對話已清空" in output
+    results.append("PASS：/reset清空後仍可用/exit結束")
+
+    state, calls, _, output = run_case([" ", "你好", "/exit"])
+    assert len(calls) == 1 and len(state["history"]) == 2 and "本輪未成功" in output
+    results.append("PASS：單輪錯誤後仍可繼續聊天")
+
+    state, calls, snapshots, output = run_case(["第一輪", "第二輪"], interrupt_second=True)
+    assert len(calls) == 2 and state == snapshots[1]
+    assert len(state["history"]) == 2 and state["completed_requests"] == 1
+    assert "未完成片段" in output and "已收到停止要求" in output
+    results.append("PASS：串流途中中斷結束CLI，保留上一成功回合且不保存部分回答")
+    return results
+
+
 def check_builder(notebooks):
     import build_week06_revision
     captured = {}
@@ -147,6 +220,7 @@ def main():
                 if week == 5:
                     with contextlib.redirect_stdout(io.StringIO()):
                         assert len(env["run_offline_checks"]()) == 5
+                        assert len(check_cli_interrupts(env)) == 5
             if week == 6:
                 sixth.append((path, nb))
             summaries.append({"week": week, "edition": "教師" if teacher else "學生", "cells": len(nb["cells"]), "python": ordinary, "fake_timeout_calls": timeout_count})
