@@ -1,209 +1,257 @@
-# 專案工作記憶
+# 專案工作記憶（Claude 版）
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
+
+## 與 Codex 記憶的關係（2026-10-13 同步）
+
+- **`PROJECT_MEMORY.md`（Codex 維護）是專案現況的權威來源**；本檔與其同步現況、講義製作原則與待辦，另外保存 Claude Code 產出的替代版本（`_claude`／`Claude生成`）紀錄。兩檔衝突時以 `PROJECT_MEMORY.md` 與實際檔案為準，並回頭修正本檔。
+- 本次同步基準：分支 `Home_Test`、提交 `842f212`（Update PROJECT_MEMORY.md），已核對 `week01/`～`week12/` 實際檔案、`skills/course-material-authoring/` 與各週修訂／比較紀錄。
+- Claude Code 開始工作時：先讀 `PROJECT_MEMORY.md`（尤其「公司電腦接續摘要」「講義製作原則」），再讀本檔的 Claude 版紀錄；修改教材後兩檔都要更新，避免再次落差。
+- 教材製作 skill：`skills/course-material-authoring/SKILL.md` 與 `references/conventions.md`（Codex 建立，Claude 製作教材時同樣遵守）。
+
+## 目前接續摘要（2026-10-13，同步自 Codex「公司電腦接續摘要」）
+
+若較舊紀錄提到第 5、6 週語音銜接，以 10 月 13 日「已刪除」為現行決策。
+
+### 工作區
+
+- 家裡專案位置 `K:\115_1_GenAI-App-Development-Tutorial`；本機（另一台電腦）為 `E:\Git Repos\115_1_GenAI-App-Development-Tutorial`。以實際專案位置為準，不沿用其他電腦的絕對路徑或 Python 環境。
+- 換電腦接續前先確認 Git 狀態與遠端是否含最新提交，不能只靠聊天歷史。
+
+### 現行修訂版本（後續在這些檔案續改，不另建重複修訂版）
+
+| 週次 | 現行版本 | 現況 |
+|---|---|---|
+| 第 1 週 | `week01/生成式AI應用開發_第01週教材_語音增補修訂版.md`、`生成式AI應用開發_第01週投影片_語音增補修訂版.md`／`.html` | 23 頁；STT→確認文字→文字回答→TTS 概念、10 分鐘預錄示範腳本與設備調查。評量 40／20／25／10／5%，期末至少 RAG 或 Function Calling。原始三檔保留，尚未製作實際音檔。 |
+| 第 4 週 | `week04/..._Prompt_Engineering實作教材_150分鐘修訂版_學生版／教師版.ipynb` | 各 72 cells（43 Markdown、29 code）；G、A 必做，B/C 擇一，v3 延伸。詳見 `week04/第04週_150分鐘修訂版_修訂與驗證紀錄.md`。 |
+| 第 5 週 | `week05/..._對話狀態_Streaming與聊天機器人實作教材_150分鐘修訂版_學生版／教師版.ipynb` | 各 63 cells；%pip、Secrets 與重啟順序、套件版本顯示、`max_retries=0`、可調 60 秒 timeout；已刪除語音預告；固定活動規劃 15 次請求。 |
+| 第 6 週 | `week06/..._Structured_Outputs_JSON_Schema與資料抽取實作教材_150分鐘修訂版_學生版／教師版.ipynb` | 各 70 cells；JSON Schema 先教，G 與 A 必做、B/C 擇一，主線 7 次請求、選讀另 1 次；事件欄位驗證、A2 六項離線契約、Colab 提示與 60 秒 timeout；已刪除語音預告。 |
+
+第 4～6 週原始版與 Claude 參考版保留。學生 TODO 與教師答案分工、ID、順序、付費旗標預設 False 均保留。
+
+### 使用者已確認的教學取捨
+
+- 第 5、6 週沒有語音 API 範例或練習，不得只因「未來可以整合」就加入 STT／TTS 預告；更新與重建腳本也不會加回。
+- 第 6 週 Schema 版本管理、巢狀會議模型、重試 R 保留為課後延伸；第 7／8 週 App 銜接保留。
+- 語音概念保留在第 1 週；第 12 週增補語音輸入與輸出是後續規劃，目前第 12 週仍是 Vision 教材與 App，尚未修改第 12 週、主課綱或第 7 週 App。
+- 60 秒是待課前實測的網路等待起始值，不是串流總時間上限；套件版本顯示供紀錄，Colab 驗證後再固定安裝版本，不可直接套用 Windows 完整快照。
+
+### 腳本入口（Codex 建立）
+
+- `scripts/update_colab_runtime_guidance.py`（第 5、6 週更新）、`scripts/verify_colab_runtime_guidance.py`（共同離線驗證）。
+- `scripts/build_week06_revision.py`、`scripts/verify_week06_revision.py`（第 6 週重建／檢查）；`scripts/build_week01_voice_revision.py`（第 1 週來源）。
+- `scripts/verify_classroom_environment.py`（第 7–12 週 App 課堂環境離線檢核）。
+- 上述第 5、6 週檢查以假 OpenAI 模組替代 SDK；未執行真實 API、Colab 或 150 分鐘試教，不得把離線通過寫成真實驗證成功。
+
+### 下一步
+
+下一個要修改的週次尚未指定。候選：「第 12 週語音實作及主課綱同步規劃」或「第 5、6 週 Colab 課前實測」；不把規劃視為已完成或自動開始。
 
 ## 專案定位
 
 本資料夾是 115 學年度上學期課程大綱與教材工作區，主要正在製作「生成式AI應用開發」課程教材。課程主線以 Python、OpenAI API、Google Colab、Streamlit 為核心；Claude API 與 Gemini API 作為比較或補充版本，不作為主要教學主線。
 
+## 講義製作原則（2026-10-06 確認，後續製作與修訂必須沿用；與 `PROJECT_MEMORY.md` 同文）
+
+適用本專案各週Notebook、實作講義與學生／教師教材。開始工作時先讀本節，規劃與交付前逐項核對；使用者當次明確指示優先。第四、第五周150分鐘修訂版為本次做法的參考，應依各週目標調整，不機械複製題型或cell數量。
+
+1. **先確認課程銜接與時間安排。** 檢視前周先備、本周目標、後續應用與實際教材；150分鐘包含講解、示範、實作、除錯與討論，明確區分必做、擇一、選讀與延伸，不把所有內容列為必做。
+2. **依理解與操作順序編排。** 採「概念→完整示範→引導練習→學生實作→結果檢查→反思」；新概念先解釋再使用，練習緊接相關主題。完整示範不依賴學生尚未完成的TODO；若有依賴，須明確標示先備及可用替代示範。
+3. **文字cell與code cell緊密對應。** 程式前交代目的、輸入、回傳值、資料流與責任；程式後交代預期結果、判讀與常見錯誤。長程式依責任拆格，維持清楚的定義與執行順序，不為湊數增加cells。
+4. **語法／細節選讀必須連回正式程式。** 新增或修訂教材時主動盤點兩版所有code cells中的非基礎Python語法，先對照前週實際教材確認已教內容；只有本週新出現、對完成核心任務有必要且難以從簡短註解理解的語法才新增選讀，不等使用者逐一指出。已教語法以一兩句用途提示或前週回查處理，基礎語法不另加長選讀；共用語法集中解釋，避免每種語法都變成獨立選讀或小示範。指明對應函式、變數與原程式片段，提供「離線小示範→正式程式」對照、逐步讀法、預期觀察與限制；讀完能回到指定code cell理解用途。不要只孤立介紹Python語法，也不要用選讀示範揭露整題學生答案。
+5. **程式註解解釋目的與原因。** 使用繁體中文，說明區塊責任、API與資料流、函式傳入／執行時機、狀態更新與錯誤處理。語法選讀配套code cells也必須有註解，標明正式程式的對應位置；避免只翻譯明顯語法或只在文字cell解釋。
+6. **每項TODO都有具體規格。** 列出情境、已提供內容、學生負責項目、輸入型別、回傳值、結果保存變數、執行順序與完成條件；編號與說明逐項對應。指出哪些helper、資料及固定測試器不需修改。區分return、print、回傳物件與副作用，避免學生只顯示結果卻未保存。
+7. **學生版與教師版同步製作。** 同章節、活動、程式責任及執行順序；學生版保留必要骨架、提示與TODO，教師版提供完整實作、預期結果及判讀標準。共用helper與固定測試器直接提供，練習集中在本周學習目標；未完成處明確提示，不以空值冒充完成。
+8. **實驗與檢查條件明確。** 比較時固定資料與規則，指出操弄因素，測試題不混入few-shot範例。區分格式／標籤合法、答案正確、契約錯誤與API／回應失敗；不預設few-shot一定改善，也不以偶然回答證明記憶或reset。說清楚程式檢查、人工核對與測試限制。
+9. **執行開關放在使用位置。** 真實API旗標與對應if操作放在同一code cell，預設False；同格標示先備、開啟方式與請求數。不同活動可獨立開啟與重跑，避免集中在環境cell宣告。互動CLI預設不啟動，先提供離線示範與檢查；新增解說不應無故增加付費呼叫。
+10. **驗證、繳交與紀錄一致。** 列明交件、實際input／輸出、測試證據與反思；交付前檢查JSON、唯一ID、輸出、語法、執行順序、版本分工及必要的成功／失敗行為。區分靜態、離線、真實API、Colab與試教，未執行項目明確標記；假回應不能充當真實成果。保留原始教材，首次修訂另存，後續在使用者指定修訂版繼續修改；同步修訂紀錄及本專案記憶，不自動改動其他週次。
+
+後續交付自查：學生是否知道改哪裡、傳入什麼、回傳／保存什麼、依序執行哪格、如何證明完成？選讀是否指出正式程式位置？API開關是否緊鄰活動？教師答案與學生規格是否一致？
+
+## 版本主線與命名規則（重要）
+
+- **正式主線一律為 Codex 版**（skill 規定「Prefer the formal Codex track unless the user explicitly names another variant」）；最早於 2026-07-21 確立第 5–7 週，之後第 8–12 週沿用。Claude 版為比較／備援，不是預設對齊對象。
+- 新教材延續時，以 Codex 版的檔案結構、helper 命名、函式簽名為基準。課堂第 7 週使用 `week07/week07_streamlit_app/`，helper：`get_secret()`、`create_client()`、`ask_ai(user_input, system_prompt=...)`、`stream_ai(...)`。`extract_structured()` 源自第 6 週結構化輸出。
+- 檔名：`..._Claude生成.ipynb`、`*_claude/`、`..._Claude生成.md` ＝ Claude Code 產出；`...實作教材_....ipynb` ＝ Codex 產出；`..._150分鐘修訂版_...`／`..._語音增補修訂版...` ＝ 在 Codex 正式版上的修訂版（目前的續改對象）。
+- 正式課程 starter／範例專案（如 `week08_midterm_starter/`）與 Codex 新產出不加工具後綴；`_claude`／`Claude生成` 只保留給既有 Claude 參考檔，正式新產出不使用。
+- 所有教材位於 `week01/`～`week12/` 週資料夾（2026-07-21 重整），引用請用 `weekNN/...` 路徑。
+- 專案中沒有 repo 層 `CLAUDE.md`；Claude Code 的入口是本檔與 auto-memory。Codex 另有 `.codex/config.toml`（`workspace-write`、`approval_policy = "never"`）。
+
 ## 目前教材狀態
 
-目前 notebook 教材只保留「學生版」與「教師版」。原始版 notebook 已刪除，避免和教師版內容重複。
+課程主大綱：`生成式AI應用開發_16周課程大綱.md`（實際 18 週，含 16 週授課與第 17、18 週自主學習）。Notebook 只保留「學生版」與「教師版」。
 
-- `生成式AI應用開發_16周課程大綱.md`：課程主大綱，目前實際規劃為 18 週，含 16 週授課與第 17、18 週自主學習。
-- `生成式AI應用開發_第02週_Python複習_學生版.ipynb`：第 2 週學生版，保留 TODO 骨架。
-- `生成式AI應用開發_第02週_Python複習_教師版.ipynb`：第 2 週教師版，保留完整參考答案。
-- `生成式AI應用開發_第03週_OpenAI_API入門_學生版.ipynb`：第 3 週 OpenAI API 學生版，保留 TODO 骨架。
-- `生成式AI應用開發_第03週_OpenAI_API入門_教師版.ipynb`：第 3 週 OpenAI API 教師版，保留完整參考答案。
-- `生成式AI應用開發_第03週_Gemini_API入門_學生版.ipynb`：第 3 週 Gemini API 學生版，保留 TODO 骨架。
-- `生成式AI應用開發_第03週_Gemini_API入門_教師版.ipynb`：第 3 週 Gemini API 教師版，保留完整參考答案。
-- `生成式AI應用開發_第03週_Claude_API入門_學生版.ipynb`：第 3 週 Claude API 學生版，保留 TODO 骨架。
-- `生成式AI應用開發_第03週_Claude_API入門_教師版.ipynb`：第 3 週 Claude API 教師版，保留完整參考答案。
-- `生成式AI應用開發_第04週_Prompt_Engineering_教師版_Claude生成.ipynb`：第 4 週教師版（**Claude Code 產出**），35 cells，保留完整參考答案。
-- `生成式AI應用開發_第04週_Prompt_Engineering_學生版_Claude生成.ipynb`：第 4 週學生版（**Claude Code 產出**），四大功能與課堂練習保留 TODO 骨架。
-- `生成式AI應用開發_第04週_Prompt_Engineering實作教材_教師版.ipynb`：第 4 週教師版（**Codex 產出**）。
-- `生成式AI應用開發_第04週_Prompt_Engineering實作教材_學生版.ipynb`：第 4 週學生版（**Codex 產出**）。
-- `生成式AI應用開發_第05週_對話與Streaming_教師版_Claude生成.ipynb`：第 5 週教師版（**Claude Code 產出**），33 cells，保留完整參考答案。
-- `生成式AI應用開發_第05週_對話與Streaming_學生版_Claude生成.ipynb`：第 5 週學生版（**Claude Code 產出**），33 cells，核心實作與練習保留 TODO 骨架。
-- `生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_教師版.ipynb`：第 5 週教師版（**Codex 產出**）。
-- `生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_學生版.ipynb`：第 5 週學生版（**Codex 產出**）。
-- `生成式AI應用開發_第03週投影片.md`：第 3 週 Marp 投影片，25 頁，OpenAI 主線；內文不提第 4 週，結尾為「課後動手做」；含擴充的 Gemini / Claude API 差異介紹（對照總表 + 各自程式碼寫法 + 多輪對話差異 + 選用建議）。
-- `生成式AI應用開發_第06週_Structured_Outputs與資料抽取_教師版_Claude生成.ipynb`：第 6 週教師版（**Claude Code 產出**），31 cells，保留完整參考答案。
-- `生成式AI應用開發_第06週_Structured_Outputs與資料抽取_學生版_Claude生成.ipynb`：第 6 週學生版（**Claude Code 產出**），31 cells，8 個 cell 保留 TODO（含版本說明）。
-- `生成式AI應用開發_第07週_Streamlit_Web_App入門_教師版_Claude生成.ipynb`：第 7 週教師版（**Claude Code 產出**），40 cells，完整可用程式與練習解答。
-- `生成式AI應用開發_第07週_Streamlit_Web_App入門_學生版_Claude生成.ipynb`：第 7 週學生版（**Claude Code 產出**），40 cells，6 個 code cell 保留 TODO（cell 13/16/19 三大核心技能 + 33/35/37 練習 A/B/C）。
-- `生成式AI應用開發_第07週_Streamlit_Web_App入門實作教材_學生版.ipynb` / `..._教師版.ipynb`：第 7 週（**Codex 產出**），各 40 cells，附 `week07_streamlit_app/` 專案資料夾。
-- `week07_streamlit_app_claude/`：第 7 週 Claude 版可部署 Streamlit 專案（app.py、requirements.txt、.gitignore、.env.example、README.md、.streamlit/config.toml + secrets.example.toml）。與 Codex 的 `week07_streamlit_app/` 並存不衝突。
-- `生成式AI應用開發_第07週_Git實作教材.md`：第 7 週 Git/GitHub/部署講義（既有，非 notebook）。
-- **檔案結構已重整為 `week01/`…`week08/` 週資料夾**；各週教材與專案資料夾移入對應週資料夾（如 `week07/week07_streamlit_app/`）。上方列出的檔名現位於各自週資料夾內。
-- 第 8 週（期中個人小專題）產出，位於 `week08/`：
-  - `生成式AI應用開發_第08週_期中個人小專題_內容規劃.md`：規劃檔，第十一節七項決策已定案。
-  - `生成式AI應用開發_第08週_期中個人小專題_專題說明書.md`：**Codex 產出**說明書。
-  - `week08_midterm_starter/`、`week08_midterm_example_summarizer/`：**Codex 產出** starter 與範例（結構化輸出用原生 json_schema dict）。
-  - `生成式AI應用開發_第08週_期中個人小專題_專題說明書_Claude生成.md`：**Claude 產出**說明書（反映定案：部署加分、結構化硬性、安全一票否決、worksheet 內嵌）。
-  - `week08_midterm_starter_claude/`、`week08_midterm_example_summarizer_claude/`：**Claude 產出** starter 與範例（各含 app.py、requirements.txt、.env.example、.gitignore、README.md、.streamlit/secrets.example.toml）。結構化輸出改用 **Pydantic `responses.parse()` + `output_parsed`**；範例為完整可跑 AI 摘要器（含檔案上傳、串流）。
-- 第 9 週（文件處理與資料前處理）產出，位於 `week09/`：
-  - `生成式AI應用開發_第09週_文件處理與資料前處理實作教材_學生版.ipynb` / `..._教師版.ipynb`：**Codex 產出**，各 34 cells，附 `week09_document_processor/` 專案。
-  - `生成式AI應用開發_第09週_文件處理與資料前處理_教師版_Claude生成.ipynb`：**Claude 產出**教師版，36 cells（15 code），完整參考答案。
-  - `生成式AI應用開發_第09週_文件處理與資料前處理_學生版_Claude生成.ipynb`：**Claude 產出**學生版，36 cells，6 個 code cell 保留 TODO（`clean_text`、`chunk_text`、`summarize_document` 三大核心技能 + 練習 A `chunk_by_paragraph`/B `build_document_report`/C `challenge_plan`）。
-  - `week09_document_processor_claude/`：**Claude 產出**可部署專案（`app.py`、`document_utils.py`、requirements.txt、.env.example、.gitignore、README.md、.streamlit/config.toml + secrets.example.toml、sample_data/course_notes.txt）。helper 對齊 Codex：`extract_text`/`clean_text`/`chunk_text`/`decode_text_bytes`/`get_secret`/`summarize_document`。與 Codex 的 `week09_document_processor/` 並存不衝突。
-- 第 10 週（Embedding 與語意搜尋）產出，位於 `week10/`：
-  - `生成式AI應用開發_第10週_Embedding與語意搜尋_教師版_Claude生成.ipynb`：**Claude 產出**教師版，31 cells（12 code），完整參考答案。
-  - `生成式AI應用開發_第10週_Embedding與語意搜尋_學生版_Claude生成.ipynb`：**Claude 產出**學生版，31 cells，6 個 code cell 保留 TODO（`cosine_similarity`、`get_embedding` 真 API 分支、`search_chunks` 三核心 + 練習 A `build_chroma_collection`/B `query_chroma`/C `challenge_plan`）。
-  - `week10_semantic_search_claude/`：**Claude 產出**可部署專案（`app.py`、`document_utils.py`〔沿用第 9 週〕、`embedding_utils.py`、requirements.txt〔含 numpy/chromadb〕、.env.example、.gitignore、README.md、.streamlit/config.toml + secrets.example.toml、sample_data/ai_course_faq.md）。
-  - **Codex 版尚未產出**，但已有 Codex 計劃（平行檔名 `..._實作教材_...`、專案 `week10_semantic_search_app/`、utils `embedding_utils.py`）。Claude 版已對齊其函式命名以利對照。
-- 第 11 週（RAG 基礎與改良）產出，位於 `week11/`：
-  - `生成式AI應用開發_第11週_RAG基礎與改良_教師版_Claude生成.ipynb`：**Claude 產出**教師版，32 cells（13 code），完整參考答案。
-  - `生成式AI應用開發_第11週_RAG基礎與改良_學生版_Claude生成.ipynb`：**Claude 產出**學生版，32 cells，5 個 TODO（核心 `build_context`/`answer_with_rag` 用 graceful degradation + 練習 A `evaluate_rag`/B `check_citations`/C `challenge_plan` 用 `NotImplementedError` + 註解 demo）。
-  - `week11_rag_qa_claude/`：**Claude 產出**可部署專案（`app.py`、`document_utils.py`〔第 9 週〕、`embedding_utils.py`〔第 10 週〕、`rag_utils.py`〔新〕、requirements〔含 numpy/chromadb〕、.env.example、.gitignore、README.md、.streamlit/config.toml + secrets.example.toml、sample_data/ai_course_faq.md）。
-  - **Codex 版第 11 週已於此期間出現**：`..._RAG基礎與文件問答實作教材_教師/學生版.ipynb` + 專案 `week11_rag_app/`（app.py、document_utils.py、embedding_utils.py、rag_utils.py、sample_data/course_handbook.md）。
-  - **helper 命名已對齊 Codex（2026-08-11 依使用者裁示 (a)）**：Claude 版 `rag_utils.py` 改為與 Codex 相同 API — `build_rag_context`(→str)/`build_rag_prompt`/`generate_rag_answer`/`format_sources`(→list)/`evaluate_rag_answer`/`answer_from_hits`，常數 `DEFAULT_GENERATION_MODEL`/`INSUFFICIENT_EVIDENCE_MESSAGE`；hits 改為**扁平結構**（頂層含 source/chunk_id/start/end/score/text）。`embedding_utils.query_chroma` 改回傳扁平 hits 並加 `min_score` 參數（函式名仍保留 Claude 的 `build_chroma_collection`/`query_chroma`，未改成 Codex 的 `build_chroma_index`/`query_chroma_index`——那層屬第 10 週，未在本次對齊範圍）。notebook 與 `app.py` 已同步改用對齊後 API。
+### 第 1 週（`week01/`）
+- 原始：`生成式AI應用開發_第01週教材.md`、`生成式AI應用開發_第01週投影片.md`／`.html`（21 頁）。
+- **現行**：語音增補修訂版三檔（23 頁 Marp），紀錄 `第01週_語音增補修訂與Colab檢視紀錄.md`。
 
-## 已完成的重要決策
+### 第 2 週（`week02/`）
+- `..._第02週_Python複習_學生版／教師版.ipynb`：各 63 cells；含 with／context manager、type hints 快速讀法、「3-3 用函式指定排序規則與 lambda」。教師版保留 18 個既有已執行／含輸出 cells。
 
-- 第 12 週（多模態應用：Vision API 與圖片理解）產出，位於 `week12/`：
-  - **Codex 版（2026-09-16 產出，尚未 commit）**：`..._Vision_API與圖片理解實作教材_教師/學生版.ipynb`（各 40 cells，22 code；學生版 4 個 TODO：A `validate_upload`、B `choose_detail`、C `normalize_receipt`、D `evaluate_vision_answer`）+ 專案 `week12_vision_app/`（app.py、vision_utils.py、sample_data/create_demo_receipt.py、固定套件版本）。Codex 同日另修改了 `PROJECT_MEMORY.md`、`docs/課堂環境與部署指南.md`、`scripts/verify_classroom_environment.py`（Claude 未動）。
-  - `生成式AI應用開發_第12週_多模態應用_Vision_API與圖片理解_教師版_Claude生成.ipynb`：**Claude 產出**教師版，40 cells（17 code），完整參考答案。
-  - `生成式AI應用開發_第12週_多模態應用_Vision_API與圖片理解_學生版_Claude生成.ipynb`：**Claude 產出**學生版，40 cells，6 個 TODO cell（核心 `validate_image`/`build_task_prompt` graceful degradation + 練習 A `choose_detail`/B `normalize_receipt`/C `evaluate_vision_answer` 用 `NotImplementedError` + 註解 demo + D `challenge_plan`）。
-  - `week12_vision_app_claude/`：**Claude 產出**可部署專案（`app.py`、`vision_utils.py`、requirements〔openai/streamlit/python-dotenv/pillow〕、.env.example、.gitignore、README.md、.streamlit/config.toml + secrets.example.toml、sample_data/create_demo_receipt.py〔產清楚版 + 模糊旋轉版，PNG 已 gitignore〕）。
-  - `生成式AI應用開發_第12週_Vision_Claude與Codex版比較.md`：兩版比較（結構、TODO、專案、對齊處、建議吸收項目、驗證狀態）。
-  - **helper 命名一開始就對齊 Codex 專案 `vision_utils.py`**：`detect_image_mime`/`validate_image`/`image_to_data_url`/`build_task_prompt(mode, question)`/`get_refusal_reason`/`require_completed_response`/`analyze_image(file_bytes, *, mode, question, detail, model)`/`RECEIPT_SCHEMA`/`get_secret`/`create_client`。Notebook 的 given helper 由 builder 以 `inspect.getsource` 直接從專案取出，保證兩者一致（Codex 版 Notebook 與專案函式名不一致：`validate_upload`/`analyze_image_bytes`/`extract_receipt` vs `validate_image`/`analyze_image`）。
-- 第 2 週定位為 API 開發前的 Python 快速複習，內容包含函式、f-string、list / dict、JSON、例外處理、API key 管理與公開 API 呼叫。
-- 第 2 週已分成學生版與教師版；學生版不直接提供主要練習答案。
-- 第 2 週第六節已補上 Colab Secrets、環境變數設定、PowerShell、`setx`、macOS / Linux `export` 等 API key 設定方式。
-- 曾發生 Colab / Windows 編碼流程造成中文被寫成大量 `?` 的問題；目前 notebook 需用 JSON Unicode escape 格式輸出以降低風險。
-- 第 3 週 OpenAI API 版本主線使用 Responses API：`client.responses.create()` 與 `response.output_text`。
-- 第 3 週 OpenAI API 預設模型已由 `gpt-5.5` 改為 `gpt-5.4-mini`，並保留 `OPENAI_MODEL` 環境變數覆蓋機制。
-- 第 3 週 OpenAI API 版本已補上多輪對話示範：使用 `previous_response_id=response1.id` 延續上一輪 Responses API 對話。
-- 第 3 週第十節已補強為三題：練習 A「Python 作業批改助教」、練習 B「usage 與費用估算」、練習 C「自由設計角色與 instructions」。
-- 第 3 週另產生 Gemini API 與 Claude API 版本，用於跨平台比較。
-- Gemini 版本使用 `google-genai`、`GEMINI_API_KEY`、`client.interactions.create()`、`system_instruction`、`interaction.output_text`、`previous_interaction_id`。
-- Claude 版本使用 `anthropic`、`ANTHROPIC_API_KEY`、`client.messages.create()`、top-level `system`、`message.content[0].text`，並強調 Claude Messages API 每次需送出完整 messages history。
-- 第 3 週三個平台的多輪對話比較：OpenAI 使用 `previous_response_id`，Gemini 使用 `previous_interaction_id`，Claude 送出完整 `messages` history。
-- 第 3 週 OpenAI / Gemini / Claude 的學生版與教師版已做 markdown text cell 視覺美化：標題加入少量 emoji，學習任務、安全提醒、課堂練習與成本提醒加入 HTML 提示框。
-- Colab 對 markdown cell 的 CSS `style` 支援不穩定；若要讓文字顏色更容易顯示，優先使用 `<font color="..."><b>文字</b></font>` 標示重點詞。
-- 第 4 週 Prompt Engineering 為 OpenAI 主線（依課程大綱，不再做三平台版本），延續第 3 週的 Responses API 與 `ask_ai_safe(user_input, role=...)`（role 即 instructions/system prompt）。
-- 第 4 週涵蓋：system prompt/角色設定、任務拆解、輸出限制與格式控制、few-shot（用 role/content 清單放範例對）、prompt 測試（`compare_prompts()`），實作 `summarize` / `classify` / `rewrite` / `answer_question` 四大功能。
-- 第 4 週 `answer_question` 採「只依參考資料回答、找不到就說找不到」設計，作為第 11 週 RAG 的雛形。
-- 第 4 週學生版將四大功能函式與三題課堂練習（A 會議記錄整理、B few-shot 垃圾郵件分類、C 選做 prompt 測試）保留 TODO；示範用的 demo cell（第二～六節）兩版皆完整可執行。
-- 第 4 週沿用第 3 週 markdown 風格與 emoji/HTML 提示框；沿用預設模型 `gpt-5.4-mini`（`OPENAI_MODEL` 可覆蓋）。
-- 第 4 週學生版與教師版已通過 JSON 解析、cell ID 唯一性、code cell 靜態語法、保存輸出、中文問號亂碼與 TODO 分離檢查；付費 API cells 尚未實際執行。
-- 依需求將第 4 週兩版內容另外儲存為含「實作教材」的新檔名；原始正式檔案保留不變，新檔目前為逐位元相同副本。
-- 第 5 週為 OpenAI 主線，成果為「具多輪對話記憶與串流輸出的簡易聊天機器人」，延續第 3 週 `ask_ai_safe()` 與 Responses API、第 4 週 prompt 技巧。
-- 第 5 週呈現兩種多輪對話做法並比較：方法 A `previous_response_id`（平台代管）、方法 B 自己維護 `messages` history（可控上下文、跨平台、便於成本控制）；後段採方法 B。
-- 第 5 週用 `ChatSession` 類別封裝 `system` 設定、`history` 累積、`_trim()` 只保留最近 `max_turns` 輪、`reset()`。
-- 第 5 週 Streaming 用 Responses API `stream=True`，取 `event.type == "response.output_text.delta"` 的 `event.delta` 逐字印出並累加成完整文字。
-- 第 5 週聊天機器人 `chat_bot()` 用 `input()` 迴圈 + streaming + 歷史裁切；教師版預設把 `chat_bot()` 呼叫「註解掉」，避免 Colab「全部執行」卡在 input()。
-- 第 5 週學生版 TODO 落在 `ChatSession`（cell-16）、`stream_reply`（cell-20）、`chat_bot`（cell-25）、練習 A/B/C（cell-27/29/31）；demo cell（無記憶、previous_response_id、手動 history、成本觀察）兩版皆完整。
-- 第 5 週三題練習：A 主題聊天機器人（英文練習夥伴）、B 上下文長度實驗（max_turns=1 觀察遺忘）、C 選做累計整場 token 與估算成本。
-- 第 5 週兩版已通過 JSON 解析、cell id 無重複、code cell `ast` 語法、中文亂碼與 TODO 分離檢查；付費 API cells 尚未實際執行。
-- 第 3 週投影片內文的第 4 週前向指涉已全數移除（依需求「先不提第四周」），並擴充 Gemini / Claude API 差異段落。
-- 第 6 週主題為 Structured Outputs 與資料抽取，延續 OpenAI Responses API 主線；涵蓋純文字回覆的解析困境、JSON Schema 手動定義（`text.format` + `json_schema` + `strict`）、Pydantic 模型定義（`client.responses.parse()` + `text_format` + `response.output_parsed`）、巢狀模型與清單抽取、`ValidationError`/`try except` 錯誤處理、`extract_structured()` 共用抽取函式封裝。已用 WebFetch 對照 OpenAI 官方 Structured Outputs 與 Responses API 文件確認語法正確。
-- 第 6 週練習：A 履歷抽取（`ResumeInfo`）、B 訂單抽取（`OrderItem` + `OrderInfo` 巢狀清單並計算總額）、C 選做抽取失敗重試機制（`extract_with_retry()`）。
-- 第 6 週 TODO 設計採「模型/函式定義留空、demo 呼叫維持完整」原則：demo cell 一律用 `print(model)` 而非存取特定欄位，避免學生未完成 TODO 時下游 cell 因缺欄位 `AttributeError` 而整個中斷。
-- 第 6 週結尾预告 Week 7 為 Git 版本控制與 Streamlit 部署，與既有 `生成式AI應用開發_第07週_Git實作教材.md` 內容一致。
-- 第 7 週主題為 Streamlit Web App 入門（OpenAI + Streamlit），涵蓋大綱要求的：Streamlit UI、表單（`st.form`）、檔案上傳（`st.file_uploader`）、session state、secrets 管理、串流回覆顯示（`st.write_stream`）。延續第 3–5 週 Responses API 與 `ask_ai_safe()` / streaming。
-- 第 7 週為課程從 Colab 過渡到 VS Code + 本機 Python + GitHub 的轉捩點；notebook 用 `%%writefile` 漸進產生 `app_1_hello.py` → `app_2_ai.py` → `app_3_stream.py` → `app_4_chat.py`，並提供 Colab localtunnel 備援執行方式。
-- 第 7 週 secrets 採雙軌：本機 `.env`（python-dotenv）＋雲端 `st.secrets`，用 `get_secret()` 統一。串流用 generator + `st.write_stream`，對話記憶用 `st.session_state.messages` + `st.chat_input` / `st.chat_message`。
-- 第 7 週三題練習：A 側邊欄自訂 system prompt（必做）、B 翻譯/分類表單（必做）、C 累計 token 與估算成本（選做，延伸第 5 週練習 C）。
-- 第 7 週學生版 TODO 落在三大核心技能（`ask_ai_safe` body、串流 generator 迴圈、聊天迴圈組裝）與三題練習，共 6 個 code cell；其餘 demo/說明兩版皆完整。
-- 第 7 週 Claude 版另附可部署專案 `week07_streamlit_app_claude/`；整合版 `app.py` 含側邊欄設定、串流聊天、摘要表單、檔案上傳與累計成本，`app.py` 已通過 `py_compile`。
-- 第 7 週兩版已通過 JSON 解析、cell id 無重複、`.py` code cell `ast` 語法（`%%writefile` 非 .py 檔如 .gitignore/requirements 不做語法檢查）、無亂碼與 TODO 分離檢查；付費 API / Streamlit 實跑尚未執行。
-- 第 8 週為期中個人小專題整合週（非新 API 教學），採「專題說明書 + starter 骨架 + 教師 demo 範例」形式，非 notebook 學生/教師雙版。
-- 第 8 週七項決策定案（2026-07-21）：①第 7 週對齊 Codex 版；②Claude 產出加 `_claude` 區分；③部署只列加分、期末才強制；④結構化輸出為硬性最低要求（Pydantic 或 json_schema，不接受純自由文字）；⑤三題目（摘要器/履歷助手/客服分類器）+ 開放自訂；⑥rubric 沿用 功能30/LLM25/UI20/安全10/README+Demo15，API key 外洩為一票否決紅線；⑦worksheet 內嵌為說明書「專題設計表」。
-- 第 8 週 Claude 版兩個 `app.py` 已通過 `py_compile`；helper 對齊 Codex week07（`get_secret`/`create_client`/`ask_ai`/`stream_ai`）；秘密檔僅 `.example`、`.gitignore` 已排除 `.env`/`secrets.toml`/`__pycache__`；付費 API 實跑尚未執行。
-- 第 9 週主題為文件處理與資料前處理（OpenAI Responses API + 本機檔案處理），涵蓋大綱要求：PDF/Word/CSV/TXT/MD 讀取、文字清理、chunking 基本概念。核心心智模型為「六層管線：輸入→格式路由→文字抽取→清理→chunking→應用」；抽取/清理/chunking 皆本機確定性、不花錢，AI 只接管線後段（`summarize_document`）且僅在按鈕觸發。
-- 第 9 週 Claude 版 helper 對齊 Codex week09：`decode_text_bytes`（utf-8-sig/utf-8/cp950 fallback）、`extract_pdf_text`（保留 `[第 N 頁]` 來源標記）、`extract_docx_text`（段落+表格）、`extract_csv_text`（保留欄名、限 200 列）、`extract_text`（副檔名路由）、`clean_text`（統一換行、行內空白合併、保留段落）、`chunk_text`（滑動視窗 + overlap，回傳含 chunk_id/start/end/text 的 dict）。
-- 第 9 週三題練習：A `chunk_by_paragraph`（段落優先切割，必做）、B `build_document_report`（文件品質報告：字元數/chunk 數/平均長度/是否需 OCR，必做）、C Streamlit 功能改造（挑戰，先寫 `challenge_plan` dict 再改 `app.py`）。
-- 第 9 週學生版 TODO 採graceful degradation：`clean_text` stub 回傳 passthrough、`chunk_text`/`chunk_by_paragraph` 回傳 `[]`、`build_document_report` 回傳 `{}`，避免未完成 TODO 時下游 demo cell 崩潰；`run_local_checks()` 為自我檢查，完成 TODO 後才會通過（AssertionError 即預期回饋）。付費 `summarize_document` 由 `RUN_PAID_API=False` 旗標守門。
-- 第 9 週兩版已通過 JSON 解析、cell id 無重複、code cell `ast` 語法、無亂碼、TODO 分離檢查；教師版本機（非 API）程式已實際執行通過（`extract_text`/`clean_text`/`chunk_text`/`run_local_checks`/練習 A/B 全部正確），`app.py` + `document_utils.py` 已通過 `py_compile`；付費 API / Streamlit 實跑尚未執行。
-- 第 10 週主題為 Embedding 與語意搜尋（OpenAI Embeddings + ChromaDB）。範圍界定：只做到「找到最相近片段」，完整 RAG 生成式問答與來源引用留第 11 週。銜接第 9 週 chunks → embedding → 向量索引 → top-k 搜尋 → 第 11 週 RAG。
-- 第 10 週 helper 對齊 Codex 計劃：`get_embedding(text, offline=)`（單筆）、`embed_texts`（批次）、`cosine_similarity`（numpy）、`search_chunks(query, chunks, top_k, offline=)`、`build_chroma_collection`、`query_chroma`；沿用 `get_secret`。Embeddings 已用官方文件確認語法：`client.embeddings.create(model=, input=)` → `resp.data[i].embedding`；預設模型 `text-embedding-3-small`（1536 維），可用 `OPENAI_EMBED_MODEL` 覆蓋。ChromaDB 用 `EphemeralClient` + `create_collection(metadata={"hnsw:space":"cosine"})`，相似度 ≈ 1 − distance。
-- 第 10 週向量庫決策：**ChromaDB 為主 + FAISS 只作選讀補充**（不列主 requirements、不設課堂必跑；Windows 電腦教室較穩，且 ChromaDB 綁原文+metadata 天然支援第 11 週引用）。理由與比較已寫入 notebook 與 README。
-- 第 10 週 Claude 版差異化：**離線假 embedding `local_demo_embed()`**（字元 + bigram + 空白斷詞雜湊，中文無空格也能產生字面重疊）。`RUN_PAID_API=False` 或 App「離線示範模式」時用它，讓沒有 API key 也能跑完整搜尋管線並通過 `run_local_checks`；明確標註「只驗證邏輯、非真語意」。Codex 計劃無此設計。
-- 第 10 週三題練習：A `build_chroma_collection`（建 ChromaDB 索引，必做）、B `query_chroma`（top-k + 顯示來源 metadata + 相似度，必做，即 RAG 檢索階段）、C Streamlit App 改造（挑戰，先寫 `challenge_plan` 再改 `app.py`）。
-- 第 10 週兩版已通過 JSON 解析、cell id 無重複、`ast` 語法、無亂碼、TODO 分離；教師版離線（非 API、非 chroma）程式實跑通過（`cosine_similarity`/`search_chunks`/`run_local_checks` 正確，離線搜尋能正確把「向量資料庫」chunk 排第一）；`app.py`/`embedding_utils.py`/`document_utils.py` 通過 `py_compile`，`embedding_utils` 離線搜尋煙霧測試通過。付費 Embeddings API 與 ChromaDB cells（需裝 `chromadb`）/`streamlit run` 尚未實跑；ChromaDB API 以官方文件確認。
-- 第 11 週主題為 RAG 基礎與改良（OpenAI Responses API + 第 10 週 ChromaDB 檢索）。管線：問題→檢索 top-k→組 context（帶 `[來源 N]` 標籤）→grounded prompt（只依資料、找不到就 abstain、標來源）→生成→顯示答案+可展開來源。降低幻覺＝相似度門檻 `min_score` + abstain（無片段不呼叫生成 API）。銜接第 10 週檢索→第 12 週 Vision。
-- 第 11 週 TODO 策略（採用第 9 週整合建議的折衷版）：2 核心（`build_context`/`answer_with_rag`，graceful degradation 回 `("",[])`/placeholder dict）+ 3 練習（A `evaluate_rag` 檢索命中率、B `check_citations` 引用正確性、C `challenge_plan`；A/B 用 `raise NotImplementedError` + 註解 demo，同 Codex 風格）；docstring 改用 Codex 結構化格式（參數/回傳/可能錯誤/教學重點）；callout 只放安全/成本/幻覺紅線。Notebook 自足（內嵌精簡 week10 helper + 離線假 embedding，用 cosine 檢索；專案版用 ChromaDB）。
-- 第 11 週 `build_context` 修正：只對「實際保留」的非空片段連續編號（原 `enumerate` 會因空片段跳號成 [來源 1]/[來源 3]）；notebook 與 `rag_utils.py` 均已修正。
-- 第 11 週 helper 對齊 Codex 後，核心 TODO 改為 `build_rag_context`（graceful 回 `""`）與 `answer_from_hits`（graceful 回 placeholder dict）；練習改為 A `evaluate_retrieval`（檢索命中率）、B `filter_hits_by_score`（門檻過濾）、C `challenge_plan`（A/B 用 `NotImplementedError` + 註解 demo）；`format_sources`/`evaluate_rag_answer`/`build_rag_prompt`/`generate_rag_answer` 為 given。
-- 第 11 週兩版（對齊後）已通過 JSON 解析、cell id 無重複、`ast` 語法（無 SyntaxWarning）、無亂碼、TODO 分離；教師版離線程式**全數實跑 0 錯誤**（`build_rag_context` 產出 Codex 式區塊、`run_local_checks` ✅、`evaluate_retrieval` hit_rate 1.0、`filter_hits_by_score` 4→2/→0、`evaluate_rag_answer` 正確）；4 個 .py 通過 `py_compile`，`rag_utils` 對齊後離線煙霧測試通過（含 build_rag_prompt/format_sources/abstain）。付費 Responses API/ChromaDB/`streamlit run` 未實跑；Responses API 語法沿用第 9 週已確認版本。
-- 第 12 週主題為多模態應用（OpenAI Responses API + `input_image`，Base64 data URL）。四種任務模式：圖片描述、圖片問答、截圖檢查、收據／表單抽取（JSON Schema strict，欄位允許 null）。錯誤分流：refusal → incomplete（max_output_tokens/content_filter）→ status 異常 → 空輸出。`store=False` 不代表圖片沒傳送。上限 8 MB、2,000 萬像素、非動態 GIF；格式依 magic bytes 判斷而非副檔名。銜接第 6 週 schema、第 9～11 週輸入驗證與只依證據回答 → 第 13 週 Function Calling。
-- 第 12 週 Claude 版差異化（Codex 無）：①**離線示範模式** `analyze_image(..., offline=True)` 跑完驗證與 prompt 後回傳標註「不是模型分析結果」的固定樣本（`OFFLINE_DEMO_NOTICE`），App 側邊欄可勾選；②`build_request` + `preview_request` 印出將送出的 request（data URL 截短、schema 略）；③模糊旋轉版收據示範 null/warnings；④`choose_detail`/`normalize_receipt`/`evaluate_vision_answer` 放進專案並在 App 使用（detail 依模式給建議值、抽取結果先正規化再顯示）；⑤Claude API 圖片輸入對照表（markdown 選讀，不加依賴）。App 用保守控制項（radio/selectbox/form），結果存 session_state，API 只在送出表單後呼叫。
-- 第 12 週 Claude 版驗證（2026-09-16）：兩版通過 JSON 解析、`cell_type` 合法、cell id 無重複、`ast` 無 SyntaxWarning、無亂碼、TODO 分離、學生版 `run_local_checks()` 為註解；**教師版與學生版全部 code cell 依序離線執行 0 錯誤**；3 個 .py 通過 `py_compile`，`vision_utils` 離線煙霧測試通過（5 種驗證負例、refusal/incomplete 分流）；Streamlit `AppTest`（1.64）初始畫面、模式切換、離線切換無例外。付費 Vision API 與 `streamlit run` 未正式實跑。**注意：本機環境已設定 `OPENAI_API_KEY`，測試時曾意外真實呼叫一次 `analyze_image`（單張小圖、描述模式，成功）；之後測試一律把金鑰清空。附帶確認 `input_image` + data URL 在 openai 3.14 SDK 可用。**
+### 第 3 週（`week03/`）
+- OpenAI／Gemini／Claude API 入門學生版／教師版（OpenAI 為主線；Gemini 各 33 cells）。
+- `生成式AI應用開發_第03週投影片.md`（25 頁 Marp，OpenAI 主線，不提第 4 週）與 `.pdf`。
 
-## 編輯與驗證原則
+### 第 4 週（`week04/`）
+- Codex：`..._Prompt_Engineering實作教材_學生版／教師版.ipynb`（40 cells）、`..._實作教材_修訂版_...`、**`..._實作教材_150分鐘修訂版_...`（現行，72 cells）**，紀錄 `第04週_150分鐘修訂版_修訂與驗證紀錄.md`。
+- Claude：`..._Prompt_Engineering_學生版／教師版_Claude生成.ipynb`（35 cells）。
 
-- 修改 notebook 時，優先用 Python `json` 模組讀寫 `.ipynb`。
-- 輸出 notebook 時使用 `json.dumps(..., ensure_ascii=True, indent=1)`，降低 Colab 中文亂碼風險。
-- 修改學生版時，保留 TODO，不要把教師版完整答案貼回學生版。
-- 修改教師版時，可保留完整答案與課堂示範程式。
-- 第 3 週 notebook 的 markdown 風格已採用少量 emoji、HTML 提示框與 `<font color>` 重點標籤；後續新增章節時可沿用此風格，但避免過度使用顏色。
-- 每次修改 notebook 後，至少檢查：
-  - JSON 可正常解析。
-  - **每個 cell 的 `cell_type` 必須是 `"markdown"` 或 `"code"`（不可是 `"md"`）**——Jupyter/Colab 只認合法值；曾因 builder 寫成 `"md"` 導致第 9–11 週 Claude notebook cell_type 全部無效（2026-08-11 已修，builder 改為 `"markdown" if t=='md' else "code"`）。
-  - code cell 靜態語法檢查通過（含無 SyntaxWarning）。
-  - 沒有大量 `?` 亂碼 cell。
-  - 學生版主要練習仍保留 TODO。
-  - **學生版「Run All」不會中斷**：自我檢查 `run_local_checks()` 在學生版要「註解掉、附說明」（完成 TODO 後再取消註解），不可自動執行導致 AssertionError 中斷（2026-08-11 已於第 9–11 週學生版修正）。
+### 第 5 週（`week05/`）
+- Codex：`..._對話狀態_Streaming與聊天機器人實作教材_學生版／教師版.ipynb`（現為 42 cells）、**`..._150分鐘修訂版_...`（現行，63 cells）**，紀錄 `第05週_150分鐘修訂版_修訂與驗證紀錄.md`。
+- Claude：`..._對話與Streaming_學生版／教師版_Claude生成.ipynb`（33 cells）。
+
+### 第 6 週（`week06/`）
+- Codex：`..._Structured_Outputs_JSON_Schema與資料抽取實作教材_學生版／教師版.ipynb`（40 cells）、**`..._150分鐘修訂版_...`（現行，70 cells）**，紀錄 `第06週_150分鐘修訂版_修訂與驗證紀錄.md`。
+- Claude：`..._Structured_Outputs與資料抽取_學生版／教師版_Claude生成.ipynb`（31 cells）。
+
+### 第 7 週（`week07/`）
+- Codex（正式）：`..._Streamlit_Web_App入門實作教材_學生版／教師版.ipynb`（各 40 cells）＋ `week07_streamlit_app/`。
+- Claude：`..._Streamlit_Web_App入門_學生版／教師版_Claude生成.ipynb`（40 cells）＋ `week07_streamlit_app_claude/`。
+- `生成式AI應用開發_第07週_Git實作教材.md`：GitHub Desktop／GitHub／Community Cloud 部署補充講義。
+
+### 第 8 週（`week08/`，期中個人小專題）
+- 規劃：`..._第08週_期中個人小專題_內容規劃.md`（七項決策定案）。
+- Codex（正式）：`..._專題說明書.md`、`week08_midterm_starter/`、`week08_midterm_example_summarizer/`（JSON Schema + `strict`）。
+- Claude：`..._專題說明書_Claude生成.md`、`week08_midterm_starter_claude/`、`week08_midterm_example_summarizer_claude/`（Pydantic `responses.parse()` + `output_parsed`）。
+
+### 第 9 週（`week09/`）
+- Codex（正式）：`..._文件處理與資料前處理實作教材_學生版／教師版.ipynb`（各 36 cells）＋ `week09_document_processor/`。
+- Claude：`..._文件處理與資料前處理_學生版／教師版_Claude生成.ipynb`（36 cells）＋ `week09_document_processor_claude/`。
+- 比較：`..._第09週_文件處理_Claude與Codex版比較.md`。
+
+### 第 10 週（`week10/`）
+- Codex（正式，**已產出**）：`..._Embedding與語意搜尋實作教材_學生版／教師版.ipynb`（各 34 cells）＋ `week10_semantic_search_app/`（`requirements-chroma.txt` 為 ChromaDB 選讀安裝入口）。
+- Claude：`..._Embedding與語意搜尋_學生版／教師版_Claude生成.ipynb`（31 cells）＋ `week10_semantic_search_claude/`。
+- 比較：`..._第10週_Embedding與語意搜尋_Claude與Codex版比較.md`（2026-08-04）。
+
+### 第 11 週（`week11/`）
+- Codex（正式）：`..._RAG基礎與文件問答實作教材_學生版／教師版.ipynb`（各 40 cells）＋ `week11_rag_app/`。
+- Claude：`..._RAG基礎與改良_學生版／教師版_Claude生成.ipynb`（32 cells）＋ `week11_rag_qa_claude/`。
+- 比較：`..._第11週_RAG_Claude與Codex版比較.md`。
+
+### 第 12 週（`week12/`，已於 2026-09-18 提交 `ed000e8`）
+- Codex（正式）：`..._多模態應用_Vision_API與圖片理解實作教材_學生版／教師版.ipynb`（各 40 cells）＋ `week12_vision_app/`。
+- Claude：`..._Vision_API與圖片理解_學生版／教師版_Claude生成.ipynb`（40 cells）＋ `week12_vision_app_claude/`。
+- 比較：`..._第12週_Vision_Claude與Codex版比較.md`。`sample_data/*.png` 未納入版控（由 `create_demo_receipt.py` 產生）。
+
+### 共用
+- `docs/課堂環境與部署指南.md`、`environments/classroom-windows-py312.txt`、`scripts/`（見上方腳本入口）、`skills/course-material-authoring/`。
+
+## 已完成的重要決策（各週主線，同步自 Codex）
+
+- **第 1 週**：API 費用由學生自行負擔，課程不提供免費額度；教師開課前依預計呼叫、token 與當時官方價格公告預估與建議上限，作業與專題另訂上限；區分消費提醒與硬性上限。課綱第十八節同步，移除固定新台幣估算。
+- **第 2 週**：API 開發前的 Python 快速複習（函式、f-string、list／dict、type hints、with、lambda／sorted key、JSON、例外處理、API key 管理、公開 API 呼叫）；with 只講入門心智模型；第六節含 Colab Secrets、PowerShell、`setx`、`export` 等金鑰設定方式。
+- **第 3 週**：OpenAI Responses API（`client.responses.create()`、`response.output_text`、`previous_response_id`）；預設模型 `gpt-5.4-mini`。Gemini 用 `google-genai`、`client.interactions.create()`、`previous_interaction_id`（2026-09-15 補明 `system_instruction` 每輪重送、`store=false` 不能用前次 ID）；Claude 用 `client.messages.create()` 並送完整 history。練習 A 批改助教、B usage 與費用、C 自訂角色。
+- **第 4 週**：OpenAI 主線；system prompt、任務拆解、格式控制、few-shot、`compare_prompts()`，四大功能 summarize／classify／rewrite／answer_question（只依參考資料回答，為第 11 週 RAG 雛形）。150 分鐘修訂版見上表。
+- **第 5 週**：獨立請求、`previous_response_id`、手動 history、有限視窗、重要事實記憶、usage、reset、Streaming（處理 `response.output_text.delta`、`response.completed`、`error`；完成事件後才更新 ID 與 transcript）；`run_console_chat()` 預設註解。
+- **第 6 週**：JSON Schema first（`text.format` + `json_schema` + `strict` + `json.loads()`），Pydantic `responses.parse()` 為補充，不採 Claude 版 Pydantic-first；helper 含 refusal／空輸出檢查；保留三層讀法等可讀性橋接。
+- **第 7 週**：Streamlit Web App 入門（非 Git）；notebook 講解 + VS Code 專案；聊天採手動有限 history（最近五輪、每輪重送 instructions），只在完成且非空時保存訊息配對，串流辨識 completed／error／failed／incomplete（2026-09-15 修正）。
+- **第 8 週**：說明書 + starter + 教師 demo；七項決策（2026-07-21）：①對齊 Codex 第 7 週；②Claude 產出加 `_claude`；③部署只加分、期末才強制；④結構化輸出為硬性最低要求；⑤三題目＋開放自訂；⑥rubric 30/25/20/10/15、API key 外洩一票否決；⑦專題設計表內嵌說明書。2026-09-15 兩個 Codex `app.py` 補 refusal → incomplete（區分長度限制／內容過濾）→ 其他非完成狀態 → 空輸出／`json.loads()` 的失敗分流。
+- **第 9 週**：六層管線（輸入→格式路由→抽取→清理→chunking→應用），本機確定性處理、AI 摘要按鈕觸發；字元滑動視窗 + overlap 為基礎，段落優先切割為必做練習；先複習 type hints；上傳上限 8 MB（`.streamlit/config.toml`）。
+- **第 10 週**：Codex 正式主線為 `list[dict]` + NumPy + cosine 的最小索引，OpenAI Embeddings 為主動開啟的付費模式；ChromaDB 只作 preview／選讀、FAISS 只作概念比較，皆非必要依賴（Claude 版為 ChromaDB-first 參考）。
+- **第 11 週**：ChromaDB 為必要向量庫（`EphemeralClient()`），教 Retrieval、context、來源引用、證據不足拒答、基本評估；索引與生成是兩個明確操作；文件內容視為不可信任資料。2026-08-11 加入 `evaluate_retrieval()`（檢索層）與 `evaluate_rag_answer()`（生成層）區分。FAISS、持久化、hybrid、reranking 留進階。
+- **第 10、11 週 ChromaDB 設定（2026-09-15）**：Codex 正式版改用 `configuration={"hnsw": {"space": "cosine"}}`，來源存於 `metadatas`；Claude 參考版未改（見「Claude 版與 Codex 已知差異」）。
+- **第 12 週**：Responses API `input_image` + Base64 data URL；本機 signature + Pillow 驗證格式、尺寸、像素、非動態 GIF，8 MB 上限；表單按鈕觸發 API；收據／表單沿用 JSON Schema strict；detail 只提供 `auto`／`low`／`high`；`store=False` 不代表圖片未傳送；所有文字數字需人工回看原圖。
+
+## 課堂環境（2026-09-16，Codex 建立）
+
+- 第 7–12 週正式 App 的 requirements 固定直接依賴，基準 Windows x86_64／Python 3.12.13、Streamlit 1.63.0、OpenAI SDK 2.49.0、python-dotenv 1.2.3、NumPy 2.5.3、pandas 3.0.5、pypdf 6.18.1、python-docx 1.2.0、ChromaDB 1.5.9。
+- 完整快照 `environments/classroom-windows-py312.txt`，不可直接當 Linux 雲端 lock。Streamlit 1.46 起支援入口程式旁的 `.streamlit/config.toml`，從 repo 根目錄或 App 目錄啟動皆可載入。
+- 第 12 週在現有 Windows／Python 3.14 `.venv` 實跑；課堂 Python 3.12 乾淨環境尚未對第 12 週建立。
+- Claude 版專案的 requirements 未依此固定（僅 Codex 正式版同步）。
+
+## Claude 版專屬紀錄
+
+### 第 3 週投影片
+- `week03/生成式AI應用開發_第03週投影片.md`：25 頁 Marp，Claude 產出；內文移除第 4 週前向指涉，擴充 Gemini／Claude API 差異（對照表、程式寫法、多輪對話、選用建議）。
+
+### 第 4～6 週 Claude 版
+- 第 4 週：35 cells，四大功能與課堂練習（A 會議記錄、B few-shot 垃圾郵件、C 選做 prompt 測試）保留 TODO。
+- 第 5 週：33 cells，方法 A／B 比較、`ChatSession`（`_trim()`、`reset()`）、`stream_reply`、`chat_bot()`（教師版預設註解）；練習 A 英文練習夥伴、B `max_turns=1` 遺忘、C 累計 token。2026-07-14 比較結論：Claude 版需補 API 失敗不污染 history、空白輸入驗證、Streaming 接上 history；正式主線已定為 Codex 版，這三項修正僅在需要備援版時套用。
+- 第 6 週：31 cells，Pydantic-first；練習 A `ResumeInfo`、B 巢狀 `OrderInfo`、C `extract_with_retry()`；demo cell 用 `print(model)` 避免學生未完成 TODO 時連鎖錯誤。其優點（欄位驗證表、`MeetingMinutes`、`extract_structured()`、refusal 提醒）已被 Codex 正式版吸收。
+
+### 第 7 週 Claude 版
+- `%%writefile` 漸進產生 `app_1_hello.py`→`app_4_chat.py`，含 Colab localtunnel 備援；secrets 雙軌 `.env` + `st.secrets`（`get_secret()`）；練習 A 側邊欄 system prompt、B 翻譯／分類表單、C 累計成本。`week07_streamlit_app_claude/` 通過 `py_compile`，付費 API／實跑未執行。
+
+### 第 8 週 Claude 版
+- 說明書反映七項定案；兩專案 helper 對齊 Codex 第 7 週（`get_secret`／`create_client`／`ask_ai`／`stream_ai`），結構化輸出改用 Pydantic；Codex 正式版已吸收其「真 structured output」要求、安全紅線、optional `stream_ai()`、檔案上傳與串流摘要示範。
+
+### 第 9 週 Claude 版（2026-07-31）
+- helper 對齊 Codex：`decode_text_bytes`（utf-8-sig/utf-8/cp950）、`extract_pdf_text`（`[第 N 頁]`）、`extract_docx_text`、`extract_csv_text`（限 200 列）、`extract_text`、`clean_text`、`chunk_text`、`get_secret`、`summarize_document`。
+- 學生版 6 TODO（`clean_text`／`chunk_text`／`summarize_document` + A `chunk_by_paragraph`／B `build_document_report`／C `challenge_plan`），graceful degradation；`RUN_PAID_API=False` 守門。教師版本機程式實跑通過。
+
+### 第 10 週 Claude 版（2026-08-04）
+- helper：`get_embedding(text, offline=)`、`embed_texts`、`cosine_similarity`、`search_chunks`、`build_chroma_collection`、`query_chroma`；ChromaDB-first（Codex 正式版改為 NumPy-first）。
+- 差異化：離線假 embedding `local_demo_embed()`（字元 + bigram + 空白斷詞雜湊），明確標註「非真語意」；Codex 正式版已吸收此概念。
+- 學生版 6 TODO（`cosine_similarity`、`get_embedding` 真 API 分支、`search_chunks`、A `build_chroma_collection`、B `query_chroma`、C `challenge_plan`）。
+
+### 第 11 週 Claude 版（2026-08-11）
+- helper 依使用者裁示 (a) 對齊 Codex `rag_utils`：`build_rag_context`(→str)／`build_rag_prompt`／`generate_rag_answer`／`format_sources`(→list)／`evaluate_rag_answer`／`answer_from_hits`，常數 `DEFAULT_GENERATION_MODEL`／`INSUFFICIENT_EVIDENCE_MESSAGE`；hits 為扁平結構。
+- TODO：核心 `build_rag_context`／`answer_from_hits`（graceful）+ 練習 A `evaluate_retrieval`／B `filter_hits_by_score`（`NotImplementedError`）／C `challenge_plan`。
+- 品質修正（2026-08-11）：第 9–11 週 notebook `cell_type` 由 `"md"` 改 `"markdown"`；學生版 `run_local_checks()` 改為註解；`app.py` 索引簽章用 `hashlib.sha256(file_bytes)`；按「建立／更新索引」按鈕才建索引；README 更新。`build_rag_context` 只對實際保留的非空片段連續編號。
+
+### 第 12 週 Claude 版（2026-09-16）
+- helper 一開始即對齊 Codex `vision_utils.py`：`detect_image_mime`／`validate_image`／`image_to_data_url`／`build_task_prompt(mode, question)`／`get_refusal_reason`／`require_completed_response`／`analyze_image(file_bytes, *, mode, question, detail, model)`／`RECEIPT_SCHEMA`／`get_secret`／`create_client`；Notebook 的 given helper 由 builder 以 `inspect.getsource` 從專案取出。
+- 學生版 6 TODO（核心 `validate_image`／`build_task_prompt` graceful + A `choose_detail`／B `normalize_receipt`／C `evaluate_vision_answer` 用 `NotImplementedError` + D `challenge_plan`）。
+- 差異化：離線示範模式 `analyze_image(..., offline=True)`（`OFFLINE_DEMO_NOTICE`）、`build_request`／`preview_request`、模糊旋轉收據、練習 helper 放進專案、Claude API 圖片輸入對照表（選讀）。
+- 驗證：兩版全部 code cell 離線依序執行 0 錯誤、3 個 .py `py_compile`、`vision_utils` 煙霧測試、Streamlit `AppTest`。**本機已設定 `OPENAI_API_KEY`，曾意外真實呼叫一次 `analyze_image`；之後測試一律清空金鑰。**
+
+### Claude 版與 Codex 已知差異（未同步，僅記錄）
+- 第 10、11 週 Claude 版 `embedding_utils.py:183` 仍用 `create_collection(name, metadata={"hnsw:space": "cosine"})`；Codex 正式版已改 `configuration={"hnsw": {"space": "cosine"}}`。
+- 第 11 週 Claude 版 embedding 層函式名保留 `build_chroma_collection`／`query_chroma`，未改成 Codex 的 `build_chroma_index`／`query_chroma_index`（刻意維持與第 10 週 Claude 版一致）。
+- 第 12 週 Codex 版 Notebook 與專案函式名不一致（`validate_upload`／`analyze_image_bytes`／`extract_receipt` vs `validate_image`／`analyze_image`）；比較文件建議 Codex 統一並吸收模糊測試圖、練習 helper 放進專案。
+- Claude 版各週 App requirements 未固定版本、未納入 `scripts/verify_classroom_environment.py`。
+- 第 2、5、10 週 Codex 正式版的 2026-09-22 lambda／callback／sorted 補強、第 7 週 history 修正、第 8 週失敗分流等，均未回補至 Claude 版。
+
+## 編輯與驗證原則（同步 Codex 現行規則）
+
+- 修改 notebook 時用 Python `json` 模組讀寫 `.ipynb`，不用全文字串替換。
+- **輸出 notebook 使用 `json.dumps(..., ensure_ascii=False, indent=1)`**，保留可讀繁體中文；寫入後必須重新解析 JSON 並檢查亂碼（取代早期為避免 Colab／Windows 中文變 `?` 而使用的 `ensure_ascii=True`）。
+- 修改學生版時保留 TODO，不貼回教師版答案；教師版可保留完整答案與示範程式，不殘留真正待完成的 TODO。
+- 生成或修改程式碼時加入繁體中文教學型註解與結構化 docstring（目的、參數、回傳、可能錯誤、教學重點）；避免逐行翻譯明顯語法。
+- Markdown 可用少量 emoji、HTML 提示框與 `<font color="..."><b>…</b></font>`（Colab 對 CSS `style` 支援不穩），避免過度裝飾；callout 只放安全／成本／幻覺等紅線。
+- 每次生成或修改某一週教材後，同步更新 `PROJECT_MEMORY.md` 與本檔的教材狀態、進度、決策與下一步，並保留原始教材、不自動改動其他週次。
+- 每次修改 notebook 後至少檢查：
+  - JSON 可解析；每個 cell 的 `cell_type` 只能是 `"markdown"` 或 `"code"`（曾因 builder 寫成 `"md"` 導致第 9–11 週 Claude notebook 失效）。
+  - cell ID 存在且唯一；`outputs` 清空、`execution_count` 為 `null`（另有要求除外）。
+  - 普通 Python code cell 通過 `ast.parse()`（排除 magic 與寫入非 Python 檔的 cell），無 SyntaxWarning。
+  - 無大量 `?`、`�` 等亂碼；無疑似 API key 或個資。
+  - 學生版主要練習保留 TODO 且無答案洩漏；學生版「Run All」不中斷（`run_local_checks()` 等自我檢查要註解並附說明）。
+- Streamlit 專案：`.py` 通過 `py_compile`；requirements／`.env.example`／`.gitignore`／README／secrets 範例一致；表單或按鈕避免 rerun 重複觸發付費 API；無金鑰能做的 import／啟動檢查就執行，真實金鑰測試未執行要如實標示。
+- 本機有真實 `OPENAI_API_KEY`：離線測試前先清空該環境變數。
 
 ## 模型與環境變數
 
-- OpenAI 版本預設模型：`gpt-5.4-mini`，可用 `OPENAI_MODEL` 覆蓋。
-- Gemini 版本預設模型：`gemini-3.5-flash`，可用 `GEMINI_MODEL` 覆蓋。
-- Claude 版本預設模型：`claude-haiku-4-5`，可用 `CLAUDE_MODEL` 覆蓋。
+- OpenAI 預設模型：`gpt-5.4-mini`（`OPENAI_MODEL` 可覆蓋）；Embeddings：`text-embedding-3-small`。
+- Gemini 預設模型：`gemini-3.5-flash`（`GEMINI_MODEL`）。
+- Claude 預設模型：`claude-haiku-4-5`（`CLAUDE_MODEL`）。
 - 若任一預設模型在上課帳號不可用，課前改成實際可用模型。
 
-## 第五週兩版比較（2026-07-14）
+## 最近工作進度（新→舊，同步自 Codex；細節見 `PROJECT_MEMORY.md` 與各週紀錄）
 
-Claude 版與 Codex 版已完成詳細比較，主要差異如下：
+- 2026-10-13：Claude 依使用者要求同步本檔與 auto-memory 至 Codex 記憶（`842f212`）；第 12 週比較文件更新提交狀態。未改動任何教材內容。
+- 2026-10-13：Codex 於 `PROJECT_MEMORY.md` 開頭建立「公司電腦接續摘要」；依使用者指示移除第 5、6 週 150 分鐘雙版的語音銜接預告（code cells 完全不變，各只改一格 Markdown），並移除學生教材中的修訂作業說明。
+- 2026-10-12：第 5、6 週 150 分鐘雙版補 Colab 操作、`API_TIMEOUT_SECONDS=60.0`、SDK 版本顯示、Secrets 授權與 runtime 重啟順序；第 5 週 `max_retries=0` 與 `%pip`。第 1 週另存語音增補修訂版（21→23 頁）。第 6 週 150 分鐘修訂版建立（64 cells）後再改善為 70 cells。
+- 2026-10-06：確認「講義製作原則」；第 4 週 150 分鐘修訂版 72 cells；第 5 週經全面展開語法（75 cells）後依第 4 週精簡為 63 cells。
+- 2026-09-22：第 2 週補 lambda 先備（各 63 cells）；第 5 週補 callback 建立／呼叫時機；第 10 週補 sort／sorted 與 top-k 排序複習。
+- 2026-09-16：Codex 與 Claude 各自完成第 12 週；Codex 固定課堂環境並建立部署指南與檢核腳本（2026-09-18 提交）。
+- 2026-09-15：第 1 週 API 費用政策與課綱第十八節；第 3 週 Gemini 多輪說明；第 7 週聊天 history／串流完成事件修正；第 8 週 Structured Outputs 失敗分流；第 10、11 週 ChromaDB `configuration` 寫法。
+- 2026-08-11：Codex 完成第 11 週並補 `evaluate_retrieval()`；Claude 完成第 11 週並對齊 Codex `rag_utils`，修正第 9–11 週 `cell_type` 與 Run All 中斷。
+- 2026-08-04／08-05：Codex 完成第 10 週並寫比較文件；第 9 週註解繁中化、吸收 Claude callout；第 2、9 週補 type hints。Claude 完成第 10 週。
+- 2026-07-28～07-31：第 2 週 with 橋接；第 7、8 週程式註解補強；第 8 週虛擬環境步驟；Codex 建立 `skills/course-material-authoring/` 與第 9 週；Claude 完成第 9 週。
+- 2026-07-21／07-22：週資料夾重整；第 5–7 週 Codex 主線確立；第 6 週可讀性與 Pydantic 補強；第 7 週 Streamlit 概念導入；第 8 週七項決策定案，兩版產出。
+- 2026-07-14／07-15：第 4、5 週兩版比較與整合；第 7 週定位為 Streamlit。
 
-**Claude 版優點**：程式碼初學者友善；以方法 B（自己維護 history）為主線，跨平台通用；`chat_bot()` + `input()` 直觀；emoji/HTML callout 視覺格式清楚。
+## 下一步建議（同步 Codex，另附 Claude 版項目）
 
-**Claude 版需修正**：
-1. `ChatSession.send()` 缺乏 API 失敗時的狀態保護（未捕捉例外時 history 可能被污染）
-2. 無輸入驗證（空白字串直接送 API）
-3. `stream_reply()` 無法接上對話歷史，Streaming 與 `ChatSession` 脫節
-
-**Codex 版優點**：API 失敗不更新狀態（正確）；`important_facts` 與對話歷史分離（Week 11 RAG 先備概念）；有課程時間表、測試計畫、完成檢核清單與課後作業。
-
-**Codex 版需調整**：40 cells 對 150 分鐘略多；繼承設計對大三學生偏進階；`RUN_PRACTICE = False` 旗標容易讓學生困惑。
-
-**整合建議**：以 Claude 版結構為底，從 Codex 版借入：失敗不更新狀態的保護寫法、`important_facts` 概念、完成檢核清單與課後作業說明。
-
-## 命名規則（重要）
-
-- `..._Claude生成.ipynb`：Claude Code（本工具）產出
-- `...實作教材_....ipynb`：Codex（其他 AI 工具）產出
-- CLAUDE.md 已更新此規則，且記憶檔入口已改為 `PROJECT_MEMORY_claude.md`
-- 例外：正式課程 starter / 範例專案（如第 8 週 `week08_midterm_starter/`）不加工具後綴。
-
-## 版本主線決策（重要，2026-07-21）
-
-- **第 5–7 週教材以 Codex 版為正式主線**（`..._實作教材_...` notebook 與 `week07_streamlit_app/` 專案），除非另外指定。
-- Claude 版（`..._Claude生成`、`week07_streamlit_app_claude/`）為比較／備援，非預設對齊對象。
-- 新教材延續時，以 Codex 版的檔案結構、helper 命名、函式簽名為基準。
-- 已確認課堂第 7 週使用 Codex 版 `week07_streamlit_app/`；其 helper：`get_secret()`（app.py:10）、`create_client()`（:22）、`ask_ai(user_input, system_prompt=...)`（:30）、`stream_ai(...)`（:42）。`extract_structured()` 非 week07 helper，源自第 6 週結構化輸出。
-
-## 下一步建議
-
-- **第 5 週**：正式主線已定為 Codex 版（見「版本主線決策」）；Claude 版三項修正僅在需要比較或另作備援版時套用
-- 實際上傳第 3–6 週學生版到 Colab 測試（串流顯示、`input()` 聊天迴圈、Structured Outputs 付費 cells）
-- 產生第 4、5、6 週投影片
-- 第 6 週目前只有 Claude Code 版本，尚無 Codex 版本可比較；若 Codex 後續也產出第 6 週教材，可比照第 4、5 週流程做優缺點比較與整合
-- 第 7 週 Claude 版已完成（notebook 兩版 + `week07_streamlit_app_claude/` 專案）；可比照第 4、5 週流程與 Codex 版（`..._實作教材_...` + `week07_streamlit_app/`）做優缺點比較與整合建議
-- 第 7 週建議實測：本機 `streamlit run app.py`（聊天/串流/表單/檔案上傳）、`.env` 未被 Git 追蹤、部署到 Streamlit Community Cloud
-- **第 8 週 Claude 版已完成**（說明書 + `week08_midterm_starter_claude/` + `week08_midterm_example_summarizer_claude/`）；可比照第 4、5 週流程與 Codex 版（`week08_midterm_starter/` + `..._example_summarizer/` + Codex 說明書）做優缺點比較與整合建議
-- 第 8 週建議實測：兩個 Claude 版專案本機 `streamlit run app.py`（starter TODO 骨架、範例摘要器的檔案上傳/串流/Pydantic 結構化輸出）、`.env` 未被 Git 追蹤
-- **第 9 週 Claude 版已完成**（notebook 兩版 + `week09_document_processor_claude/` 專案）；可比照第 4、5 週流程與 Codex 版（`..._實作教材_...` + `week09_document_processor/`）做優缺點比較與整合建議
-- 第 9 週建議實測：本機 `streamlit run app.py`（上傳 PDF/DOCX/CSV/TXT、清理與 chunking 預覽、chunks JSON 下載、按鈕觸發 AI 摘要）、掃描 PDF 的 OCR 提示、`.env` 未被 Git 追蹤
-- **第 10 週 Claude 版已完成**（notebook 兩版 + `week10_semantic_search_claude/` 專案）；Codex 版尚未產出，待 Codex 產出後可比照做優缺點比較與整合建議
-- 第 10 週建議實測：`pip install chromadb` 後跑 notebook 練習 A/B（ChromaDB 建索引/查詢）、本機 `streamlit run app.py`（離線示範模式先驗證流程，再用真 API 看語意搜尋、觀察 top-k 與來源顯示）、`.env` 未被 Git 追蹤
-- **第 11 週 Claude 版已完成且 helper 已對齊 Codex**（notebook 兩版 + `week11_rag_qa_claude/`）；**Codex 版第 11 週已存在**（`..._RAG基礎與文件問答實作教材_...` + `week11_rag_app/`）。兩版 `rag_utils` API 現一致，可互換對照。可比照第 9 週流程做兩版優缺點比較。
-- 第 11 週選項（未做）：若要 week11 Claude 專案成為 Codex 完全複本，可再把 `embedding_utils` 也改名對齊（`build_chroma_index`/`query_chroma_index`、build 回傳 (client, collection)、query 加 model 參數）——目前刻意未做，以免破壞與第 10 週 Claude `embedding_utils` 的一致性。
-- **第 11 週品質修正（2026-08-11，回應使用者回報 5 項）**：①第 9–11 週所有 Claude notebook 的 `cell_type` 由無效的 `"md"` 修正為 `"markdown"`（builder 修正並全部重建）；②第 9–11 週學生版 `run_local_checks()` 改為註解＋說明，避免 Run All 中斷；③`app.py` 索引簽章改用 `hashlib.sha256(file_bytes)` 內容雜湊（原只用檔名+大小，同名同大小異內容會誤用舊索引）；④`app.py` 改為「按『建立／更新索引』按鈕才建索引」（原調 slider 會自動重建，線上模式產生非預期 Embeddings 費用），index 就緒才顯示問答框；⑤README 更新（移除「Codex 版尚未產出」、函式名改為對齊後的 `build_rag_context`/`answer_from_hits` 等、補充建索引按鈕與內容雜湊說明）。app.py 通過 py_compile。
-- 第 11 週建議實測：`pip install chromadb` 後本機 `streamlit run app.py`（離線模式先驗證檢索+context，再用真 API 看 grounded 答案+來源引用、問文件沒有的問題確認 abstain）、`.env` 未被 Git 追蹤
-- **第 12 週 Claude 版已完成且 helper 一開始即對齊 Codex**（notebook 兩版 + `week12_vision_app_claude/` + 比較文件）。Codex 版與 Claude 版皆**尚未 commit**（`week12/` 整個目錄為 untracked）；commit 前確認 `sample_data/*.png` 未被追蹤。
-- 第 12 週建議 Codex 版吸收：Notebook 與專案函式名統一、模糊版測試圖片、練習 helper 放進專案（見比較文件第五節）。
-- 第 12 週建議實測：`python sample_data/create_demo_receipt.py` 後本機 `streamlit run app.py`（先離線模式走完流程與 request 預覽，再用真 API 跑清楚版與模糊版抽取，觀察 null/warnings；改副檔名的文字檔確認被擋）、`.env` 未被 Git 追蹤。
-- 產生第 4、5、6、7、8、9、10、11、12 週投影片
+- 第 5、6 週 150 分鐘雙版：在新的 Colab runtime 驗證安裝、Secrets 授權／重啟、一般與串流回應、Structured／Pydantic 成功與失敗及逾時處理，記錄 OpenAI SDK／Pydantic 版本後固定安裝指令，依實測調整 60 秒設定；以教學帳號確認第 6 週 G、A、B/C 流程與授課時間。
+- 第 12 週語音輸入與輸出增補及主課綱同步規劃（尚未開始，需使用者指定）。
+- 上傳第 3、4、6 週學生版到 Colab 測試顯示與 API 執行；產生第 3、4、6 週投影片或講義版 Markdown；整理 OpenAI／Gemini／Claude 三版一頁對照表。
+- 第 7 週：以測試用 key 啟動 `week07/week07_streamlit_app/`，用兩輪追問、清空紀錄、串流／非串流切換確認真實行為。
+- 第 8 週：分別執行 starter 與 example summarizer，確認 structured output 與畫面。
+- 第 9 週：以文字型 PDF、掃描 PDF、含表格 DOCX、UTF-8／CP950 CSV 測 reader 與錯誤訊息，再測 Streamlit chunk 參數、預覽、JSON 下載與按鈕式摘要。
+- 第 10 週：先用 `sample_data/ai_course_faq.md` 跑離線索引與 top-k，再關閉離線模式測真實 Embeddings；ChromaDB preview 需安裝 `requirements-chroma.txt`。
+- 第 11 週：依 `docs/課堂環境與部署指南.md` 用 Python 3.12，先用 `sample_data/course_handbook.md` 測離線 embedding、ChromaDB、有答案／無答案／提示注入三種問題，再測真實 API，確認 `[來源 n]` 對應 UI 實際 chunk；再評估 Community Cloud 的 ChromaDB 安裝與記憶體。
+- 第 12 週：在 Python 3.12 新環境安裝 `week12_vision_app/requirements.txt`，產生示範收據後測四種模式與錯誤分流，再以測試 key 檢查真實 Vision 回應、detail 差異與 usage；Colab、瀏覽器與 Community Cloud 驗證；只用無敏感資料。
+- （Claude 版，選做）若要讓 Claude 參考版與正式版一致：第 10、11 週 ChromaDB 改 `configuration` 寫法、固定 requirements 版本；第 12 週建議 Codex 吸收的項目見比較文件第五節。Claude 版目前只作比較／備援，未經使用者指示不主動改動。
+- 產生第 4～12 週投影片。
