@@ -11,6 +11,7 @@
 目前 notebook 教材只保留「學生版」與「教師版」。原始版 notebook 已刪除，避免和教師版內容重複。
 
 - `生成式AI應用開發_16周課程大綱.md`：課程主大綱，目前實際規劃為 18 週，含 16 週授課與第 17、18 週自主學習。
+- `week01/生成式AI應用開發_第01週教材_語音增補修訂版.md`、同名主題投影片Markdown／HTML：第1週新修訂主線，原始三檔保留。23頁Marp加入STT／文字回答／TTS概念、10分鐘預錄示範與背景調查；150分鐘核心教學、10分鐘休息、20分鐘彈性排障。評量與期末最低要求對齊主課綱。第12週語音為後續增補規劃，尚未更新該週或主課綱。
 - `week02/生成式AI應用開發_第02週_Python複習_學生版.ipynb`：第 2 週學生版，保留 TODO 骨架。
 - `week02/生成式AI應用開發_第02週_Python複習_教師版.ipynb`：第 2 週教師版，保留完整參考答案。
 - `week03/生成式AI應用開發_第03週_OpenAI_API入門_學生版.ipynb`：第 3 週 OpenAI API 學生版，保留 TODO 骨架。
@@ -25,8 +26,10 @@
 - `week04/生成式AI應用開發_第04週_Prompt_Engineering實作教材_學生版.ipynb`：依原規劃重建的 40-cell 學生版，三組綜合練習保留 TODO 骨架。
 - `week05/生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_教師版.ipynb`：第 5 週 40-cell 教師版，包含完整聊天 session、Streaming 與三組練習答案。
 - `week05/生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_學生版.ipynb`：第 5 週 40-cell 學生版，三組綜合練習保留 TODO 骨架。
+- `week05/生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_150分鐘修訂版_學生版.ipynb` 與教師版：目前各63 cells，後續第5週修訂在此雙版接續。第5、6週150分鐘雙版皆補Colab操作、可調整的60秒網路逾時、版本顯示；2026-10-13已移除無當週實作支撐的語音預告。SDK自動重試關閉，課前仍需實測Colab並確認版本。
 - `week06/生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材_教師版.ipynb`：第 6 週 40-cell 教師版，包含 Structured Outputs、JSON Schema、資料抽取、Pydantic、巢狀模型、refusal handling 與練習答案。
 - `week06/生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材_學生版.ipynb`：第 6 週 40-cell 學生版，保留 JSON Schema、Pydantic 與重試練習 TODO 骨架。
+- `week06/生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材_150分鐘修訂版_學生版.ipynb` 與教師版：目前各70 cells，G、A必做與B/C擇一；原始版保留，後續第6周修訂以此雙版接續。
 - `week07/生成式AI應用開發_第07週_Streamlit_Web_App入門實作教材_教師版.ipynb`：第 7 週 40-cell 教師版，主軸為 VS Code、本機 Python、Streamlit、OpenAI Responses API、session state、streaming、secrets、表單與檔案上傳。
 - `week07/生成式AI應用開發_第07週_Streamlit_Web_App入門實作教材_學生版.ipynb`：第 7 週 40-cell 學生版，保留 Streamlit App、API helper、session state、streaming 與期中小專題規劃 TODO。
 - `week07/week07_streamlit_app/`：第 7 週可直接用 VS Code 開啟的 Streamlit 範例專案，包含 `app.py`、`requirements.txt`、`.env.example`、`.gitignore`、`README.md` 與 `.streamlit/secrets.example.toml`。
@@ -45,6 +48,16 @@
 - `week12/week12_vision_app/`：第 12 週正式 Streamlit 圖片理解專案，支援 PNG、JPEG、WEBP、非動態 GIF，提供 8 MB／格式／尺寸／影格驗證、圖片描述、圖片問答、截圖檢查、收據／表單 strict structured output、拒答／未完成分流、隱私與人工覆核提醒。
 
 ## 最近工作進度
+
+- 2026-10-13 依使用者指示移除第5、6週150分鐘學生／教師版的語音銜接預告：兩週沒有語音API活動，避免將後續構想混入當週教材。第6週逐段檢視後，Schema版本管理與巢狀會議有本機程式，重試為明訂輸入／回傳與假operation檢查的課後設計任務，均保留；第7／8週App銜接對應本週抽取與驗證成果，保留。另移除學生教材中的「本次不改第七周App或其他週次」修訂作業說明。四份Notebook各維持63／70 cells，所有code、TODO、ID、metadata與Colab／成本設定不變。更新腳本改為移除預告，第6週重建腳本不再加回；驗證腳本支援已提交的環境設定，新增預告缺席檢查。JSON、122格普通Python AST、程式完全未改、離線／假SDK及第6週重建比對通過；未執行真實API或Colab。詳見第5、6週修訂紀錄。本次以此狀態取代10月12日加入語音預告的決策，第1週語音概念與第12週增補規劃仍沿用。
+
+- 2026-10-12 依使用者確認，同步修改第5、6週150分鐘學生／教師版的Colab操作與API設定：第5週改為max_retries=0及%pip；兩週新增API_TIMEOUT_SECONDS=60.0、SDK版本顯示（第6週另含Pydantic），並說明網路等待與串流總時間差異、Secrets授權、runtime重啟後執行順序及付費旗標復原。補簡短STT／TTS銜接，未增加語音API或練習。第5週各63、第6週各70 cells，ID／TODO／其他練習程式保留。四份Notebook共122格普通Python AST、無金鑰順序執行、假SDK初始化、Secrets未授權與逾時檢查通過；第6週既有離線／假API檢查與重建結果比對亦通過。原始教材保留。修改與檢查腳本為scripts/update_colab_runtime_guidance.py、scripts/verify_colab_runtime_guidance.py，第6週重建腳本已同步。詳細紀錄見兩週修訂紀錄；未執行真實OpenAI SDK／API或Colab，60秒及套件版本須於課前實測後調整／固定。此前「第5、6週僅檢視」為歷史狀態，本項為後續完成狀態。
+
+- 2026-10-12 已另存第1週語音增補修訂教材與Marp Markdown／HTML，沿用原版型由21增為23頁；新增STT／TTS與輸入輸出概念、文字Streaming區分、固定示意文字／預錄示範腳本、錯誤修正與學生檢核、語音專題範例及設備調查。教材大綱逐頁對齊23頁；評量統一40／20／25／10／5%，期末至少RAG或Function Calling其中一項。兩份Markdown內容／亂碼、HTML頁數與全部23頁渲染檢視通過，技術地圖頁尾重疊已修正。第5、6週150分鐘雙版僅檢視，JSON／ID／輸出／122格普通Python AST／RUN旗標預設False通過；建議後續補%pip、課前實測版本、Secrets授權、runtime重啟順序及簡短語音銜接，第5週SDK重試設定亦須配合請求上限說明。原始第1週、第5、6週與主課綱未改，沒有產生實際音檔，未執行Colab、真實SDK／API、語音播放或試教。詳見`week01/第01週_語音增補修訂與Colab檢視紀錄.md`；重建來源為`scripts/build_week01_voice_revision.py`。
+
+- 2026-10-12 自行檢查第6周150分鐘修訂雙版並改善：補事件欄位validator，區分解析成功與可用資料；一般prompt／Structured拆兩格獨立旗標，各1次請求；新增A2六項無金鑰契約檢查與參數轉交規格；G檢查原Schema副作用及原五欄保留；補B/C時間、選題及逐欄核對指引。兩版由64增至70 cells（34 Markdown、36 code，35普通Python），原64個ID與順序保留，固定主線仍7次請求。靜態、無金鑰順序、教師離線／假API及新增失敗情境通過；182份原始教材與專案檔案雜湊一致。詳細紀錄與腳本已同步，未執行真實SDK／API、Colab或150分鐘試教。
+
+- 2026-10-12 在家裡電腦的 `Home_Test` 分支依第4、5周原則另存第6周150分鐘學生／教師修訂版，各64 cells（32 Markdown、32 code，含31格普通Python）。採JSON Schema first，G事件Schema引導與A客服抽取必做、B評論／C巢狀訂單擇一；版本管理、巢狀會議與重試移至選讀／延伸。補上TODO型別／回傳／保存規格、deepcopy與Pydantic正式程式對照、拒答／incomplete／failed／空回應分流、客服欄位與摘要驗證、固定三題與人工核對。缺金鑰仍可離線；各真實API旗標置於使用格且預設False，SDK自動重試關閉；主線固定7次請求，作業Schema選讀另1次。雙版JSON、唯一ID、清空輸出、AST、無金鑰順序執行、學生骨架分離、教師本機契約與六項假API活動檢查通過；未呼叫真實API、安裝OpenAI SDK、驗證Colab／教室環境或150分鐘試教。原始第6周及其他週次未改。詳見 `week06/第06週_150分鐘修訂版_修訂與驗證紀錄.md`；重建與離線檢查腳本為 `scripts/build_week06_revision.py`、`scripts/verify_week06_revision.py`。後續第6周修訂在此雙版續改，不自動取代原版。
 
 - 2026-10-06 依使用者最新要求對照第四周精簡第五周細節選讀，兩版由75減為63 cells（36 Markdown／27 code，26普通Python）；刪12個重複或非必要語法cells，保留**request、history副本與reset、usage／假client的新需求說明及A/B任務。已教getattr／or、集合、函式物件／解包改前週回查；基礎環境、字串、型別、迴圈及CLI不另設長選讀，類別整併對照表。保留程式AST一致，靜態／離線順序、配對TODO、教師五項契約與七個活動假API（15次請求）通過，其他教材未變更，未驗證真實API／Colab。本次取代前次「全面展開語法」的呈現方式，講義原則第4項同步改為主動盤點但只補必要新選讀。
 
@@ -206,6 +219,8 @@
 
 ## 下一步建議
 
+- 第5、6週150分鐘雙版已完成Colab操作修訂；課前在新的Colab runtime驗證安裝、Secrets授權／重啟、一般與串流回應及逾時處理，記錄OpenAI SDK／Pydantic版本後固定安裝指令，依實測調整60秒設定。
+- 優先檢視第6周150分鐘修訂版的G、A與B/C擇一流程；以教學帳號在Colab確認套件安裝、模型可用性、真實欄位／分類／金額與授課時間。固定假回應只驗證程式，不替代真實模型成果；原始版保留供比較。
 - 實際上傳第 3 週學生版到 Colab 測試顯示與 API 執行。
 - 比較 OpenAI、Gemini、Claude 三版的 API key、client、輸入格式、回應欄位與多輪對話差異，整理成一頁對照表。
 - 產生第 3 週投影片或講義版 Markdown。
