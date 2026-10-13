@@ -28,6 +28,7 @@ def run_offline(path):
     ordinary = 0
     for index, (new, old) in enumerate(zip(nb["cells"], before["cells"])):
         source = "".join(new["source"])
+        assert '**語音' not in source
         assert not re.search(r"\?{4,}|\ufffd|sk-[A-Za-z0-9_-]{20,}", source)
         if new["cell_type"] != "code":
             continue
@@ -40,7 +41,7 @@ def run_offline(path):
         ast.parse(source)
         ordinary += 1
     # 只有安裝／環境格可修改程式；所有學生答案與正式練習維持原樣。
-    assert set(changed_code) == {5, 6}, changed_code
+    assert set(changed_code) <= {5, 6}, changed_code
     assert nb["metadata"] == before["metadata"]
     constructors = []
     sdk = types.ModuleType("openai")

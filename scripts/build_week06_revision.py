@@ -901,7 +901,6 @@ def build(teacher):
     真實API成果須附實際input与結果；假回應與fixture單獨標為離線測試，不能冒充模型成果。
     交件可保留必要實際輸出；教材發佈版輸出清空。不得附金鑰、個資或真實客服資料。
     第七周App：表單收input→按鈕呼叫→ok分流→欄位驗證→結果顯示；第八周期中要求真structured output。
-    本次不改第七周App或其他週次。
     ''')
     md('cost', '''
     ### 執行與成本表
@@ -932,8 +931,6 @@ def build(teacher):
             cell['source'] = [line.replace(before, after) for line in cell['source']]
         if cell['id'] == 'w06r-setup':
             cell['source'] = change_setup(''.join(cell['source']), 6).splitlines(keepends=True)
-        if cell['id'] == 'w06r-handoff':
-            cell['source'].append('\n**語音銜接（概念預告）**：後續可用本週Schema抽取已確認的逐字稿；格式通過仍要核對人名、日期、金額與原錄音。本週不新增錄音或語音API。\n')
         if cell['id'] == 'w06r-sources':
             cell['source'].append('\n- [OpenAI官方Python SDK說明](https://developers.openai.com/api/reference/python)：timeout與max_retries。\n- [IPython %pip](https://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-pip)：目前kernel的套件安裝。\n- [Colab FAQ](https://research.google.com/colaboratory/faq.html)：runtime與執行狀態。\n')
     original['cells'] = cells

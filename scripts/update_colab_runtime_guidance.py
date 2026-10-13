@@ -79,18 +79,12 @@ def update(week):
                 "- [Colab FAQ](https://research.google.com/colaboratory/faq.html)：runtime與執行狀態。\n"
             )
         sources["source"] = source_text.splitlines(keepends=True)
-        # 僅補銜接文字，不加入新的API活動或學生必做項目。
-        bridge_cell = next(c for c in cells if c["cell_type"] == "markdown" and (
-            ("完成檢核與後續銜接" in "".join(c["source"])) if week == 5 else c["id"] == "w06r-handoff"
-        ))
-        bridge = "".join(bridge_cell["source"])
-        if "語音銜接（概念預告）" not in bridge:
-            bridge += (
-                "\n**語音銜接（概念預告）**：後續把已確認的辨識文字送進本週聊天函式；只有完整、可用的回答才交給TTS。文字delta顯示與音訊播放是不同步驟，本週不新增語音API。\n"
-                if week == 5 else
-                "\n**語音銜接（概念預告）**：後續可用本週Schema抽取已確認的逐字稿；格式通過仍要核對人名、日期、金額與原錄音。本週不新增錄音或語音API。\n"
-            )
-        bridge_cell["source"] = bridge.splitlines(keepends=True)
+        # 移除無當週實作支撐的語音預告與修訂作業說明，保留原章節。
+        for cell in cells:
+            if cell["cell_type"] == "markdown":
+                cell["source"] = [line for line in cell["source"]
+                                  if not line.lstrip().startswith('**語音')
+                                  and not (week == 6 and line.startswith('本次不改'))]
         assert [(c["id"], c["cell_type"]) for c in cells] == [(c["id"], c["cell_type"]) for c in original["cells"]]
         for index, (before, after) in enumerate(zip(original["cells"], cells)):
             if before["cell_type"] == "code" and index not in (5, 6):

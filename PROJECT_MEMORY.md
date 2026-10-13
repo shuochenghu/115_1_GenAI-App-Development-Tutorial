@@ -26,7 +26,7 @@
 - `week04/生成式AI應用開發_第04週_Prompt_Engineering實作教材_學生版.ipynb`：依原規劃重建的 40-cell 學生版，三組綜合練習保留 TODO 骨架。
 - `week05/生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_教師版.ipynb`：第 5 週 40-cell 教師版，包含完整聊天 session、Streaming 與三組練習答案。
 - `week05/生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_學生版.ipynb`：第 5 週 40-cell 學生版，三組綜合練習保留 TODO 骨架。
-- `week05/生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_150分鐘修訂版_學生版.ipynb` 與教師版：目前各63 cells，後續第5週修訂在此雙版接續。第5、6週150分鐘雙版皆補Colab操作、可調整的60秒網路逾時、版本顯示與語音概念銜接；SDK自動重試關閉，課前仍需實測Colab並確認版本。
+- `week05/生成式AI應用開發_第05週_對話狀態_Streaming與聊天機器人實作教材_150分鐘修訂版_學生版.ipynb` 與教師版：目前各63 cells，後續第5週修訂在此雙版接續。第5、6週150分鐘雙版皆補Colab操作、可調整的60秒網路逾時、版本顯示；2026-10-13已移除無當週實作支撐的語音預告。SDK自動重試關閉，課前仍需實測Colab並確認版本。
 - `week06/生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材_教師版.ipynb`：第 6 週 40-cell 教師版，包含 Structured Outputs、JSON Schema、資料抽取、Pydantic、巢狀模型、refusal handling 與練習答案。
 - `week06/生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材_學生版.ipynb`：第 6 週 40-cell 學生版，保留 JSON Schema、Pydantic 與重試練習 TODO 骨架。
 - `week06/生成式AI應用開發_第06週_Structured_Outputs_JSON_Schema與資料抽取實作教材_150分鐘修訂版_學生版.ipynb` 與教師版：目前各70 cells，G、A必做與B/C擇一；原始版保留，後續第6周修訂以此雙版接續。
@@ -48,6 +48,8 @@
 - `week12/week12_vision_app/`：第 12 週正式 Streamlit 圖片理解專案，支援 PNG、JPEG、WEBP、非動態 GIF，提供 8 MB／格式／尺寸／影格驗證、圖片描述、圖片問答、截圖檢查、收據／表單 strict structured output、拒答／未完成分流、隱私與人工覆核提醒。
 
 ## 最近工作進度
+
+- 2026-10-13 依使用者指示移除第5、6週150分鐘學生／教師版的語音銜接預告：兩週沒有語音API活動，避免將後續構想混入當週教材。第6週逐段檢視後，Schema版本管理與巢狀會議有本機程式，重試為明訂輸入／回傳與假operation檢查的課後設計任務，均保留；第7／8週App銜接對應本週抽取與驗證成果，保留。另移除學生教材中的「本次不改第七周App或其他週次」修訂作業說明。四份Notebook各維持63／70 cells，所有code、TODO、ID、metadata與Colab／成本設定不變。更新腳本改為移除預告，第6週重建腳本不再加回；驗證腳本支援已提交的環境設定，新增預告缺席檢查。JSON、122格普通Python AST、程式完全未改、離線／假SDK及第6週重建比對通過；未執行真實API或Colab。詳見第5、6週修訂紀錄。本次以此狀態取代10月12日加入語音預告的決策，第1週語音概念與第12週增補規劃仍沿用。
 
 - 2026-10-12 依使用者確認，同步修改第5、6週150分鐘學生／教師版的Colab操作與API設定：第5週改為max_retries=0及%pip；兩週新增API_TIMEOUT_SECONDS=60.0、SDK版本顯示（第6週另含Pydantic），並說明網路等待與串流總時間差異、Secrets授權、runtime重啟後執行順序及付費旗標復原。補簡短STT／TTS銜接，未增加語音API或練習。第5週各63、第6週各70 cells，ID／TODO／其他練習程式保留。四份Notebook共122格普通Python AST、無金鑰順序執行、假SDK初始化、Secrets未授權與逾時檢查通過；第6週既有離線／假API檢查與重建結果比對亦通過。原始教材保留。修改與檢查腳本為scripts/update_colab_runtime_guidance.py、scripts/verify_colab_runtime_guidance.py，第6週重建腳本已同步。詳細紀錄見兩週修訂紀錄；未執行真實OpenAI SDK／API或Colab，60秒及套件版本須於課前實測後調整／固定。此前「第5、6週僅檢視」為歷史狀態，本項為後續完成狀態。
 
