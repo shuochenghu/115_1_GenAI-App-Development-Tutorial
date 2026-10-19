@@ -9,7 +9,7 @@ Follow the project’s established teaching sequence, file conventions, student/
 
 ## Start with project context
 
-1. Read `PROJECT_MEMORY.md` completely and treat it as the current source of truth. Apply its「講義製作原則」section to every new lesson and revision, and check each applicable principle before handoff; explicit user instructions take precedence.
+1. Read [PROJECT_MEMORY.md](../../PROJECT_MEMORY.md) completely and treat it as the current source of truth. Apply its「講義製作原則」and「程式教材簡化原則（2026-10-19）」to every new lesson and revision, and check each applicable principle before handoff; explicit user instructions take precedence.
 2. Read `PROJECT_MEMORY_claude.md` only when comparing Claude-produced variants or tracing older decisions.
 3. Inspect the target week, related preceding-week materials, and the course outline before editing.
 4. Prefer the formal Codex track unless the user explicitly names another variant.
@@ -36,6 +36,15 @@ Do not create new `_claude` or `Claude生成` names for formal outputs. Keep exi
 8. Never write API keys, passwords, student data, or other secrets into materials.
 
 For student editions, retain useful scaffolding and TODOs without exposing full answers. For teacher editions, provide complete reference implementations and expected observations.
+
+### Default to classroom-simple code
+
+Use the Week 6 classroom simplified edition as the design reference for future teaching code. The complete, maintained rules are in `PROJECT_MEMORY.md`; use the [Week 6 teacher guide](../../week06/第06週_課堂簡化版_教師導讀與修訂紀錄.md) when a concrete example is useful.
+
+- Prioritize understanding the unit's concepts. Prefer a visible input → specification → processing → checks → result flow, short examples, and minimal, explicitly listed cell dependencies. Local examples should carry their imports and data when practical; small repetition is acceptable.
+- Introduce only the functions, classes, and syntax needed for the concept. Keep fake clients, dependency injection, generic wrappers, and complex test harnesses in teacher verification scripts unless they are themselves the lesson. Adding commentary or hiding complexity in a helper does not by itself simplify a lesson.
+- Compare tools using the same familiar data after introducing each tool. Focus student TODOs on fields, constraints, simple rules, and result interpretation; preserve necessary response checks, field validation, and distinctions between offline and real-model evidence.
+- Start each heading in its own Markdown/text cell, with its related prose and tables. Separate the previous example's observations from the next heading, and synchronize student/teacher editions, reading copies, cell references, and rebuild sources.
 
 ## Edit safely
 
