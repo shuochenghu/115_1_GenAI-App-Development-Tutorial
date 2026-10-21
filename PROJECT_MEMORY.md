@@ -2,6 +2,19 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第6週簡化版教師TODO對應提醒（2026-10-21）
+
+- 依使用者要求，只在教師版code cells加入註解提示：G1／G2、A1、A2、B1、C1參考答案旁標明「教師提醒（學生TODO…）」及學生要完成的內容；A5學生版原有TODO預檢註解，教師版補充此格沒有新增填空、執行前三題須確認A1／A2完成。共六格註解調整，雙版仍各90格，教師版程式含註解541行。
+- 同步教師版Notebook／Markdown、教師導讀、重建來源與既有驗證腳本的雙版差異清單。學生版Notebook與Markdown逐檔SHA-256對照本次修改前完全相同；教師版只有上述code cells註解不同，文字格、cell IDs與程式執行語法樹不變。
+- 既有靜態／本機Pydantic／假SDK完整檢查與git diff --check通過。未執行安裝格、真實API、Colab／瀏覽器或試教；沒有commit或push。前次上色修改保留。
+
+## 第6週簡化版文字格上色（2026-10-21）
+
+- 依使用者要求，學生／教師課堂簡化版Notebook的text cells同步上色：重要觀念、須特別說明的限制與易錯處固定紅色粗體；前置需求／操作提示標籤用藍色，預期結果標籤用綠色。首頁新增色彩提示。包含required／nullable、格式與事實正確性、Pydantic Optional與strict、離線與真實成果界線等重點。
+- 同步同名Markdown、教師導讀與 `scripts/build_week06_simple.py`，使用行內HTML font標記；標題保持原Markdown層級並各自起始文字格。雙版仍各90格（64文字、26程式），對照修改前的cell IDs、所有code cells（含metadata／TODO）、標題與去除色彩標記後的原文均完全相同，僅多首頁色彩提示。原150分鐘版與其他週次未改。
+- 已通過HTML標記配對／行內程式碼未混入色彩標記、既有完整離線／本機Pydantic／假SDK檢查、Markdown與Notebook對齊及git diff --check。未執行真實API、安裝格、Colab／真人瀏覽器色彩檢查或試教；閱讀器的HTML支援可能不同，不將靜態檢查當作實際顯示驗證。
+- 本次開始基準main／HEAD `a09c542`，工作目錄原為乾淨；未commit、push或操作遠端。
+
 ## 第7週課堂簡化版（2026-10-19，另存教材）
 
 - 依使用者「另外製作簡化版教材，保留原教材」，新增 `week07/生成式AI應用開發_第07週_Streamlit_Web_App_課堂簡化版_學生版.ipynb`／教師版與同名Markdown、`第07週_課堂簡化版_教師導讀與修訂紀錄.md`，配套為 `week07/week07_streamlit_simple/`。原第7週雙版、Git補充、原App及Claude參考檔案保留。

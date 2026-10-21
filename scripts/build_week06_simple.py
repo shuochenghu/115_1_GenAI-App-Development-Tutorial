@@ -7,6 +7,93 @@ import textwrap
 ROOT = Path(__file__).resolve().parents[1]
 STEM = '生成式AI應用開發_第06週_Structured_Outputs_課堂簡化版'
 
+# 僅用於講義文字顯示；重要觀念與限制固定紅色，不改程式或標題。
+IMPORTANT_TEXT = {
+    'title': ['把原文轉成固定欄位，檢查後再使用。', '三個問題不能互相代替。'],
+    'roadmap': ['先完成離線活動，真實API標未執行'],
+    'env-guide': ['先儲存副本、重新啟動runtime，再從Z1開始'],
+    'setup-guide': ['不把金鑰填在程式或成果表', '存在不代表金鑰有效或帳號能用該模型'],
+    'execution': ['一次只開目前活動，結束恢復False後儲存；不要保留True再「全部執行」',
+                  '手動重跑另計請求；逾時或失敗不代表免費'],
+    'json-guide': ['JSON字串適合傳遞；Python dict適合程式讀欄位'],
+    'json-after': ['才是保存結果的變數', 'JSON合法不代表評分符合整數規格'],
+    'schema-guide': ['不表示每欄都有已知答案', '不等於可以省略key', '不等於已執行驗證',
+                     '每層object的欄位都列required，並禁止額外欄位；未知值用nullable表示',
+                     '並非所有JSON Schema的共同要求'],
+    'null-after': ['只用get時，漏key與明確None看起來相同，所以還要查key是否存在',
+                   'G2在required加入meeting_url', 'required且nullable'],
+    'copy-guide': ['通過只證明列出的規格檢查，不是AI抽取成功', '淺拷貝會共用子資料'],
+    'copy-after': ['不保證巢狀隔離'],
+    'array-guide': ['items說明「每一筆活動」的規格', 'title是文字，owner可未知，兩個key都必填', '空清單[]不等於null'],
+    'array-after': ['沒有執行Schema驗證或模型抽取', '不可以，應保留key並填None'],
+    'api-guide': ['沒有開JSON mode', 'strict約束支援的資料形狀，沒有保證事實正確',
+                  '呼叫 → 拒答／完成檢查 → 非空文字 → 解析dict → 欄位檢查 → 保存'],
+    'plain-heading': ['預設不請求；開啟1次API，執行後恢復False'],
+    'strict-heading': ['預設不請求；開啟1次API，執行後恢復False'],
+    'comparison-record': ['不把錯誤訊息當資料讀取', '一次比較不能證明所有輸入的穩定性',
+                          '未執行API就標未執行，不使用手寫dict代填真實成果'],
+    'failure-guide': ['教學用簡化紀錄，不是SDK回應結構，也不是模型輸出'],
+    'failure-parse-guide': ['incomplete即使留下合法JSON也不能先採用', '不連續付費重跑'],
+    'failure-after': ['尚未通過完整事件欄位檢查', '固定案例通過不能證明真實模型品質'],
+    'a-guide': ['enum限制可選值，規則決定該選哪個值', 'summary的description只是說明，30字元由A2補查'],
+    'a-validator-guide': ['不代表模型分類正確', '空list表示這裡列出的規則通過',
+                          '計原字串字元，含空白標點，不是token數', '先查型別，型別錯就不繼續做strip／len'],
+    'a-local-guide': ['不要改測試資料來讓自己的程式通過'],
+    'a-local-after': ['程式接受「其他」這個標籤，不表示帳務題真的該選其他。',
+                      '四欄合格才保存support_result；失敗保持None，原因放support_error', 'summary另查是否忠於原文'],
+    'a-batch-guide': ['成功後仍逐欄查原文', '直接比三欄，不比摘要；summary由人核對', '失敗不會沿用上一筆結果'],
+    'a-record': ['matches=True只證明這次三個指定欄位相符，沒有檢查摘要忠實性',
+                 '不更改expected迎合模型', '格式錯先修程式，內容錯才回查規則與原文'],
+    'pydantic-guide': ['這個「模型」指資料規格，不是LLM',
+                       'class規格 → dict資料 → model_validate → 物件 → model_dump回dict',
+                       '大於等於1，不是預設為1', '沒有預設值時key仍必填', '與API的strict分工不同'],
+    'pydantic-bad-guide': ['Optional允許None，不等於可以省略'],
+    'event-list-model-guide': ['owner: Optional[str]，不給預設值', '必須有key，但值可未知',
+                              '每筆都依活動模型驗證', '輸入是dict，驗證結果是EventList物件'],
+    'event-list-model-after': ['仍沒有從原文抽取', '不要因owner允許None就刪除key',
+                              'model_dump只是轉成dict，沒有寫檔', '型別與結構通過仍不保證活動內容符合原文'],
+    'b-guide': ['只填rating為整數且1≤rating≤5'],
+    'b-live-guide': ['還沒有模型抽取', '只在本機驗證，兩者不同', '已是物件，不必再json.loads'],
+    'b-after': ['格式通過仍可能姓名錯或摘要編造', '本機strict與API strict不同', '未跑API明列未執行'],
+    'c-guide': ['items為商品物件清單', '中的元素是物件，讀item.quantity，不是item["quantity"]'],
+    'c-live-guide': ['商品是否漏掉仍要查原文'],
+    'c-after': ['不是預先填好的模型實測結果', '金額對也要查訂單編號、顧客、兩筆商品名稱、數量、單價、運費'],
+    'deliver': ['只有顯示結果不代表已寫檔或完成App', '實際寫入系統前仍需內容覆核',
+                '期中真正Structured Outputs仍須送API格式規格', '版本名稱不會自動處理相容性'],
+    'meeting-guide': ['不是從會議原文抽取'],
+    'retry': ['姓名與任務是否真實仍不由型別保證', '不要反覆請求', '其他錯誤立即回報'],
+    'cost-sources': ['重跑另計；請求數不等於費用', '文件核對與離線測試不等於真實API或Colab成功'],
+}
+
+
+def color_markdown(key, source):
+    """只加行內font標記；標題、表格結構與原句保持原樣。"""
+    for phrase in IMPORTANT_TEXT.get(key, []):
+        assert phrase in source, (key, phrase, '需同步更新重點標記')
+    lines = []
+    for line in source.splitlines(keepends=True):
+        if not line.startswith('#'):
+            # 先套明確選定的概念重點，不依關鍵字把整段染紅。
+            for phrase in IMPORTANT_TEXT.get(key, []):
+                line = line.replace(phrase, f'<font color="#C62828"><b>{phrase}</b></font>')
+            for label in ['需要：', '本格需要：', '操作順序：', '提問：']:
+                if line.startswith(label):
+                    line = f'<font color="#1565C0"><b>{label}</b></font>' + line[len(label):]
+                    break
+            match = re.match(r'^\*\*([^*]+)\*\*', line)
+            if match:
+                label = match.group(1)
+                if '預期' in label:
+                    line = f'<font color="#2E7D32"><b>{label}</b></font>' + line[match.end():]
+                elif label == '限制':
+                    line = f'<font color="#C62828"><b>{label}</b></font>' + line[match.end():]
+        lines.append(line)
+    if key == 'title':
+        lines.append('\n色彩提示：<font color="#C62828"><b>紅色＝重要觀念／必須說明的限制</b></font>；'
+                     '<font color="#1565C0"><b>藍色＝前置需求／操作提示</b></font>；'
+                     '<font color="#2E7D32"><b>綠色＝預期結果標籤</b></font>。\n')
+    return ''.join(lines)
+
 
 def clean(s):
     return textwrap.dedent(s).strip() + '\n'
@@ -18,7 +105,7 @@ def build(teacher=False):
     def md(key, text):
         # 每個標題從新文字格開始，供Colab目錄定位；前一例判讀不混入下一標題。
         # 保留原文與原格ID；只有新增的後段文字格加後綴。
-        parts = re.split(r'(?=^#{1,6} )', clean(text), flags=re.MULTILINE)
+        parts = re.split(r'(?=^#{1,6} )', color_markdown(key, clean(text)), flags=re.MULTILINE)
         parts = [part for part in parts if part.strip()]
         for index, part in enumerate(parts):
             cell_id = 'w06s-' + key
@@ -205,8 +292,10 @@ def build(teacher=False):
     完成後保存practice_event_schema，能說明「required且nullable」。
     ''')
     g_edit = '''
+    # 教師提醒（學生TODO G1）：請學生先新增允許文字或null的meeting_url；下方為參考答案。
     practice_event_schema["properties"]["meeting_url"] = {
         "type": ["string", "null"], "description": "線上連結，原文未提供用null"}
+    # 教師提醒（學生TODO G2）：再將meeting_url加入required，強調「必有key，但值可未知」。
     practice_event_schema["required"].append("meeting_url")
     ''' if teacher else '''
     # TODO G1：在properties新增meeting_url規格。
@@ -414,6 +503,7 @@ if {flag}:
     補完重跑本格，保存support_schema；本格沒有API。
     ''')
     a1edit = '''
+    # 教師提醒（學生TODO A1）：學生須補boolean欄位並同步required；下方兩行為參考答案。
     support_schema["properties"]["needs_reply"] = {"type": "boolean"}
     support_schema["required"].append("needs_reply")
     ''' if teacher else '''
@@ -457,7 +547,7 @@ print("A1四欄已補齊：", a_schema_ready)
     code('a-validator', '''
     def validate_support_data(data):
         """只查欄位，不改資料；成功回空list，失敗回原因list。"""
-        summary_limit = ''' + ('30\n' if teacher else 'None  # TODO A2：填入摘要最大字元數。\n') + '''
+        summary_limit = ''' + ('30  # 教師提醒（學生TODO A2）：學生只需填30；計算字元數，不是token數。\n' if teacher else 'None  # TODO A2：填入摘要最大字元數。\n') + '''
         if summary_limit is None:
             raise NotImplementedError("請先填A2的摘要字元限制")
         if not isinstance(data, dict):
@@ -558,7 +648,7 @@ if RUN_A_BATCH:
         ("建議增加深色模式。", "其他", "low", False),
     ]
     support_rows = []
-    # 避免設定或TODO未完成時送出任何一題。
+    ''' + ('# 教師提醒：學生版此處提及TODO預檢，沒有新增填空；先確認A1、A2完成，避免未完成就送出三題。' if teacher else '# 避免設定或TODO未完成時送出任何一題。') + '''
     if client is None or not a_schema_ready:
         raise RuntimeError("先確認金鑰與A1四欄")
     validate_support_data({})
@@ -709,7 +799,7 @@ if RUN_A_BATCH:
     輸入review_fixture是手寫dict，驗證後保存review_local物件；用model_dump轉回dict。
     選B者補完TODO，重跑本格並開RUN_B_LOCAL；範圍6應被擋下，完成後恢復False。
     ''')
-    b_field = 'rating: int = Field(ge=1, le=5)' if teacher else '# TODO B1：宣告rating為int，使用Field限制1到5（含邊界）。'
+    b_field = 'rating: int = Field(ge=1, le=5)  # 教師提醒（學生TODO B1）：學生須補整數評分與1到5的限制；此處為參考答案。' if teacher else '# TODO B1：宣告rating為int，使用Field限制1到5（含邊界）。'
     code('b-model', '''
     from typing import Literal
     from pydantic import BaseModel, Field, ConfigDict, ValidationError
@@ -781,7 +871,7 @@ if RUN_B_REVIEW:
     同一格放完整資料、模型與本機檢查，不必回其他單元找函式。
     `order_local.items`中的元素是物件，讀item.quantity，不是item["quantity"]。
     ''')
-    c_field = 'items: list[OrderItem]' if teacher else '# TODO C1：宣告items為list[OrderItem]。'
+    c_field = 'items: list[OrderItem]  # 教師提醒（學生TODO C1）：學生須補商品物件清單；此處為參考答案。' if teacher else '# TODO C1：宣告items為list[OrderItem]。'
     code('c-model', '''
     from pydantic import BaseModel, Field, ConfigDict, ValidationError
 
@@ -1021,6 +1111,14 @@ def export_guide():
         name = f'{STEM}_{role}'
         guide += f'- {role}：[Notebook]({name}.ipynb)／[Markdown]({name}.md)。\n'
     guide += '''
+## 2026-10-21文字格色彩標示
+
+學生／教師Notebook的文字格與同名Markdown已同步加入行內色彩：紅色粗體固定用於重要觀念、必須說明的限制與易錯處；藍色標示前置需求與操作提示標籤；綠色標示預期結果標籤。首頁附色彩提示，閱讀時仍以文字本身判讀。
+
+例如required不代表每欄都有已知答案、Optional不等於可以省略、格式通過仍須查原文，以及離線檢查不等於真實API成果，均固定標紅。色彩以HTML font標記呈現，未改動標題層級／分格、cell IDs、程式與學生待填處；重建來源保留同一組色彩規則。
+
+本次核對文字與程式內容、標題分格、標記結構及既有離線檢查；尚未在Colab或真人瀏覽器驗證色彩呈現，不同閱讀器可能有不同的HTML支援。
+
 ## 課堂只抓住這條資料流
 
 **原文 → 規格 → 一次請求 → 檢查 → 顯示與原文核對。**
@@ -1034,7 +1132,7 @@ API回應檢查段完整提供，教師指出「拒答／未完成／空文字�
 | 面向 | 原150分鐘修訂版 | 課堂簡化版 |
 |---|---|---|
 | code cells | 36格 | 26格（1安裝＋25普通Python） |
-| 教師版程式總行數（含空白註解） | 631 | 538 |
+| 教師版程式總行數（含空白註解） | 631 | 541 |
 | 最長code cell | 63行 | 45行 |
 | 函式架構 | 請求、client選擇、回應讀取、解析、safe、任務入口、測試器等 | 課堂主線只有validate_support_data一個短函式 |
 | 輸出型別 | 多層(ok,result)，result可能dict／str／物件 | result成功固定dict或物件；失敗None，error另存文字 |
@@ -1071,6 +1169,7 @@ API回應檢查段完整提供，教師指出「拒答／未完成／空文字�
 | C1 | 宣告商品物件清單 | 子模型在前，清單逐筆驗證與計算 |
 
 學生版五格程式保留待填處；教師版同ID提供答案。先預測與嘗試，再揭示教師版，不把完成框架當本週學習指標。
+2026-10-21補充：教師版在G1／G2、A1、A2、B1、C1參考答案旁加入「教師提醒（學生TODO…）」註解，標明學生需完成的內容；A5另提醒該格僅提及TODO預檢，沒有新增填空。雙版共六個程式格文字不同，其中五格含練習答案，A5僅註解不同；程式執行內容未改，學生版Notebook與Markdown保持本次修改前原樣。
 A3不是舊版A2六項假client接線測試；本版要求的是資料正負例與理由，舊support_local_report的語意不可直接沿用。
 未完成A/B/C練習時，API入口會先以本機預檢阻止付費；預檢只是防止未填，不是完整API能力驗證。
 

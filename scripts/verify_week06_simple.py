@@ -194,7 +194,7 @@ def check():
         assert not constructors, '無金鑰不應建立client'
         assert [c['id'] for c in pairs[0]['cells']]==[c['id'] for c in pairs[1]['cells']]
         changed=[a['id'] for a,b in zip(pairs[0]['cells'],pairs[1]['cells']) if a['cell_type']=='code' and a['source']!=b['source']]
-        assert changed==['w06s-g','w06s-a-schema','w06s-a-validator','w06s-b-model','w06s-c-model']
+        assert changed==['w06s-g','w06s-a-schema','w06s-a-validator','w06s-a-batch','w06s-b-model','w06s-c-model']
 
         tc, sc = cells_of(pairs[1]), cells_of(pairs[0])
         local = [('g','RUN_G'), ('a-local','RUN_A_LOCAL'), ('b-model','RUN_B_LOCAL'), ('c-model','RUN_C_LOCAL')]

@@ -2,12 +2,14 @@
 
 **教師版：含參考答案，先讓學生預測與實作，再揭示答案。**
 
-本週要學的是：**把原文轉成固定欄位，檢查後再使用。**
+本週要學的是：**<font color="#C62828"><b>把原文轉成固定欄位，檢查後再使用。</b></font>**
 前週已經用提示做分類、摘要，也學過完成後才保存回答；本週讓回答成為可讀取欄位的資料。
 原150分鐘修訂版保留。本簡化版沒有假client、通用safe wrapper或多層函式接線。
 
 先問三個問題：①回應完成了嗎？②欄位合格嗎？③內容符合原文嗎？
-**三個問題不能互相代替。** 所有範例只使用虛構資料。
+**<font color="#C62828"><b>三個問題不能互相代替。</b></font>** 所有範例只使用虛構資料。
+
+色彩提示：<font color="#C62828"><b>紅色＝重要觀念／必須說明的限制</b></font>；<font color="#1565C0"><b>藍色＝前置需求／操作提示</b></font>；<font color="#2E7D32"><b>綠色＝預期結果標籤</b></font>。
 
 ## 今天的目標與時間
 
@@ -22,7 +24,7 @@
 | 135–150 | 覆核與成果紀錄 | 有哪些證據？哪些尚未執行？ |
 
 休息另計。第一次學Pydantic建議選B；C適合已能閱讀list與巢狀資料者。
-版本管理、會議模型與重試設計保留在課後區。若排障超時，先完成離線活動，真實API標未執行。
+版本管理、會議模型與重試設計保留在課後區。若排障超時，<font color="#C62828"><b>先完成離線活動，真實API標未執行</b></font>。
 
 
 ### 如何避免跳來跳去？
@@ -36,7 +38,7 @@
 ## 0｜環境：只準備一次
 
 **Z0 安裝**：新Colab runtime或缺套件才執行。`%pip`是Notebook安裝指令，不是一般Python；安裝需網路，不呼叫模型。
-如果升級已匯入的套件，先儲存副本、重新啟動runtime，再從Z1開始。課前記錄實測版本後再固定套件版本。
+如果升級已匯入的套件，<font color="#C62828"><b>先儲存副本、重新啟動runtime，再從Z1開始</b></font>。課前記錄實測版本後再固定套件版本。
 
 **程式位置：Notebook第5格｜cell ID：`w06s-install`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -47,9 +49,9 @@
 
 ### Z1｜讀金鑰與建立client
 
-需要：已安裝套件。金鑰放Colab Secrets的`OPENAI_API_KEY`並授權本Notebook；本機使用同名環境變數。
-回查第3週金鑰設定即可，不把金鑰填在程式或成果表。這格只顯示有無設定及套件版本。
-修改Secrets或重啟runtime後，重跑Z1。`client`存在不代表金鑰有效或帳號能用該模型。
+<font color="#1565C0"><b>需要：</b></font>已安裝套件。金鑰放Colab Secrets的`OPENAI_API_KEY`並授權本Notebook；本機使用同名環境變數。
+回查第3週金鑰設定即可，<font color="#C62828"><b>不把金鑰填在程式或成果表</b></font>。這格只顯示有無設定及套件版本。
+修改Secrets或重啟runtime後，重跑Z1。`client`<font color="#C62828"><b>存在不代表金鑰有效或帳號能用該模型</b></font>。
 
 **程式位置：Notebook第7格｜cell ID：`w06s-setup`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -77,10 +79,10 @@ print("模型：", MODEL, "金鑰已設定：", client is not None)
 print("套件版本：", openai.__version__, pydantic.__version__)
 ```
 
-**Z1預期**：無金鑰仍可執行本機範例；缺套件須先處理安裝。這格0次模型請求。
+<font color="#2E7D32"><b>Z1預期</b></font>：無金鑰仍可執行本機範例；缺套件須先處理安裝。這格0次模型請求。
 
-所有`RUN_`開關都放在活動所在格，預設False。一次只開目前活動，結束恢復False後儲存；不要保留True再「全部執行」。
-SDK自動重試關閉，手動重跑另計請求；逾時或失敗不代表免費。
+所有`RUN_`開關都放在活動所在格，預設False。<font color="#C62828"><b>一次只開目前活動，結束恢復False後儲存；不要保留True再「全部執行」</b></font>。
+SDK自動重試關閉，<font color="#C62828"><b>手動重跑另計請求；逾時或失敗不代表免費</b></font>。
 套件、模型與60秒設定仍需教師在實際Colab和教學帳號課前確認。
 
 ## 1｜先分清JSON字串、dict與Schema
@@ -88,8 +90,8 @@ SDK自動重試關閉，手動重跑另計請求；逾時或失敗不代表免�
 
 ### J1｜同一筆資料，用兩種形式表示
 
-需要：無其他程式格。原文「下週三讀書會，負責人尚未指定」可以整理成資料。
-JSON字串適合傳遞；Python dict適合程式讀欄位；Schema則是「欄位應該長什麼樣子」的規格，下一節才看。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。原文「下週三讀書會，負責人尚未指定」可以整理成資料。
+<font color="#C62828"><b>JSON字串適合傳遞；Python dict適合程式讀欄位</b></font>；Schema則是「欄位應該長什麼樣子」的規格，下一節才看。
 下格先看型別，再取`title`，最後把dict轉回JSON顯示。`loads`是解析，`dumps`是轉成文字。
 
 **程式位置：Notebook第11格｜cell ID：`w06s-json`｜需要：無其他程式格（套件需已安裝）。**
@@ -105,29 +107,29 @@ print(data["title"], data["owner"], data["confirmed"])
 print(json.dumps(data, ensure_ascii=False, indent=2))
 ```
 
-**預期**：先看到`str dict`，再看到讀書會、None、True。JSON的null／true對應Python的None／True。
-`data`才是保存結果的變數；不要把`print(...)`的回傳值當資料。
-**限制**：`{"rating":"五分"}`也能被解析；JSON合法不代表評分符合整數規格。
-提問：現在有呼叫AI嗎？沒有，這是手寫資料的本機示範。
+<font color="#2E7D32"><b>預期</b></font>：先看到`str dict`，再看到讀書會、None、True。JSON的null／true對應Python的None／True。
+`data`<font color="#C62828"><b>才是保存結果的變數</b></font>；不要把`print(...)`的回傳值當資料。
+<font color="#C62828"><b>限制</b></font>：`{"rating":"五分"}`也能被解析；<font color="#C62828"><b>JSON合法不代表評分符合整數規格</b></font>。
+<font color="#1565C0"><b>提問：</b></font>現在有呼叫AI嗎？沒有，這是手寫資料的本機示範。
 
 ## 2｜事件Schema：先決定欄位，再請AI填值
 
 
 ### E1｜完整五欄規格（也準備同題比較的原文）
 
-需要：無其他程式格。先讀規格，再讀原文，不必寫函式。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。先讀規格，再讀原文，不必寫函式。
 
 | 寫法 | 意思 | 常見誤解 |
 |---|---|---|
 | type=object | 外層有key/value，解析後是dict | 不是已抽取的資料 |
 | properties | 每個欄位的規格 | 不是這次的欄位值 |
-| required | 這些key都要出現 | 不表示每欄都有已知答案 |
-| string或null | 可以文字，也可以未知 | 不等於可以省略key |
+| required | 這些key都要出現 | <font color="#C62828"><b>不表示每欄都有已知答案</b></font> |
+| string或null | 可以文字，也可以未知 | <font color="#C62828"><b>不等於可以省略key</b></font> |
 | additionalProperties=False | 不接受額外key | 不會核對事實 |
-| description | 說明欄位意思 | 不等於已執行驗證 |
+| description | 說明欄位意思 | <font color="#C62828"><b>不等於已執行驗證</b></font> |
 
-本週API strict Structured Outputs要求每層object的欄位都列required，並禁止額外欄位；未知值用nullable表示。
-這是本週API路徑的規則，並非所有JSON Schema的共同要求。
+本週API strict Structured Outputs要求<font color="#C62828"><b>每層object的欄位都列required，並禁止額外欄位；未知值用nullable表示</b></font>。
+這是本週API路徑的規則，<font color="#C62828"><b>並非所有JSON Schema的共同要求</b></font>。
 
 **程式位置：Notebook第15格｜cell ID：`w06s-event-schema`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -152,12 +154,12 @@ event_rules = "只依原文抽取title/date/time/location/owner五欄JSON，未�
 print(json.dumps(event_schema, ensure_ascii=False, indent=2))
 ```
 
-**E1預期**：看到五欄規格，還沒抽取；0次API。title只限制string，尚未拒絕空字串。
+<font color="#2E7D32"><b>E1預期</b></font>：看到五欄規格，還沒抽取；0次API。title只限制string，尚未拒絕空字串。
 
 
 ### E2｜有key且未知、漏key、空字串有何不同？
 
-需要：無其他程式格。用三筆固定資料直接觀察，先不寫驗證框架。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。用三筆固定資料直接觀察，先不寫驗證框架。
 
 **程式位置：Notebook第18格｜cell ID：`w06s-null`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -168,16 +170,16 @@ for item in examples:
     print("有owner欄位：", "owner" in item, "讀到的值：", item.get("owner"))
 ```
 
-**預期**：True/None、False/None、True/空字串。只用get時，漏key與明確None看起來相同，所以還要查key是否存在。
-提問：本週owner未知時，哪筆表示方式合格？第一筆。若是完整事件，還須提供其他四欄。
+<font color="#2E7D32"><b>預期</b></font>：True/None、False/None、True/空字串。<font color="#C62828"><b>只用get時，漏key與明確None看起來相同，所以還要查key是否存在</b></font>。
+<font color="#1565C0"><b>提問：</b></font>本週owner未知時，哪筆表示方式合格？第一筆。若是完整事件，還須提供其他四欄。
 
 
 ### G｜練習：替獨立規格新增線上連結（必做、0次API）
 
-需要：無其他程式格。下格自帶五欄規格，不會修改E1。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。下格自帶五欄規格，不會修改E1。
 G1在properties新增meeting_url，允許string或null，description說明未知用null。
-G2在required加入meeting_url。先補規格，再開RUN_G；固定檢查已提供，不必改。
-完成後保存practice_event_schema，能說明「required且nullable」。
+<font color="#C62828"><b>G2在required加入meeting_url</b></font>。先補規格，再開RUN_G；固定檢查已提供，不必改。
+完成後保存practice_event_schema，能說明「<font color="#C62828"><b>required且nullable</b></font>」。
 
 **程式位置：Notebook第21格｜cell ID：`w06s-g`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -193,8 +195,10 @@ practice_event_schema = {
     "required": ["title", "date", "time", "location", "owner"],
     "additionalProperties": False,
 }
+# 教師提醒（學生TODO G1）：請學生先新增允許文字或null的meeting_url；下方為參考答案。
 practice_event_schema["properties"]["meeting_url"] = {
     "type": ["string", "null"], "description": "線上連結，原文未提供用null"}
+# 教師提醒（學生TODO G2）：再將meeting_url加入required，強調「必有key，但值可未知」。
 practice_event_schema["required"].append("meeting_url")
 
 RUN_G = False  # 補完G1/G2後開啟；0次API，執行後恢復False。
@@ -206,12 +210,12 @@ if RUN_G:
     print("G完成：六個key都要出現，meeting_url可未知。")
 ```
 
-**G判讀**：通過只證明列出的規格檢查，不是AI抽取成功。KeyError先查是否新增欄位；AssertionError查required與型別。
+**G判讀**：<font color="#C62828"><b>通過只證明列出的規格檢查，不是AI抽取成功</b></font>。KeyError先查是否新增欄位；AssertionError查required與型別。
 
 
 ### D1｜必要細節快示範：複製巢狀規格要小心什麼？
 
-需要：無其他程式格。G已用獨立資料，不必靠副本技巧才能完成；若將來從既有規格改版，仍要知道淺拷貝會共用子資料。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。G已用獨立資料，不必靠副本技巧才能完成；若將來從既有規格改版，仍要知道<font color="#C62828"><b>淺拷貝會共用子資料</b></font>。
 只看兩個修改的效果，不需記憶物件架構。
 
 **程式位置：Notebook第24格｜cell ID：`w06s-copy`｜需要：無其他程式格（套件需已安裝）。**
@@ -228,14 +232,14 @@ deep["properties"]["title"]["type"] = "boolean"
 print(source)
 ```
 
-**預期**：原title仍為string，但多了「共用修改」description；deep的boolean不影響原資料。0次API。
-`copy`保護外層，不保證巢狀隔離；後面課後版本管理會用deepcopy。其他單元不依賴本格變數。
+<font color="#2E7D32"><b>預期</b></font>：原title仍為string，但多了「共用修改」description；deep的boolean不影響原資料。0次API。
+`copy`保護外層，<font color="#C62828"><b>不保證巢狀隔離</b></font>；後面課後版本管理會用deepcopy。其他單元不依賴本格變數。
 
 ### N1｜從一筆活動到多筆活動：array與items
 
-需要：無其他程式格。本格延續E1的活動情境，為了看清清單形狀，每筆只保留title與owner兩欄。
-最外層object有events欄位；events是array；items說明「每一筆活動」的規格。
-title是文字，owner可未知，兩個key都必填。空清單[]不等於null。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。本格延續E1的活動情境，為了看清清單形狀，每筆只保留title與owner兩欄。
+最外層object有events欄位；events是array；<font color="#C62828"><b>items說明「每一筆活動」的規格</b></font>。
+<font color="#C62828"><b>title是文字，owner可未知，兩個key都必填</b></font>。<font color="#C62828"><b>空清單[]不等於null</b></font>。
 先從外往內指規格，再看兩筆手寫活動。這仍是JSON Schema單元，尚未使用Pydantic。
 
 **程式位置：Notebook第27格｜cell ID：`w06s-array`｜需要：無其他程式格（套件需已安裝）。**
@@ -262,30 +266,30 @@ for item in event_list_data["events"]:
     print(item["title"], item["owner"])
 ```
 
-**N1預期**：先object，再AI專題討論／None、讀書會／範例小安；0次API。
-第一個print在讀規格，for在讀資料；只是顯示手寫資料，沒有執行Schema驗證或模型抽取。
+<font color="#2E7D32"><b>N1預期</b></font>：先object，再AI專題討論／None、讀書會／範例小安；0次API。
+第一個print在讀規格，for在讀資料；只是顯示手寫資料，<font color="#C62828"><b>沒有執行Schema驗證或模型抽取</b></font>。
 for讀清單，即使清單空也不會直接取[0]而出錯。每層object都有自己的required與禁止額外欄位設定。
-提問：不知道第一筆負責人時，可否刪owner？不可以，應保留key並填None。
+<font color="#1565C0"><b>提問：</b></font>不知道第一筆負責人時，可否刪owner？<font color="#C62828"><b>不可以，應保留key並填None</b></font>。
 
 ## 3｜同題比較：一般文字要求與API格式設定
 
 
 ### P1／P2｜先預測，再各執行一次
 
-需要：Z1與E1。兩格各自獨立，不需要G、D1或另一個API活動成功。
+<font color="#1565C0"><b>需要：</b></font>Z1與E1。兩格各自獨立，不需要G、D1或另一個API活動成功。
 先在紙上寫：date應保留「下週三」、time為14:00、location為A203、owner為null。
 title可以換表述，但不可增加原文沒有的事件。
 
-P1只用文字要求JSON，沒有開JSON mode；P2多傳`text.format`。
+P1只用文字要求JSON，<font color="#C62828"><b>沒有開JSON mode</b></font>；P2多傳`text.format`。
 `input`是原文、`instructions`是規則、`text.format.schema`是欄位規格。
-format的name用來命名格式，不會新增輸出欄位；strict約束支援的資料形狀，沒有保證事實正確。
+format的name用來命名格式，不會新增輸出欄位；<font color="#C62828"><b>strict約束支援的資料形狀，沒有保證事實正確</b></font>。
 
-每格直接寫請求與檢查：**呼叫 → 拒答／完成檢查 → 非空文字 → 解析dict → 欄位檢查 → 保存**。
+每格直接寫請求與檢查：**<font color="#C62828"><b>呼叫 → 拒答／完成檢查 → 非空文字 → 解析dict → 欄位檢查 → 保存</b></font>**。
 回應檢查段完整提供，教師指認「不採用失敗資料」即可，學生不需重寫迴圈。
 
 ### P1｜一般prompt
 
-本格需要：Z1、E1。預設不請求；開啟1次API，執行後恢復False。
+<font color="#1565C0"><b>本格需要：</b></font>Z1、E1。<font color="#C62828"><b>預設不請求；開啟1次API，執行後恢復False</b></font>。
 
 **程式位置：Notebook第32格｜cell ID：`w06s-event-plain`｜需要：w06s-setup、w06s-event-schema。**
 
@@ -329,7 +333,7 @@ if RUN_EVENT_PLAIN:
 
 ### P2｜Structured Outputs
 
-本格需要：Z1、E1。預設不請求；開啟1次API，執行後恢復False。
+<font color="#1565C0"><b>本格需要：</b></font>Z1、E1。<font color="#C62828"><b>預設不請求；開啟1次API，執行後恢復False</b></font>。
 
 **程式位置：Notebook第34格｜cell ID：`w06s-event-strict`｜需要：w06s-setup、w06s-event-schema。**
 
@@ -373,8 +377,8 @@ if RUN_EVENT_STRICT:
         print("未採用資料：", strict_error)
 ```
 
-**P1／P2判讀**：成功結果為dict；失敗result保持None，error另存文字，不把錯誤訊息當資料讀取。
-兩版都成功就照實記錄，不製造失敗；一次比較不能證明所有輸入的穩定性。
+**P1／P2判讀**：成功結果為dict；失敗result保持None，error另存文字，<font color="#C62828"><b>不把錯誤訊息當資料讀取</b></font>。
+兩版都成功就照實記錄，不製造失敗；<font color="#C62828"><b>一次比較不能證明所有輸入的穩定性</b></font>。
 一般prompt成功也不代表這次請求有API層Schema約束。
 
 | 方法 | 實際結果／未執行 | 欄位通過？ | owner未知？ | 日期、地點等是否符合原文？ |
@@ -383,14 +387,14 @@ if RUN_EVENT_STRICT:
 | P2Structured | | | | |
 
 API／金鑰／網路錯誤先排障；欄位錯誤查規格；欄位合法但內容不符，才查規則與原文。
-**未執行API就標未執行，不使用手寫dict代填真實成果。**
+**<font color="#C62828"><b>未執行API就標未執行，不使用手寫dict代填真實成果</b></font>。**
 
 ## 4｜失敗判讀：為什麼不能拿到文字就保存？
 
 
 ### F1｜用簡單資料看完成與拒答
 
-需要：無其他程式格。以下是**教學用簡化紀錄，不是SDK回應結構，也不是模型輸出**。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。以下是**<font color="#C62828"><b>教學用簡化紀錄，不是SDK回應結構，也不是模型輸出</b></font>**。
 只觀察if分支，回到P1／P2時可找到對應的拒答與status檢查。
 
 **程式位置：Notebook第38格｜cell ID：`w06s-failure-status`｜需要：無其他程式格（套件需已安裝）。**
@@ -415,13 +419,13 @@ for item in examples:
         print("可以進入JSON解析，還沒證明欄位正確")
 ```
 
-**F1預期**：依序是可解析、拒答、未完成、失敗、空文字；incomplete即使留下合法JSON也不能先採用。
-輸出限制或內容過濾可能造成未完成，要看實際錯誤原因再決定下一步，不連續付費重跑。
+<font color="#2E7D32"><b>F1預期</b></font>：依序是可解析、拒答、未完成、失敗、空文字；<font color="#C62828"><b>incomplete即使留下合法JSON也不能先採用</b></font>。
+輸出限制或內容過濾可能造成未完成，要看實際錯誤原因再決定下一步，<font color="#C62828"><b>不連續付費重跑</b></font>。
 
 
 ### F2｜能解析JSON，也可能不是本週要的object
 
-需要：無其他程式格。先看正常物件、非JSON、合法清單三種固定文字，預測哪些會被拒絕。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。先看正常物件、非JSON、合法清單三種固定文字，預測哪些會被拒絕。
 
 **程式位置：Notebook第41格｜cell ID：`w06s-failure-parse`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -438,8 +442,8 @@ for raw_text in ['{"title":"讀書會"}', '不是JSON', '[]']:
         print("未採用：", str(exc))
 ```
 
-**F2預期**：一筆dict、兩筆被拒絕。JSON解析錯誤也屬ValueError，所以此處用同一except顯示原因。
-本格成功資料只有title，尚未通過完整事件欄位檢查。0次API；固定案例通過不能證明真實模型品質。
+<font color="#2E7D32"><b>F2預期</b></font>：一筆dict、兩筆被拒絕。JSON解析錯誤也屬ValueError，所以此處用同一except顯示原因。
+本格成功資料只有title，<font color="#C62828"><b>尚未通過完整事件欄位檢查</b></font>。0次API；<font color="#C62828"><b>固定案例通過不能證明真實模型品質</b></font>。
 
 ## 5｜A客服資料抽取（必做）
 
@@ -449,8 +453,8 @@ for raw_text in ['{"title":"讀書會"}', '不是JSON', '[]']:
 
 ### A1｜補一個欄位，理解enum與boolean
 
-需要：無其他程式格。已提供三欄與規則；只需補needs_reply的boolean規格並加入required。
-enum限制可選值，規則決定該選哪個值；summary的description只是說明，30字元由A2補查。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。已提供三欄與規則；只需補needs_reply的boolean規格並加入required。
+<font color="#C62828"><b>enum限制可選值，規則決定該選哪個值</b></font>；<font color="#C62828"><b>summary的description只是說明，30字元由A2補查</b></font>。
 補完重跑本格，保存support_schema；本格沒有API。
 
 **程式位置：Notebook第45格｜cell ID：`w06s-a-schema`｜需要：無其他程式格（套件需已安裝）。**
@@ -466,6 +470,7 @@ support_schema = {
     "required": ["category", "urgency", "summary"],
     "additionalProperties": False,
 }
+# 教師提醒（學生TODO A1）：學生須補boolean欄位並同步required；下方兩行為參考答案。
 support_schema["properties"]["needs_reply"] = {"type": "boolean"}
 support_schema["required"].append("needs_reply")
 
@@ -483,22 +488,22 @@ a_schema_ready = (
 print("A1四欄已補齊：", a_schema_ready)
 ```
 
-**A1預期**：補完顯示True。False先查新增欄與required；這只是本機就緒提示，不代表模型分類正確。
+<font color="#2E7D32"><b>A1預期</b></font>：補完顯示True。False先查新增欄與required；這只是本機就緒提示，<font color="#C62828"><b>不代表模型分類正確</b></font>。
 
 
 ### A2｜補摘要長度限制；其他檢查完整提供
 
-需要：無其他程式格。函式吃一筆dict，回錯誤list；空list表示這裡列出的規則通過。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。函式吃一筆dict，回錯誤list；<font color="#C62828"><b>空list表示這裡列出的規則通過</b></font>。
 TODO A2只填`summary_limit`為30，不必重寫函式或例外架構。
-讀法：查dict→四欄→兩組enum→摘要→boolean。`len`計原字串字元，含空白標點，不是token數。
-`or`先查型別，型別錯就不繼續做strip／len，這是保護資料操作。
+讀法：查dict→四欄→兩組enum→摘要→boolean。`len`<font color="#C62828"><b>計原字串字元，含空白標點，不是token數</b></font>。
+`or`<font color="#C62828"><b>先查型別，型別錯就不繼續做strip／len</b></font>，這是保護資料操作。
 
 **程式位置：Notebook第48格｜cell ID：`w06s-a-validator`｜需要：無其他程式格（套件需已安裝）。**
 
 ```python
 def validate_support_data(data):
     """只查欄位，不改資料；成功回空list，失敗回原因list。"""
-    summary_limit = 30
+    summary_limit = 30  # 教師提醒（學生TODO A2）：學生只需填30；計算字元數，不是token數。
 
     if summary_limit is None:
         raise NotImplementedError("請先填A2的摘要字元限制")
@@ -521,8 +526,8 @@ def validate_support_data(data):
 
 ### A3｜先做本機判讀，再呼叫模型
 
-需要：A2。不需要A1、Z1或任何API。先補A2並重跑定義，再開RUN_A_LOCAL，完成後恢復False。
-已提供合法資料與五個變形；請預測哪筆會被擋。不要改測試資料來讓自己的程式通過。
+<font color="#1565C0"><b>需要：</b></font>A2。不需要A1、Z1或任何API。先補A2並重跑定義，再開RUN_A_LOCAL，完成後恢復False。
+已提供合法資料與五個變形；請預測哪筆會被擋。<font color="#C62828"><b>不要改測試資料來讓自己的程式通過</b></font>。
 
 **程式位置：Notebook第50格｜cell ID：`w06s-a-local`｜需要：w06s-a-validator。**
 
@@ -547,16 +552,16 @@ if RUN_A_LOCAL:
     assert support_local_report[5] == []  # 合法類別仍可能不符合原文。
 ```
 
-**A3預期**：合法、缺summary、31字元、字串true、多欄、合法但可能選錯的其他；錯誤清單依序空／非空／非空／非空／非空／空。
-最後一筆是重點：**程式接受「其他」這個標籤，不表示帳務題真的該選其他。**
+<font color="#2E7D32"><b>A3預期</b></font>：合法、缺summary、31字元、字串true、多欄、合法但可能選錯的其他；錯誤清單依序空／非空／非空／非空／非空／空。
+最後一筆是重點：**<font color="#C62828"><b>程式接受「其他」這個標籤，不表示帳務題真的該選其他。</b></font>**
 保存support_local_report並解釋一筆失敗原因。NotImplementedError回查A2；AssertionError查欄位規則。
 
 
 ### A4｜真實單筆：直接送出、驗證、保存
 
-需要：Z1、A1、A2；先通過A3再開旗標。原文在本格，不依賴事件比較或失敗示範。
-四欄合格才保存support_result；失敗保持None，原因放support_error。
-原文「訂閱被扣款兩次，請今天處理。」應對照帳務問題／high／True；summary另查是否忠於原文。
+<font color="#1565C0"><b>需要：</b></font>Z1、A1、A2；先通過A3再開旗標。原文在本格，不依賴事件比較或失敗示範。
+<font color="#C62828"><b>四欄合格才保存support_result；失敗保持None，原因放support_error</b></font>。
+原文「訂閱被扣款兩次，請今天處理。」應對照帳務問題／high／True；<font color="#C62828"><b>summary另查是否忠於原文</b></font>。
 
 **程式位置：Notebook第53格｜cell ID：`w06s-a-single`｜需要：w06s-setup、w06s-a-schema、w06s-a-validator。**
 
@@ -598,14 +603,14 @@ if RUN_A_SINGLE:
         print("未採用資料：", support_error)
 ```
 
-**A4預期**：成功為dict，錯誤另存文字；0或1次API。未執行就標「API未執行」。成功後仍逐欄查原文。
+<font color="#2E7D32"><b>A4預期</b></font>：成功為dict，錯誤另存文字；0或1次API。未執行就標「API未執行」。<font color="#C62828"><b>成功後仍逐欄查原文</b></font>。
 
 
 ### A5｜三題固定觀察：普通for迴圈
 
-需要：Z1、A1、A2；課堂先確認A4可用，但本格程式不讀A4變數。三題資料直接列在本格。
-每題一次API，合計3次。`matches`直接比三欄，不比摘要；summary由人核對。
-每筆row分開保存result與error；失敗不會沿用上一筆結果。
+<font color="#1565C0"><b>需要：</b></font>Z1、A1、A2；課堂先確認A4可用，但本格程式不讀A4變數。三題資料直接列在本格。
+每題一次API，合計3次。`matches`<font color="#C62828"><b>直接比三欄，不比摘要；summary由人核對</b></font>。
+每筆row分開保存result與error；<font color="#C62828"><b>失敗不會沿用上一筆結果</b></font>。
 
 **程式位置：Notebook第56格｜cell ID：`w06s-a-batch`｜需要：w06s-setup、w06s-a-schema、w06s-a-validator。**
 
@@ -619,7 +624,7 @@ if RUN_A_BATCH:
         ("建議增加深色模式。", "其他", "low", False),
     ]
     support_rows = []
-    # 避免設定或TODO未完成時送出任何一題。
+    # 教師提醒：學生版此處提及TODO預檢，沒有新增填空；先確認A1、A2完成，避免未完成就送出三題。
     if client is None or not a_schema_ready:
         raise RuntimeError("先確認金鑰與A1四欄")
     validate_support_data({})
@@ -658,7 +663,7 @@ if RUN_A_BATCH:
 ```
 
 **A5判讀**：result=None時先讀error，是回應／解析／欄位等流程問題；result是dict但matches=False時，比對原文、規則與expected。
-matches=True只證明這次三個指定欄位相符，沒有檢查摘要忠實性，也不是完整模型評測。
+<font color="#C62828"><b>matches=True只證明這次三個指定欄位相符，沒有檢查摘要忠實性</b></font>，也不是完整模型評測。
 
 | 原文題目 | 實際result／error或未執行 | 三欄相符？ | 摘要有無新增事實？ | 修改／保留理由 |
 |---|---|---|---|---|
@@ -666,25 +671,25 @@ matches=True只證明這次三個指定欄位相符，沒有檢查摘要忠實�
 | 匯出詢問 | | | | |
 | 深色模式建議 | | | | |
 
-不更改expected迎合模型；重跑要記原因與額外請求。格式錯先修程式，內容錯才回查規則與原文。
+<font color="#C62828"><b>不更改expected迎合模型</b></font>；重跑要記原因與額外請求。<font color="#C62828"><b>格式錯先修程式，內容錯才回查規則與原文</b></font>。
 
 ## 6｜Pydantic：用Python欄位宣告規格
 
 
 ### M1｜先驗證一張閱讀卡（完整本機示範）
 
-需要：已安裝Pydantic，無其他程式格。這個「模型」指資料規格，不是LLM。
-現在只認識這條路：**class規格 → dict資料 → model_validate → 物件 → model_dump回dict**。
+<font color="#1565C0"><b>需要：</b></font>已安裝Pydantic，無其他程式格。<font color="#C62828"><b>這個「模型」指資料規格，不是LLM</b></font>。
+現在只認識這條路：**<font color="#C62828"><b>class規格 → dict資料 → model_validate → 物件 → model_dump回dict</b></font>**。
 
 | 程式 | 本週用途 |
 |---|---|
 | class …(BaseModel) | 宣告資料規格，不必寫__init__或self |
 | pages: int | 型別宣告由Pydantic用來驗證；普通Python註記本身不會驗證 |
-| Field(ge=1) | 大於等於1，不是預設為1 |
+| Field(ge=1) | <font color="#C62828"><b>大於等於1，不是預設為1</b></font> |
 | Literal[...] | 指定可用文字，相當於enum |
-| Optional[str] | 可為文字或None；沒有預設值時key仍必填 |
+| Optional[str] | 可為文字或None；<font color="#C62828"><b>沒有預設值時key仍必填</b></font> |
 | extra="forbid" | 不接受多餘欄位 |
-| strict=True | 本機嚴格型別；與API的strict分工不同 |
+| strict=True | 本機嚴格型別；<font color="#C62828"><b>與API的strict分工不同</b></font> |
 
 先讀兩行欄位宣告，再看資料驗證與取值。陌生class語法在本週只需讀欄位，不展開OOP架構。
 
@@ -707,14 +712,14 @@ print(card.book_name)
 print(card.model_dump())
 ```
 
-**M1預期**：印出範例書與dict；card本身是ReadingCard物件，所以用`card.book_name`讀屬性。
+<font color="#2E7D32"><b>M1預期</b></font>：印出範例書與dict；card本身是ReadingCard物件，所以用`card.book_name`讀屬性。
 
 
 ### M2｜不合格資料要看欄位與規則
 
-需要：無其他程式格。重新宣告一個很小的規格，方便單獨執行；不用回頭找M1變數。
-預測三筆：字串10、數字0、漏note。Optional允許None，不等於可以省略。
-**預期觀察**：三筆都失敗，0次API。先讀錯誤欄位，再讀型別／範圍／必填原因，不把它當模型或網路問題。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。重新宣告一個很小的規格，方便單獨執行；不用回頭找M1變數。
+預測三筆：字串10、數字0、漏note。<font color="#C62828"><b>Optional允許None，不等於可以省略</b></font>。
+<font color="#2E7D32"><b>預期觀察</b></font>：三筆都失敗，0次API。先讀錯誤欄位，再讀型別／範圍／必填原因，不把它當模型或網路問題。
 
 **程式位置：Notebook第63格｜cell ID：`w06s-pydantic-bad`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -738,17 +743,17 @@ for item in [{"pages": "10", "note": None}, {"pages": 0, "note": None}, {"pages"
 
 ### N2｜用Pydantic表示同一份活動清單
 
-需要：已安裝Pydantic，無其他程式格。放在M1、M2後，沿用N1的兩筆活動，但匯入、模型與資料全部放在本格，可獨立執行。
+<font color="#1565C0"><b>需要：</b></font>已安裝Pydantic，無其他程式格。放在M1、M2後，沿用N1的兩筆活動，但匯入、模型與資料全部放在本格，可獨立執行。
 這是完整示範，沒有TODO、沒有API請求。先讀單筆EventItem，再讀包含活動清單的EventList。
 
 | N1的JSON Schema | N2的Pydantic | 表達的觀念 |
 |---|---|---|
 | 每筆活動的object及properties | EventItem的欄位宣告 | 一筆活動有title與owner |
-| owner為string或null，且required | owner: Optional[str]，不給預設值 | 必須有key，但值可未知 |
-| events為array，items定義每筆活動 | events: list[EventItem] | 每筆都依活動模型驗證 |
+| owner為string或null，且required | <font color="#C62828"><b>owner: Optional[str]，不給預設值</b></font> | <font color="#C62828"><b>必須有key，但值可未知</b></font> |
+| events為array，items定義每筆活動 | events: list[EventItem] | <font color="#C62828"><b>每筆都依活動模型驗證</b></font> |
 
-操作順序：宣告模型→提供與N1相同的手寫dict→model_validate→讀每筆物件→model_dump。
-輸入是dict，驗證結果是EventList物件；它的events是一串EventItem物件，所以使用點號讀欄位。
+<font color="#1565C0"><b>操作順序：</b></font>宣告模型→提供與N1相同的手寫dict→model_validate→讀每筆物件→model_dump。
+<font color="#C62828"><b>輸入是dict，驗證結果是EventList物件</b></font>；它的events是一串EventItem物件，所以使用點號讀欄位。
 
 **程式位置：Notebook第65格｜cell ID：`w06s-event-list-model`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -773,18 +778,18 @@ for item in event_list.events:
 print(event_list.model_dump())
 ```
 
-**N2預期**：先顯示AI專題討論／None、讀書會／範例小安，再顯示含兩筆活動的dict，內容與N1的手寫資料一致。
-N1只展示JSON Schema與資料形狀，未執行Schema驗證；N2則真的以Pydantic驗證手寫資料，仍沒有從原文抽取。
-若ValidationError，先找欄位位置，再查型別／必填／多欄；不要因owner允許None就刪除key。
-model_dump只是轉成dict，沒有寫檔；型別與結構通過仍不保證活動內容符合原文。
-提問：N1用item["title"]，N2為什麼用item.title？前者是dict，後者是驗證後的活動物件。
+<font color="#2E7D32"><b>N2預期</b></font>：先顯示AI專題討論／None、讀書會／範例小安，再顯示含兩筆活動的dict，內容與N1的手寫資料一致。
+N1只展示JSON Schema與資料形狀，未執行Schema驗證；N2則真的以Pydantic驗證手寫資料，<font color="#C62828"><b>仍沒有從原文抽取</b></font>。
+若ValidationError，先找欄位位置，再查型別／必填／多欄；<font color="#C62828"><b>不要因owner允許None就刪除key</b></font>。
+<font color="#C62828"><b>model_dump只是轉成dict，沒有寫檔</b></font>；<font color="#C62828"><b>型別與結構通過仍不保證活動內容符合原文</b></font>。
+<font color="#1565C0"><b>提問：</b></font>N1用item["title"]，N2為什麼用item.title？前者是dict，後者是驗證後的活動物件。
 
 ## 7B｜評論：B／C擇一
 
 
 ### B1｜補評分範圍，再做本機正例與負例
 
-需要：已安裝Pydantic，無其他程式格。姓名、情緒、摘要已提供；只填rating為整數且1≤rating≤5。
+<font color="#1565C0"><b>需要：</b></font>已安裝Pydantic，無其他程式格。姓名、情緒、摘要已提供；<font color="#C62828"><b>只填rating為整數且1≤rating≤5</b></font>。
 輸入review_fixture是手寫dict，驗證後保存review_local物件；用model_dump轉回dict。
 選B者補完TODO，重跑本格並開RUN_B_LOCAL；範圍6應被擋下，完成後恢復False。
 
@@ -797,7 +802,7 @@ from pydantic import BaseModel, Field, ConfigDict, ValidationError
 class ReviewInsight(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     customer_name: str
-    rating: int = Field(ge=1, le=5)
+    rating: int = Field(ge=1, le=5)  # 教師提醒（學生TODO B1）：學生須補整數評分與1到5的限制；此處為參考答案。
     sentiment: Literal["positive", "neutral", "negative"]
     summary: str
 
@@ -814,14 +819,14 @@ if RUN_B_LOCAL:
         raise AssertionError("應拒絕超出範圍的評分")
 ```
 
-**B1預期**：合法物件的dict，再印已擋下rating=6；還沒有模型抽取。若漏rating，extra forbid會拒絕fixture裡未定義的欄位，回查TODO。
+<font color="#2E7D32"><b>B1預期</b></font>：合法物件的dict，再印已擋下rating=6；<font color="#C62828"><b>還沒有模型抽取</b></font>。若漏rating，extra forbid會拒絕fixture裡未定義的欄位，回查TODO。
 
 
 ### B2｜真實抽取：SDK把class轉成輸出規格
 
-需要：Z1、B1。不需要A、M1或C。先本機通過再開旗標。
-`responses.parse(text_format=ReviewInsight)`會送出請求；`model_validate`只在本機驗證，兩者不同。
-`response.output_parsed`已是物件，不必再json.loads；成功時先model_dump才以dict顯示。
+<font color="#1565C0"><b>需要：</b></font>Z1、B1。不需要A、M1或C。先本機通過再開旗標。
+`responses.parse(text_format=ReviewInsight)`會送出請求；`model_validate`<font color="#C62828"><b>只在本機驗證，兩者不同</b></font>。
+`response.output_parsed`<font color="#C62828"><b>已是物件，不必再json.loads</b></font>；成功時先model_dump才以dict顯示。
 
 **程式位置：Notebook第72格｜cell ID：`w06s-b-live`｜需要：w06s-setup、w06s-b-model。**
 
@@ -856,9 +861,9 @@ if RUN_B_REVIEW:
         print("未採用資料：", review_error)
 ```
 
-**B2判讀**：查小明、5分、positive與摘要，四欄都要看。格式通過仍可能姓名錯或摘要編造。
-本機strict與API strict不同；Field對應的API規格是否由帳號／模型支援，仍須課前實測。
-保存review_input、review_result.model_dump()或review_error；未跑API明列未執行。
+**B2判讀**：查小明、5分、positive與摘要，四欄都要看。<font color="#C62828"><b>格式通過仍可能姓名錯或摘要編造</b></font>。
+<font color="#C62828"><b>本機strict與API strict不同</b></font>；Field對應的API規格是否由帳號／模型支援，仍須課前實測。
+保存review_input、review_result.model_dump()或review_error；<font color="#C62828"><b>未跑API明列未執行</b></font>。
 選B者可跳過C，直接到成果紀錄。B2為主線第7次請求，C不再開。
 
 ## 7C｜訂單：B／C擇一
@@ -866,11 +871,11 @@ if RUN_B_REVIEW:
 
 ### C1｜先商品，再訂單，再本機計算
 
-需要：已安裝Pydantic，無其他程式格。本格不使用N1或N2變數。
+<font color="#1565C0"><b>需要：</b></font>已安裝Pydantic，無其他程式格。本格不使用N1或N2變數。
 N1的array／items與N2的list[EventItem]都描述活動清單；這裡用相同觀念，以list[OrderItem]描述商品清單。
-已提供OrderItem商品模型；TODO C1補OrderInfo中的items為商品物件清單。
+已提供OrderItem商品模型；TODO C1補OrderInfo中的<font color="#C62828"><b>items為商品物件清單</b></font>。
 同一格放完整資料、模型與本機檢查，不必回其他單元找函式。
-`order_local.items`中的元素是物件，讀item.quantity，不是item["quantity"]。
+`order_local.items`<font color="#C62828"><b>中的元素是物件，讀item.quantity，不是item["quantity"]</b></font>。
 
 **程式位置：Notebook第76格｜cell ID：`w06s-c-model`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -887,7 +892,7 @@ class OrderInfo(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     order_id: str
     customer_name: str
-    items: list[OrderItem]
+    items: list[OrderItem]  # 教師提醒（學生TODO C1）：學生須補商品物件清單；此處為參考答案。
     shipping_fee: int = Field(ge=0)
 
 order_fixture = {"order_id": "A1023", "customer_name": "範例小陳", "shipping_fee": 60,
@@ -910,14 +915,14 @@ if RUN_C_LOCAL:
         raise AssertionError("數量0應拒絕")
 ```
 
-**C1預期**：2230／2290，再印已擋下quantity=0。數量與單價是整數且有範圍；計算由普通for完成。
+<font color="#2E7D32"><b>C1預期</b></font>：2230／2290，再印已擋下quantity=0。數量與單價是整數且有範圍；計算由普通for完成。
 輸入dict→驗證成訂單物件→每筆商品乘加，不需要額外計算helper。
 
 
 ### C2｜真實訂單：抽取數值後由Python算金額
 
-需要：Z1、C1。本機通過後開旗標；不需要B或A。
-成功保存order_result物件，再用相同乘加計算。模型欄位未規定items至少一筆，商品是否漏掉仍要查原文。
+<font color="#1565C0"><b>需要：</b></font>Z1、C1。本機通過後開旗標；不需要B或A。
+成功保存order_result物件，再用相同乘加計算。模型欄位未規定items至少一筆，<font color="#C62828"><b>商品是否漏掉仍要查原文</b></font>。
 
 **程式位置：Notebook第79格｜cell ID：`w06s-c-live`｜需要：w06s-setup、w06s-c-model。**
 
@@ -957,8 +962,8 @@ if RUN_C_ORDER:
         print("未採用資料：", order_error)
 ```
 
-**C2判讀**：2×990+1×250=2230，加60=2290是核對目標，不是預先填好的模型實測結果。
-金額對也要查訂單編號、顧客、兩筆商品名稱、數量、單價、運費。0或1次API；選C就不開B。
+**C2判讀**：2×990+1×250=2230，加60=2290是核對目標，<font color="#C62828"><b>不是預先填好的模型實測結果</b></font>。
+<font color="#C62828"><b>金額對也要查訂單編號、顧客、兩筆商品名稱、數量、單價、運費</b></font>。0或1次API；選C就不開B。
 
 ## 8｜同儕覆核與交件
 
@@ -975,8 +980,8 @@ if RUN_C_ORDER:
 | B或C | | | | |
 
 同桌互問：①required與null差在哪？②合法類別為何仍可能錯？③model_validate有送API嗎？④model_dump是否已寫檔？
-只有顯示結果不代表已寫檔或完成App。Notebook中採用結果表示通過本例指定檢查；實際寫入系統前仍需內容覆核。
-第7週學表單／按鈕／顯示，第8週再接本週抽取流程；期中真正Structured Outputs仍須送API格式規格。
+<font color="#C62828"><b>只有顯示結果不代表已寫檔或完成App</b></font>。Notebook中採用結果表示通過本例指定檢查；<font color="#C62828"><b>實際寫入系統前仍需內容覆核</b></font>。
+第7週學表單／按鈕／顯示，第8週再接本週抽取流程；<font color="#C62828"><b>期中真正Structured Outputs仍須送API格式規格</b></font>。
 JSON Schema路徑取得dict，Pydantic路徑先model_dump轉dict；不用在本週先做通用App框架。
 
 
@@ -987,7 +992,7 @@ JSON Schema路徑取得dict，Pydantic路徑先model_dump轉dict；不用在本�
 
 ### X1｜規格版本與深拷貝
 
-需要：無其他程式格。App新增欄位時，可以保留v1、另存v2；版本名稱不會自動處理相容性。
+<font color="#1565C0"><b>需要：</b></font>無其他程式格。App新增欄位時，可以保留v1、另存v2；<font color="#C62828"><b>版本名稱不會自動處理相容性</b></font>。
 
 **程式位置：Notebook第84格｜cell ID：`w06s-registry`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -1006,13 +1011,13 @@ print("v1欄位：", list(schema_v1["properties"]))
 print("v2欄位：", list(schema_v2["properties"]))
 ```
 
-**X1預期**：v1只有title，v2多owner；0次API。v2若替代v1，使用端仍須處理新增欄位。
+<font color="#2E7D32"><b>X1預期</b></font>：v1只有title，v2多owner；0次API。v2若替代v1，使用端仍須處理新增欄位。
 
 
 ### X2｜會議：文字清單與待辦物件清單
 
-需要：已安裝Pydantic，無其他程式格。attendees是list[str]，action_items是list[ActionItem]。
-未知期限填None；下格只有本機手寫資料，不是從會議原文抽取，也不會編出負責人。
+<font color="#1565C0"><b>需要：</b></font>已安裝Pydantic，無其他程式格。attendees是list[str]，action_items是list[ActionItem]。
+未知期限填None；下格只有本機手寫資料，<font color="#C62828"><b>不是從會議原文抽取</b></font>，也不會編出負責人。
 
 **程式位置：Notebook第87格｜cell ID：`w06s-meeting`｜需要：無其他程式格（套件需已安裝）。**
 
@@ -1037,18 +1042,18 @@ minutes = MeetingMinutes.model_validate({"meeting_topic": "專題討論", "atten
 print(minutes.model_dump())
 ```
 
-**X2預期**：顯示會議與一筆due_date=None的待辦。0次API。姓名與任務是否真實仍不由型別保證。
+<font color="#2E7D32"><b>X2預期</b></font>：顯示會議與一筆due_date=None的待辦。0次API。<font color="#C62828"><b>姓名與任務是否真實仍不由型別保證</b></font>。
 
 
 ### X3｜重試設計（討論，不提供付費自動重跑）
 
 | 情況 | 先做什麼？ |
 |---|---|
-| 缺金鑰、Schema錯誤、ValidationError | 修正設定或資料；不要反覆請求 |
+| 缺金鑰、Schema錯誤、ValidationError | 修正設定或資料；<font color="#C62828"><b>不要反覆請求</b></font> |
 | 拒答、未完成 | 記原因、確認限制與可接受處理方式；不自動當成功 |
 | 暫時性網路逾時 | 評估是否重試，限制次數並記成本 |
 
-延伸R規格：成功立即返回；最多3次；只有指定的暫時性TimeoutError才重試；其他錯誤立即回報。
+延伸R規格：成功立即返回；最多3次；只有指定的暫時性TimeoutError才重試；<font color="#C62828"><b>其他錯誤立即回報</b></font>。
 本機用固定假operation驗證「失敗一次再成功應呼叫2次；資料錯誤應呼叫1次」即可。
 真實SDK的錯誤類別與重試政策須另查官方文件；本週client已設max_retries=0。這是課後設計題，不增加課堂請求。
 
@@ -1063,7 +1068,7 @@ print(minutes.model_dump())
 | B2或C2擇一 | RUN_B_REVIEW或RUN_C_ORDER | 1 |
 
 固定主線各跑一次仍7次API。N1多筆活動示範僅本機，沒有原版選讀的額外付費活動。
-重跑另計；請求數不等於費用。無金鑰可完成全部離線活動，真實結果明列未執行。
+<font color="#C62828"><b>重跑另計；請求數不等於費用</b></font>。無金鑰可完成全部離線活動，真實結果明列未執行。
 
 官方核對日：2026-10-19。
 
@@ -1071,4 +1076,4 @@ print(minutes.model_dump())
 - [OpenAI Python SDK](https://developers.openai.com/api/reference/python)：Z1 timeout與max_retries。
 - [Pydantic Models](https://docs.pydantic.dev/latest/concepts/models/)與[Strict Mode](https://docs.pydantic.dev/latest/concepts/strict_mode/)：本機驗證、物件、dump與嚴格型別。
 
-文件核對與離線測試不等於真實API或Colab成功。教材不預填任何模型輸出；課前需驗證模型可用性、套件安裝、實際回應與授課時間。
+<font color="#C62828"><b>文件核對與離線測試不等於真實API或Colab成功</b></font>。教材不預填任何模型輸出；課前需驗證模型可用性、套件安裝、實際回應與授課時間。
