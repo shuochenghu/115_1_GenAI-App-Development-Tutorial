@@ -1,0 +1,4 @@
+# 沿用原第7週目標版本；尚須在目標Python3.12環境驗證。
+streamlit==1.63.0
+openai==2.49.0
+python-dotenv==1.2.3
