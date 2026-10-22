@@ -9,6 +9,72 @@ WEEK = ROOT/'week07'
 APP = WEEK/'week07_streamlit_simple'
 STEM = '生成式AI應用開發_第07週_Streamlit_Web_App_課堂簡化版'
 
+# 與第6週相同：重要觀念固定紅色，只修飾講義文字，不套用到App原碼。
+IMPORTANT_TEXT = {
+    'title': ['本週在VS Code／本機執行Streamlit。Notebook與Markdown是閱讀講義，不在Colab或Notebook直接執行以下App程式格。',
+              '不需要剪貼其他格，也不匯入前一個範例', '同時只啟動一個範例',
+              '排障超時先完成離線流程，付費活動明列未執行'],
+    'setup': ['勿直接把第6週Colab安裝當作本機已準備完成', '看到文字輸入與送出按鈕，才進下一節。',
+              '不提交Git', '不放真的金鑰', '不是任務總時限', '手動重跑另計費用', '目標環境須課前驗證'],
+    '01-after': ['改輸入時先前按鈕區的結果可能消失'],
+    '02-guide': ['先連按兩次加一，對照普通變數與保存次數，再按歸零'],
+    '02-after': ['普通變數仍為1，保存次數為2', '不是永久資料庫或模型記憶'],
+    '03-guide': ['先保持API未勾選', '離線固定活動卡', '未知負責人顯示尚未指定'],
+    '03-after': ['不會抽取其他輸入', '不能誤認為新文字結果', '結構通過仍須逐欄對原文'],
+    '04-guide': ['切換真實API時清空紀錄，避免把固定離線回答送給模型',
+                 '最近10則已完成訊息加本輪input，每輪重送instructions'],
+    '04-after': ['離線只能證明畫面與保存', '清空後畫面與下一次請求都不帶舊紀錄',
+                 '失敗不保存半輪', '不要用離線固定回覆證明模型記得'],
+    '05-guide': ['離線片段很快，只看串接，不拿來測模型速度', '完成檢查後才走保存區'],
+    '05-after': ['拒答／失敗／未完成／缺完成事件／空回答均不保存',
+                 '可見部分文字也不代表正式紀錄', 'API是否完成仍要看完成事件'],
+    '06-guide': ['只收UTF-8 txt/md；PDF／Word／CSV留第9週', '不要讓上傳本身就觸發API'],
+    '06-after': ['離線只顯示前200字元，標記沒有AI摘要', '不默默截斷文件再當完整摘要', '字元數不等於token數'],
+    '07-after': ['切分頁不是付費開關', '不要依靠分頁當請求防護'],
+    'handoff': ['第8週至少一個功能仍須真正Structured Outputs',
+                '只有一般聊天或prompt寫JSON，尚未滿足該項要求', '離線固定卡不算真實成果',
+                '未執行API就標未執行', '不把教師版當自己的修改成果',
+                '本機／假回應與真實API分開', '確認.env與secrets.toml不被追蹤',
+                '開啟App、輸入或改版面不應自動請求', '逾時／中斷不代表免費',
+                '瀏覽器重新整理不是清空聊天的替代操作'],
+    'deployment': ['部署時不用上傳.env', '不放真的金鑰', 'API仍保留明確觸發開關',
+                   '這是課後設定對照，沒有實際部署',
+                   '不等於真實API、真人瀏覽器、課堂目標環境安裝、雲端部署或150分鐘試教'],
+}
+
+
+def color_markdown(key, source):
+    """保留標題、程式圍欄與行內程式碼；只標示選定觀念與閱讀標籤。"""
+    for phrase in IMPORTANT_TEXT.get(key, []):
+        assert phrase in source, (key, phrase, '需同步更新重點標記')
+    lines = []
+    fenced = False
+    for line in source.splitlines(keepends=True):
+        if line.startswith('```'):
+            fenced = not fenced
+        elif not fenced and not line.startswith('#'):
+            # 只處理行內程式碼之外的文字，避免HTML被當成程式碼印出。
+            parts = re.split(r'(`+[^`\n]*`+)', line)
+            for index in range(0, len(parts), 2):
+                for phrase in IMPORTANT_TEXT.get(key, []):
+                    parts[index] = parts[index].replace(phrase, f'<font color="#C62828"><b>{phrase}</b></font>')
+            line = ''.join(parts)
+            if line.startswith('需要：'):
+                line = '<font color="#1565C0"><b>需要：</b></font>' + line[len('需要：'):]
+            match = re.match(r'^\*\*([^*]+)\*\*', line)
+            if match:
+                label = match.group(1)
+                color = '#2E7D32' if '預期' in label else '#1565C0' if label in ['完整檔案：', '提問：', '證據紀錄：'] else None
+                if color:
+                    line = f'<font color="{color}"><b>{label}</b></font>' + line[match.end():]
+        lines.append(line)
+    if key == 'title':
+        # 放在首頁第一個標題的內文，不混入後面流程或增加文字格。
+        lines.insert(2, '色彩提示：<font color="#C62828"><b>紅色＝重要觀念／必須說明的限制</b></font>；'
+                        '<font color="#1565C0"><b>藍色＝前置需求／操作提示</b></font>；'
+                        '<font color="#2E7D32"><b>綠色＝預期結果標籤</b></font>。\n\n')
+    return ''.join(lines)
+
 
 def clean(s):
     return textwrap.dedent(s).strip()+'\n'
@@ -304,7 +370,7 @@ def notebook(teacher=False):
     def md(key,s):
         # 每個標題各自起始文字格；不拆程式圍欄內的內容。
         chunks=[]; part=[]; fenced=False
-        for line in clean(s).splitlines(keepends=True):
+        for line in color_markdown(key, clean(s)).splitlines(keepends=True):
             if line.startswith('```'):
                 fenced=not fenced
             if not fenced and re.match(r'^#{1,6} ',line) and part:
@@ -589,6 +655,12 @@ def guide():
     # 第07週課堂簡化版｜教師導讀與修訂紀錄
 
     2026-10-19。另存雙版Notebook／Markdown與week07_streamlit_simple配對獨立範例；原教材、原App與Claude參考保留。
+
+    ## 2026-10-21文字格色彩標示
+
+    學生／教師簡化版Notebook與Markdown沿用第6週配色：重要觀念、必須說明的限制與易錯處固定紅色粗體；前置需求／操作提示標籤用藍色，預期觀察標籤用綠色。首頁附色彩提示，採行內HTML font標記。
+    特別標紅rerun與狀態、畫面歷史與模型前文、完成才保存、離線與真實成果、表單／按鈕觸發及期中Structured Outputs要求。標題層級與分格、程式格、學生TODO及配套App均保持原樣；重建來源同步保留標示。
+    本次只核對文字與標記結構、程式／配套不變及講義重建一致，尚未在Colab或真人瀏覽器驗證顯色；不同閱讀器的HTML支援可能不同。
 
     ## 帶課重點
 

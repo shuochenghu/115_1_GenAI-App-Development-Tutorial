@@ -1,5 +1,7 @@
 # 第07週｜Streamlit Web App｜課堂簡化版
 
+色彩提示：<font color="#C62828"><b>紅色＝重要觀念／必須說明的限制</b></font>；<font color="#1565C0"><b>藍色＝前置需求／操作提示</b></font>；<font color="#2E7D32"><b>綠色＝預期結果標籤</b></font>。
+
 **教師版**。本週目標：把熟悉的文字功能變成可以操作的網頁，理解介面、重新執行、狀態與API的分工。
 第5週提供對話與串流觀念，第6週提供原文→欄位→驗證；本週只逐步加上介面。
 原教材及`week07_streamlit_app/`保留為整合參考。
@@ -7,9 +9,9 @@
 
 ## 這份Notebook如何使用？
 
-**本週在VS Code／本機執行Streamlit。Notebook與Markdown是閱讀講義，不在Colab或Notebook直接執行以下App程式格。**
-每個code cell是一份完整`.py`的對照，不需要剪貼其他格，也不匯入前一個範例。
-在配套資料夾執行對應檔案；同時只啟動一個範例，終端機按Ctrl+C停止後再換下一個。
+**<font color="#C62828"><b>本週在VS Code／本機執行Streamlit。Notebook與Markdown是閱讀講義，不在Colab或Notebook直接執行以下App程式格。</b></font>**
+每個code cell是一份完整`.py`的對照，<font color="#C62828"><b>不需要剪貼其他格，也不匯入前一個範例</b></font>。
+在配套資料夾執行對應檔案；<font color="#C62828"><b>同時只啟動一個範例</b></font>，終端機按Ctrl+C停止後再換下一個。
 01到07各自有自己的畫面與狀態，不是多個檔案協作的專案架構。
 
 
@@ -26,7 +28,7 @@
 | 135–150 | 成果覆核與專題 | 選一個主要功能整理README與Git紀錄 |
 
 全班理解所有單元；學生完成A/B/C小練習，再選一個主要功能作成果，不要求重寫全部API或generator。
-排障超時先完成離線流程，付費活動明列未執行。150分鐘安排仍須實際試教。
+<font color="#C62828"><b>排障超時先完成離線流程，付費活動明列未執行</b></font>。150分鐘安排仍須實際試教。
 
 ## 0｜只準備一次的專案環境
 
@@ -35,7 +37,7 @@
 
 在VS Code開啟`week07/week07_streamlit_simple/`。`student/`與`teacher/`各有7份完整App。
 共同的requirements、.env.example與README只負責環境，不是程式呼叫鏈。
-本週延續課程Python3.12環境，勿直接把第6週Colab安裝當作本機已準備完成。
+本週延續課程Python3.12環境，<font color="#C62828"><b>勿直接把第6週Colab安裝當作本機已準備完成</b></font>。
 
 Windows PowerShell（從配套資料夾）：
 
@@ -49,23 +51,23 @@ python -m streamlit run teacher/01_inputs.py
 
 macOS／Linux：使用`python3.12 -m venv .venv`及`source .venv/bin/activate`，其餘相同。
 若已有課程環境，可使用已確認依賴的環境啟動，不必在每個範例建立venv。
-**看到文字輸入與送出按鈕，才進下一節。** 缺套件查環境；找不到檔案查目前資料夾與命令。
+**<font color="#C62828"><b>看到文字輸入與送出按鈕，才進下一節。</b></font>** 缺套件查環境；找不到檔案查目前資料夾與命令。
 
 
 ### Z2｜金鑰：先本機.env，部署設定課後讀
 
 無金鑰也能完成全部離線畫面。需要真實API時，將`.env.example`另存`.env`，私下填入OPENAI_API_KEY。
 `load_dotenv()`讀設定，`os.getenv()`取值，這些程式已完整提供，不作本週TODO。
-`.env`、`.streamlit/secrets.toml`不提交Git；`.env.example`與範例Secrets不放真的金鑰。
-60秒是網路等待起始設定，不是任務總時限。SDK max_retries=0，不自動重試；手動重跑另計費用。
-套件固定目標沿用原專案：Streamlit1.63.0／OpenAI2.49.0／python-dotenv1.2.3，目標環境須課前驗證。
+`.env`、`.streamlit/secrets.toml`<font color="#C62828"><b>不提交Git</b></font>；`.env.example`與範例Secrets<font color="#C62828"><b>不放真的金鑰</b></font>。
+60秒是網路等待起始設定，<font color="#C62828"><b>不是任務總時限</b></font>。SDK max_retries=0，不自動重試；<font color="#C62828"><b>手動重跑另計費用</b></font>。
+套件固定目標沿用原專案：Streamlit1.63.0／OpenAI2.49.0／python-dotenv1.2.3，<font color="#C62828"><b>目標環境須課前驗證</b></font>。
 
 ## 1｜先看見畫面
 
 ### A｜輸入、送出、顯示（必做）
 
-**完整檔案：** [配套教師版 01_inputs.py](week07_streamlit_simple/teacher/01_inputs.py)。
-需要：已安裝共同套件；無其他範例變數。從配套資料夾執行：
+<font color="#1565C0"><b>完整檔案：</b></font> [配套教師版 01_inputs.py](week07_streamlit_simple/teacher/01_inputs.py)。
+<font color="#1565C0"><b>需要：</b></font>已安裝共同套件；無其他範例變數。從配套資料夾執行：
 
 ```powershell
 python -m streamlit run teacher/01_inputs.py
@@ -94,24 +96,24 @@ if st.button("送出"):
         st.warning("請先輸入稱呼。")
 ```
 
-**預期觀察與判讀：** 輸入小安後按送出，看到問候；空白送出看到提示。改輸入時先前按鈕區的結果可能消失，留待02理解。
+<font color="#2E7D32"><b>預期觀察與判讀：</b></font> 輸入小安後按送出，看到問候；空白送出看到提示。<font color="#C62828"><b>改輸入時先前按鈕區的結果可能消失</b></font>，留待02理解。
 
-**提問：** 你輸入文字時與按送出時，各有哪些程式會重新執行？先預測，再操作。
+<font color="#1565C0"><b>提問：</b></font> 你輸入文字時與按送出時，各有哪些程式會重新執行？先預測，再操作。
 
-**證據紀錄：** 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
+<font color="#1565C0"><b>證據紀錄：</b></font> 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
 
 ## 2｜rerun與狀態保存
 
 ### B｜普通變數與session_state（必做）
 
-**完整檔案：** [配套教師版 02_state.py](week07_streamlit_simple/teacher/02_state.py)。
-需要：已安裝共同套件；無其他範例變數。從配套資料夾執行：
+<font color="#1565C0"><b>完整檔案：</b></font> [配套教師版 02_state.py](week07_streamlit_simple/teacher/02_state.py)。
+<font color="#1565C0"><b>需要：</b></font>已安裝共同套件；無其他範例變數。從配套資料夾執行：
 
 ```powershell
 python -m streamlit run teacher/02_state.py
 ```
 
-本例0次API。先連按兩次加一，對照普通變數與保存次數，再按歸零。直接使用session_state，不先包初始化／加入／重置函式。
+本例0次API。<font color="#C62828"><b>先連按兩次加一，對照普通變數與保存次數，再按歸零</b></font>。直接使用session_state，不先包初始化／加入／重置函式。
 
 B練習：只補歸零按鈕的指定動作，將st.session_state.count設為0。其餘已提供。
 
@@ -138,26 +140,26 @@ st.write("保存的次數：", st.session_state.count)
 st.caption("關閉／重新整理瀏覽器可能開始新工作階段；這不是資料庫。")
 ```
 
-**預期觀察與判讀：** 教師版連按兩次：普通變數仍為1，保存次數為2；歸零後保存次數為0。學生版未完成B時按歸零只顯示TODO提示。
+<font color="#2E7D32"><b>預期觀察與判讀：</b></font> 教師版連按兩次：<font color="#C62828"><b>普通變數仍為1，保存次數為2</b></font>；歸零後保存次數為0。學生版未完成B時按歸零只顯示TODO提示。
 
-**提問：** 為何普通變數無法累加？session_state保存的是同一工作階段的值，不是永久資料庫或模型記憶。
+<font color="#1565C0"><b>提問：</b></font> 為何普通變數無法累加？session_state保存的是同一工作階段的值，<font color="#C62828"><b>不是永久資料庫或模型記憶</b></font>。
 
-**證據紀錄：** 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
+<font color="#1565C0"><b>證據紀錄：</b></font> 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
 
 ## 3｜表單接回第6週
 
 ### C｜活動文字→固定欄位（必做）
 
-**完整檔案：** [配套教師版 03_form_ai.py](week07_streamlit_simple/teacher/03_form_ai.py)。
-需要：已安裝共同套件；無其他範例變數。從配套資料夾執行：
+<font color="#1565C0"><b>完整檔案：</b></font> [配套教師版 03_form_ai.py](week07_streamlit_simple/teacher/03_form_ai.py)。
+<font color="#1565C0"><b>需要：</b></font>已安裝共同套件；無其他範例變數。從配套資料夾執行：
 
 ```powershell
 python -m streamlit run teacher/03_form_ai.py
 ```
 
-不依賴01、02的程式。先保持API未勾選，送出預設原文；畫面明示離線固定活動卡。之後再用金鑰測真實Structured Outputs。
+不依賴01、02的程式。<font color="#C62828"><b>先保持API未勾選</b></font>，送出預設原文；畫面明示<font color="#C62828"><b>離線固定活動卡</b></font>。之後再用金鑰測真實Structured Outputs。
 
-C練習：只補結果區，以st.write顯示title與owner；未知負責人顯示尚未指定。Schema、API、驗證與狀態保存完整提供。
+C練習：只補結果區，以st.write顯示title與owner；<font color="#C62828"><b>未知負責人顯示尚未指定</b></font>。Schema、API、驗證與狀態保存完整提供。
 
 下格是檔案的完整對照，請在VS Code查看／修改配套檔案並啟動，不在Notebook直接執行。
 API範例較長的回應檢查段是已提供基礎設施；教師帶讀本節指定的資料流，不逐行展開SDK結構。
@@ -239,26 +241,26 @@ if st.session_state.event_record is not None:
     st.write("負責人：", owner)
 ```
 
-**預期觀察與判讀：** 離線卡固定為AI專題討論／下週三／14:00／A203／owner=None；不會抽取其他輸入。真實模式則記實際結果。改輸入但尚未送出時，上次結果附原輸入，不能誤認為新文字結果。
+<font color="#2E7D32"><b>預期觀察與判讀：</b></font> 離線卡固定為AI專題討論／下週三／14:00／A203／owner=None；<font color="#C62828"><b>不會抽取其他輸入</b></font>。真實模式則記實際結果。改輸入但尚未送出時，上次結果附原輸入，<font color="#C62828"><b>不能誤認為新文字結果</b></font>。
 
-**提問：** 表單何時送出資料？為什麼API只放submitted條件內？日期保留原文、owner可未知；結構通過仍須逐欄對原文。
+<font color="#1565C0"><b>提問：</b></font> 表單何時送出資料？為什麼API只放submitted條件內？日期保留原文、owner可未知；<font color="#C62828"><b>結構通過仍須逐欄對原文</b></font>。
 
-**證據紀錄：** 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
+<font color="#1565C0"><b>證據紀錄：</b></font> 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
 
 ## 4｜非串流聊天
 
 ### D｜畫面紀錄與模型前文（完整示範）
 
-**完整檔案：** [配套教師版 04_chat.py](week07_streamlit_simple/teacher/04_chat.py)。
-需要：已安裝共同套件；無其他範例變數。從配套資料夾執行：
+<font color="#1565C0"><b>完整檔案：</b></font> [配套教師版 04_chat.py](week07_streamlit_simple/teacher/04_chat.py)。
+<font color="#1565C0"><b>需要：</b></font>已安裝共同套件；無其他範例變數。從配套資料夾執行：
 
 ```powershell
 python -m streamlit run teacher/04_chat.py
 ```
 
-不依賴03。先離線問兩題，看user／assistant如何配對保存與重畫；切換真實API時清空紀錄，避免把固定離線回答送給模型。
+不依賴03。先離線問兩題，看user／assistant如何配對保存與重畫；<font color="#C62828"><b>切換真實API時清空紀錄，避免把固定離線回答送給模型</b></font>。
 
-本節無TODO。只追四段：初始化→重畫→本輪請求→成功後保存。最近10則已完成訊息加本輪input，每輪重送instructions。
+本節無TODO。只追四段：初始化→重畫→本輪請求→成功後保存。<font color="#C62828"><b>最近10則已完成訊息加本輪input，每輪重送instructions</b></font>。
 
 下格是檔案的完整對照，請在VS Code查看／修改配套檔案並啟動，不在Notebook直接執行。
 API範例較長的回應檢查段是已提供基礎設施；教師帶讀本節指定的資料流，不逐行展開SDK結構。
@@ -325,26 +327,26 @@ if prompt and prompt.strip():
         st.session_state.messages.append({"role": "assistant", "content": answer})
 ```
 
-**預期觀察與判讀：** 離線只能證明畫面與保存。真實模式問兩輪，另記input／回答與人工判讀；清空後畫面與下一次請求都不帶舊紀錄。失敗不保存半輪。
+<font color="#2E7D32"><b>預期觀察與判讀：</b></font> <font color="#C62828"><b>離線只能證明畫面與保存</b></font>。真實模式問兩輪，另記input／回答與人工判讀；<font color="#C62828"><b>清空後畫面與下一次請求都不帶舊紀錄</b></font>。<font color="#C62828"><b>失敗不保存半輪</b></font>。
 
-**提問：** 畫面有歷史就代表模型收到嗎？指出messages如何送進input；不要用離線固定回覆證明模型記得。
+<font color="#1565C0"><b>提問：</b></font> 畫面有歷史就代表模型收到嗎？指出messages如何送進input；<font color="#C62828"><b>不要用離線固定回覆證明模型記得</b></font>。
 
-**證據紀錄：** 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
+<font color="#1565C0"><b>證據紀錄：</b></font> 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
 
 ## 5｜同一聊天改用串流
 
 ### E｜逐段顯示，完成才保存（完整示範）
 
-**完整檔案：** [配套教師版 05_streaming.py](week07_streamlit_simple/teacher/05_streaming.py)。
-需要：已安裝共同套件；無其他範例變數。從配套資料夾執行：
+<font color="#1565C0"><b>完整檔案：</b></font> [配套教師版 05_streaming.py](week07_streamlit_simple/teacher/05_streaming.py)。
+<font color="#1565C0"><b>需要：</b></font>已安裝共同套件；無其他範例變數。從配套資料夾執行：
 
 ```powershell
 python -m streamlit run teacher/05_streaming.py
 ```
 
-停止04，再直接啟動05，不取代04的程式片段。輸入與資料流相同，只改回答顯示流程。離線片段很快，只看串接，不拿來測模型速度。
+停止04，再直接啟動05，不取代04的程式片段。輸入與資料流相同，只改回答顯示流程。<font color="#C62828"><b>離線片段很快，只看串接，不拿來測模型速度</b></font>。
 
-本節無TODO。stream_answer已完整提供；只讀yield把文字片段交給st.write_stream，以及完成檢查後才走保存區。第5週已教事件，這裡不再要求重寫generator。
+本節無TODO。stream_answer已完整提供；只讀yield把文字片段交給st.write_stream，以及<font color="#C62828"><b>完成檢查後才走保存區</b></font>。第5週已教事件，這裡不再要求重寫generator。
 
 下格是檔案的完整對照，請在VS Code查看／修改配套檔案並啟動，不在Notebook直接執行。
 API範例較長的回應檢查段是已提供基礎設施；教師帶讀本節指定的資料流，不逐行展開SDK結構。
@@ -424,26 +426,26 @@ if prompt and prompt.strip():
         st.session_state.messages.append({"role": "assistant", "content": answer})
 ```
 
-**預期觀察與判讀：** 真實模式收到delta逐段顯示，completed後保存完整配對；拒答／失敗／未完成／缺完成事件／空回答均不保存。可見部分文字也不代表正式紀錄。
+<font color="#2E7D32"><b>預期觀察與判讀：</b></font> 真實模式收到delta逐段顯示，completed後保存完整配對；<font color="#C62828"><b>拒答／失敗／未完成／缺完成事件／空回答均不保存</b></font>。<font color="#C62828"><b>可見部分文字也不代表正式紀錄</b></font>。
 
-**提問：** st.write_stream回傳完整字串，只說明顯示與串接；API是否完成仍要看完成事件。Ctrl+C停止終端機可停止App；中止與瀏覽器操作須課前實測。
+<font color="#1565C0"><b>提問：</b></font> st.write_stream回傳完整字串，只說明顯示與串接；<font color="#C62828"><b>API是否完成仍要看完成事件</b></font>。Ctrl+C停止終端機可停止App；中止與瀏覽器操作須課前實測。
 
-**證據紀錄：** 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
+<font color="#1565C0"><b>證據紀錄：</b></font> 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
 
 ## 6｜文字檔上傳
 
 ### F｜上傳→預覽→明確按鈕（短示範）
 
-**完整檔案：** [配套教師版 06_file.py](week07_streamlit_simple/teacher/06_file.py)。
-需要：已安裝共同套件；無其他範例變數。從配套資料夾執行：
+<font color="#1565C0"><b>完整檔案：</b></font> [配套教師版 06_file.py](week07_streamlit_simple/teacher/06_file.py)。
+<font color="#1565C0"><b>需要：</b></font>已安裝共同套件；無其他範例變數。從配套資料夾執行：
 
 ```powershell
 python -m streamlit run teacher/06_file.py
 ```
 
-不依賴03或04。只收UTF-8 txt/md；PDF／Word／CSV留第9週。先用配套sample_data/activity_notes.txt，保持離線，檢查原文預覽再按摘要。
+不依賴03或04。<font color="#C62828"><b>只收UTF-8 txt/md；PDF／Word／CSV留第9週</b></font>。先用配套sample_data/activity_notes.txt，保持離線，檢查原文預覽再按摘要。
 
-本節無TODO。編碼、大小與長度檢查完整提供；只理解bytes需要decode成文字、按鈕後才處理。不要讓上傳本身就觸發API。
+本節無TODO。編碼、大小與長度檢查完整提供；只理解bytes需要decode成文字、按鈕後才處理。<font color="#C62828"><b>不要讓上傳本身就觸發API</b></font>。
 
 下格是檔案的完整對照，請在VS Code查看／修改配套檔案並啟動，不在Notebook直接執行。
 API範例較長的回應檢查段是已提供基礎設施；教師帶讀本節指定的資料流，不逐行展開SDK結構。
@@ -510,18 +512,18 @@ if st.session_state.file_record is not None:
     st.write(st.session_state.file_record["answer"])
 ```
 
-**預期觀察與判讀：** 離線只顯示前200字元，標記沒有AI摘要。真實摘要1次請求，逐點對原文。錯編碼、空檔、超64KB、超6000字元會提示並禁止處理；不默默截斷文件再當完整摘要。
+<font color="#2E7D32"><b>預期觀察與判讀：</b></font> <font color="#C62828"><b>離線只顯示前200字元，標記沒有AI摘要</b></font>。真實摘要1次請求，逐點對原文。錯編碼、空檔、超64KB、超6000字元會提示並禁止處理；<font color="#C62828"><b>不默默截斷文件再當完整摘要</b></font>。
 
-**提問：** UTF-8解碼失敗是檔案問題，還是模型品質問題？上傳、預覽、摘要分別發生什麼？字元數不等於token數。
+<font color="#1565C0"><b>提問：</b></font> UTF-8解碼失敗是檔案問題，還是模型品質問題？上傳、預覽、摘要分別發生什麼？<font color="#C62828"><b>字元數不等於token數</b></font>。
 
-**證據紀錄：** 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
+<font color="#1565C0"><b>證據紀錄：</b></font> 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
 
 ## 7｜側欄與分頁
 
 ### G｜設定與版面用途（短示範）
 
-**完整檔案：** [配套教師版 07_layout.py](week07_streamlit_simple/teacher/07_layout.py)。
-需要：已安裝共同套件；無其他範例變數。從配套資料夾執行：
+<font color="#1565C0"><b>完整檔案：</b></font> [配套教師版 07_layout.py](week07_streamlit_simple/teacher/07_layout.py)。
+<font color="#1565C0"><b>需要：</b></font>已安裝共同套件；無其他範例變數。從配套資料夾執行：
 
 ```powershell
 python -m streamlit run teacher/07_layout.py
@@ -552,11 +554,11 @@ with notes:
     st.caption("分頁不是API開關；付費工作仍要放在明確送出動作之後。")
 ```
 
-**預期觀察與判讀：** 詳細顯示時間地點，精簡只留標題；分頁有活動卡與操作說明。切分頁不是付費開關，仍須用提交或按鈕明確觸發API。
+<font color="#2E7D32"><b>預期觀察與判讀：</b></font> 詳細顯示時間地點，精簡只留標題；分頁有活動卡與操作說明。<font color="#C62828"><b>切分頁不是付費開關</b></font>，仍須用提交或按鈕明確觸發API。
 
-**提問：** 把API放進tab裡是否就只在使用者切到該tab時執行？不要依靠分頁當請求防護。
+<font color="#1565C0"><b>提問：</b></font> 把API放進tab裡是否就只在使用者切到該tab時執行？<font color="#C62828"><b>不要依靠分頁當請求防護</b></font>。
 
-**證據紀錄：** 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
+<font color="#1565C0"><b>證據紀錄：</b></font> 我操作的輸入／動作：＿＿；實際畫面或錯誤：＿＿；這只能證明＿＿；仍須核對＿＿。
 
 ## 8｜成果與期中銜接
 
@@ -565,17 +567,17 @@ with notes:
 
 A/B/C是小練習；聊天、串流、檔案、版面用完整示範理解觀念。
 學生可選03活動整理或明確任務聊天作主要功能，其他不要求從零寫完。
-第8週至少一個功能仍須真正Structured Outputs；只有一般聊天或prompt寫JSON，尚未滿足該項要求。
-03已示範JSON Schema＋strict，但離線固定卡不算真實成果；未執行API就標未執行。
+<font color="#C62828"><b>第8週至少一個功能仍須真正Structured Outputs</b></font>；<font color="#C62828"><b>只有一般聊天或prompt寫JSON，尚未滿足該項要求</b></font>。
+03已示範JSON Schema＋strict，但<font color="#C62828"><b>離線固定卡不算真實成果</b></font>；<font color="#C62828"><b>未執行API就標未執行</b></font>。
 
 | 交件 | 保存什麼 |
 |---|---|
-| A/B/C程式 | 修改的student檔案，不把教師版當自己的修改成果 |
+| A/B/C程式 | 修改的student檔案，<font color="#C62828"><b>不把教師版當自己的修改成果</b></font> |
 | 操作紀錄 | 至少一筆輸入／按鈕／預期／實際畫面；普通變數與state的差異 |
 | 選題 | 實際原文或聊天、模式、結果／錯誤，逐欄或逐點覆核 |
-| 程式證據 | 本機／假回應與真實API分開，未做的標未執行 |
+| 程式證據 | <font color="#C62828"><b>本機／假回應與真實API分開</b></font>，未做的標未執行 |
 | README | 功能、啟動命令、必要環境、成本、隱私、限制 |
-| Git | 使用者自己完成有意義的commit，確認.env與secrets.toml不被追蹤 |
+| Git | 使用者自己完成有意義的commit，<font color="#C62828"><b>確認.env與secrets.toml不被追蹤</b></font> |
 
 期中交件時把選定範例另存成自己專案的app.py，調整題目與說明；不用把7個範例全部搬進一個App。
 原week07_streamlit_app可作最後整合閱讀，不能直接當自己的專題成果。
@@ -583,20 +585,20 @@ A/B/C是小練習；聊天、串流、檔案、版面用完整示範理解觀念
 
 ### H2｜請求數與停止方式
 
-所有App預設離線，開啟App、輸入或改版面不應自動請求。勾選真實API後，每次有效表單送出、每則聊天或每次摘要按鈕最多1次API。
+所有App預設離線，<font color="#C62828"><b>開啟App、輸入或改版面不應自動請求</b></font>。勾選真實API後，每次有效表單送出、每則聊天或每次摘要按鈕最多1次API。
 課堂建議真實示範：03一筆＋04兩輪＋05一輪＝4次；06選讀另1次。這是教學活動規劃，不是自動批次，重跑與額外問答另計。
-無金鑰可先完成全部離線操作。真人API內容、串流與費用仍需實測；逾時／中斷不代表免費。
-停止App：終端機Ctrl+C；先停止再換檔。瀏覽器重新整理不是清空聊天的替代操作。
+無金鑰可先完成全部離線操作。真人API內容、串流與費用仍需實測；<font color="#C62828"><b>逾時／中斷不代表免費</b></font>。
+停止App：終端機Ctrl+C；先停止再換檔。<font color="#C62828"><b>瀏覽器重新整理不是清空聊天的替代操作</b></font>。
 
 ## 9｜課後：GitHub與雲端Secrets
 
 
 ### X1｜同一功能，換環境設定
 
-本週先學本機.env。部署時不用上傳.env，在平台Secrets設定OPENAI_API_KEY與OPENAI_MODEL。
-配套有`.streamlit/secrets.example.toml`，只供複製設定結構，不放真的金鑰。
-若把選定App部署，將讀取金鑰／模型的兩處改讀`st.secrets["OPENAI_API_KEY"]`與`st.secrets["OPENAI_MODEL"]`，API仍保留明確觸發開關。
-不再寫一個同時偵測所有環境的get_secret函式。這是課後設定對照，沒有實際部署。
+本週先學本機.env。<font color="#C62828"><b>部署時不用上傳.env</b></font>，在平台Secrets設定OPENAI_API_KEY與OPENAI_MODEL。
+配套有`.streamlit/secrets.example.toml`，只供複製設定結構，<font color="#C62828"><b>不放真的金鑰</b></font>。
+若把選定App部署，將讀取金鑰／模型的兩處改讀`st.secrets["OPENAI_API_KEY"]`與`st.secrets["OPENAI_MODEL"]`，<font color="#C62828"><b>API仍保留明確觸發開關</b></font>。
+不再寫一個同時偵測所有環境的get_secret函式。<font color="#C62828"><b>這是課後設定對照，沒有實際部署</b></font>。
 GitHub Desktop與部署的詳細操作沿用原第7週Git補充及課程環境指南。
 
 
@@ -610,4 +612,4 @@ GitHub Desktop與部署的詳細操作沿用原第7週Git補充及課程環境�
 - [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses)：03格式與拒答。
 - [OpenAI Streaming](https://developers.openai.com/api/docs/guides/streaming-responses)：05完成與增量事件。
 
-自動檢查只涵蓋程式語法、本機Streamlit AppTest／假SDK行為；不等於真實API、真人瀏覽器、課堂目標環境安裝、雲端部署或150分鐘試教。
+自動檢查只涵蓋程式語法、本機Streamlit AppTest／假SDK行為；<font color="#C62828"><b>不等於真實API、真人瀏覽器、課堂目標環境安裝、雲端部署或150分鐘試教</b></font>。
