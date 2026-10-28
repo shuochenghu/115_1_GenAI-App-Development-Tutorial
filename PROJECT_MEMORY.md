@@ -2,6 +2,14 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## Git通用教材補強部署與缺少套件排查（2026-10-28）
+
+- 使用者在Cloud遇到ModuleNotFoundError／dotenv匯入失敗後要求修改Git教材部署部分。更新既有 `week07/生成式AI應用開發_第07週_Git實作教材_學期共用Repo版.md` 第9節、常見問題及部署確認項目，保留第7週起通用定位、Google表單登記自己的Repo及每週不另交資料夾連結的規則；原Git教材與教學程式未改。
+- 9-1新增套件清單位置圖，說明入口同層優先、否則Repo根目錄，不逐層搜尋中間資料夾；保留將當週清單複製到根目錄的路徑範例，明訂已有清單先比較，不逐週覆蓋。清單版本沿用當週教材，不新增全學期固定版本。補上本機安裝不會替Cloud安裝，以及匯入dotenv對應安裝python-dotenv。
+- 9-2補部署分支上入口與清單已Push的網頁確認；9-4補首次部署Advanced settings→Secrets與已部署Settings→Secrets、TOML英文直雙引號、OPENAI_API_KEY正確名稱、頂層設定及os.getenv可沿用，真實設定不提交。9-5分開說明Push後查看安裝／執行log與必要時Reboot，重新啟動不能代替修正清單。
+- 9-6以完整log的No module named 'dotenv'作為排障例子，依序查Repo／分支／入口、實際採用的清單、python-dotenv、清單位置、Commit／Push與重新安裝結果；區分缺套件與Secrets設定錯誤，不解說特定當週App功能。
+- 已查核官方套件、Secrets、App設定及管理文件；通用定位／表單規則、UTF-8、10組圍欄、12個連結、45組色彩標記、2段PowerShell語法與TOML解析檢查通過，git diff --check通過。259份非目標檔案SHA-256與工作前一致。本次僅改新版Git講義及本檔，未修改Repo根目錄套件清單、遠端Repo或Cloud設定，未安裝套件、呼叫API、真人預覽、實際部署或試教，未commit／push。
+
 ## Git教材改採Google表單登記Repo（2026-10-28）
 
 - 使用者將另外提供Google表單讓學生填GitHub Repo連結，不要求每週繳交資料夾連結。更新 `week07/生成式AI應用開發_第07週_Git實作教材_學期共用Repo版.md`：首次建立後透過老師表單登記自己的Repo首頁網址，整學期沿用；網址變更時依公告更新登記。表單連結由老師另外公告，未杜撰網址，也未建立或操作Google表單。

@@ -283,20 +283,31 @@ Thumbs.db
 
 <font color="#C62828"><b>部署路徑使用 /，不要使用 Windows 的反斜線。</b></font> 一個部署指定一個入口；多個 `.py` 不會自動變成網站的多個頁面。
 
-Cloud 先找入口同層，再找 Repo 根目錄的套件清單。本例的 `requirements.txt` 若只位於 `week07-streamlit-app/`，不會因它在入口上層就自動找到。見 [官方套件搜尋規則](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies)。
+Cloud 會建立自己的 Python 環境，再依 GitHub 上的套件清單安裝。<font color="#C62828"><b>本機已安裝套件，不代表 Cloud 也有安裝。</b></font>
 
-可依老師指定的方式處理：
+使用 `requirements.txt` 時，Cloud 先找入口同層，再找 Repo 根目錄。<font color="#C62828"><b>它不會逐層向上搜尋每個資料夾。</b></font> 以下用第 7 週路徑示意，其他週次替換入口與資料夾：
 
-- 入口與 `requirements.txt` 在同一資料夾時，直接保留這個配置。
-- 入口在更深的子資料夾時，可由老師提供相符的 Repo 根目錄清單，或在入口同層提供該 App 的清單。
+```text
+115_1_GenAI-APP-Development/
+├── requirements.txt               ← 可讀取：Repo 根目錄
+└── week07-streamlit-app/
+    ├── requirements.txt           ← 中間一層：本例不會自動讀取
+    └── student/
+        ├── 01_inputs.py           ← 部署入口路徑範例
+        └── requirements.txt       ← 可讀取：入口同層（若採此配置）
+```
 
-以下命令只示範「根目錄尚無套件清單，且老師指定使用共用清單」的情況，從自己的 Repo 根目錄執行：
+上圖展示可讀取的位置，不是要求三處都放清單。入口同層已有清單時會優先採用；若它缺少套件，要修正該份清單，不能只補根目錄的清單。其他依賴管理檔的優先規則見 [官方套件搜尋規則](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies)。
+
+初次部署可依老師指定，將當週清單複製到 Repo 根目錄。先確認根目錄尚無 `requirements.txt`，再從自己的 Repo 根目錄執行：
 
 ```powershell
 Copy-Item .\week07-streamlit-app\requirements.txt .\requirements.txt
 ```
 
-<font color="#C62828"><b>不要每週無條件覆蓋根目錄的套件清單。</b></font> 各週需求不同時要分別確認，避免影響其他已部署 App。套件清單可提交，虛擬環境與金鑰不提交。
+若根目錄已有清單，先比較內容並依當週 README 整合，不直接覆蓋。<font color="#C62828"><b>不要每週無條件覆蓋根目錄的套件清單。</b></font> 各週需求不同時可在各入口同層提供對應清單，避免影響其他已部署 App。套件清單可提交，虛擬環境與金鑰不提交。
+
+清單必須列出程式使用的外部套件，版本沿用當週提供的清單。例如程式寫 `from dotenv import load_dotenv`，安裝名稱是 `python-dotenv`；不是在清單中寫 `dotenv`。其他套件依當週 README 確認，本講義不另固定全學期的版本。
 
 ### 9-2 以相同啟動位置檢查，再 Push
 
@@ -308,6 +319,8 @@ python -m streamlit run week07-streamlit-app/student/01_inputs.py
 
 Cloud 從 Repo 根目錄啟動，本機也從這裡檢查，可提早發現檔案路徑問題。完成檢查後，將入口、必要資料與套件清單 Commit、Push。見 [官方檔案配置說明](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/file-organization)。
 
+接著到 GitHub 網頁，切到準備部署的分支，確認入口與正確位置的 `requirements.txt` 都存在。<font color="#2E7D32"><b>預期觀察：</b></font> Cloud 指定分支中的檔案與本機準備部署的版本一致；只在本機新增清單、尚未 Push，Cloud 仍無法使用。
+
 ### 9-3 在平台建立 App
 
 1. 到 [Streamlit Community Cloud](https://share.streamlit.io) 登入，授權存取自己的 GitHub Repo。
@@ -318,19 +331,55 @@ Cloud 從 Repo 根目錄啟動，本機也從這裡檢查，可提早發現檔�
 
 本機與 Cloud 的 Python、套件及執行環境都需確認；本機能啟動不代表已完成雲端驗證。介面與完整操作可回查 [官方部署說明](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy)。
 
-### 9-4 金鑰與更新
+### 9-4 API 金鑰：Secrets 與字串格式
 
-當週程式需要 API 時，依 README 的設定名稱與讀取方式，在平台 Secrets 填入設定。例如使用 `OPENAI_API_KEY`：
+當週程式需要 API 時，在 **Streamlit Community Cloud 的 Secrets** 設定金鑰；設定名稱與讀取方式須符合當週 README。
+
+- 首次部署：開啟 <font color="#1565C0"><b>Advanced settings → Secrets</b></font>。
+- 已部署的 App：在 Cloud 工作區的 App 選單 **⋮ → Settings → Secrets** 編輯，儲存後重新確認 App。可回查 [官方 App 設定說明](https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app/app-settings)。
+
+例如程式讀取 `OPENAI_API_KEY`，在 Secrets 填入以下 TOML，將占位文字私下換成自己的金鑰：
 
 ```toml
 OPENAI_API_KEY = "填入你自己的API金鑰"
 ```
 
-本機依當週 README 使用 `.env` 或本機 Secrets，Cloud 則在平台設定；<font color="#C62828"><b>真實金鑰不經 GitHub 上傳，也不會隨 Clone 自動帶回。</b></font> 平台頂層 Secrets 可提供為環境變數，仍須與程式讀取方式一致。見 [官方 Secrets 說明](https://docs.streamlit.io/develop/concepts/connections/secrets-management)。
+<font color="#C62828"><b>API key 是字串，請使用英文直雙引號包起來。</b></font> 請使用 `"`，不要使用中文引號 `「 」` 或彎引號 `“ ”`。名稱是 `OPENAI_API_KEY`，不是 `OPEN_AI_API_KEY`；名稱大小寫也須與程式一致。
 
-之後修改已部署程式，Commit、Push 到該 App 指定分支，再開啟網址確認平台更新。不要以固定等待秒數當作完成證據。若 App 使用部署者金鑰，訪客操作可能產生請求；公開方式與使用限制依當週規範處理，API 勾選框本身不是存取控制。
+這個設定放在 Secrets 最外層，不加額外的區段標題。頂層值可提供為環境變數，因此讀取 `os.getenv("OPENAI_API_KEY")` 的程式可以沿用；若當週使用 `st.secrets`，也須依 README 的名稱與結構設定。見 [官方 Secrets 讀取說明](https://docs.streamlit.io/develop/concepts/connections/secrets-management)。
+
+本機依當週 README 使用 `.env` 或本機 Secrets，Cloud 則在平台設定；<font color="#C62828"><b>真實金鑰不經 GitHub 上傳，也不會隨 Clone 自動帶回。</b></font> 不上傳真實 `.env` 或 `secrets.toml`，也不把金鑰貼進程式、README、提交訊息或錯誤截圖。見 [官方 Cloud Secrets 說明](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management)。
+
+### 9-5 更新程式與套件後，確認雲端結果
+
+1. 修改程式或套件清單後，Commit、Push 到該 App 指定的分支。
+2. 在 GitHub 確認最新內容已上傳；不要只看本機 Changes 已清空。
+3. 在 Cloud 開啟 <font color="#1565C0"><b>Manage app</b></font> 查看安裝與執行 log。套件清單變更後，平台會處理重新安裝，可能需要數分鐘。
+4. 安裝與啟動完成後，重新開啟網址，依當週要求實際操作並記錄結果。若需重新啟動，可在工作區該 App 的 **⋮ → Reboot** 操作；重新啟動不能代替補齊套件清單。
+
+平台操作見 [官方 App 管理說明](https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app)。不要以固定等待秒數當作完成證據。若 App 使用部署者金鑰，訪客操作可能產生請求；公開方式與使用限制依當週規範處理，API 勾選框本身不是存取控制。
 
 <font color="#2E7D32"><b>完成證據：</b></font> 網址可開啟，當週要求的操作已實際檢查，README 記錄結果與未測項目。只有部署成功訊息，不能取代功能與內容驗證。
+
+### 9-6 排查缺少套件：以 dotenv 為例
+
+若 App 顯示 `ModuleNotFoundError`，先開啟 **Manage app** 查看完整 log，確認缺少的模組。公開頁面可能隱藏原始訊息，僅靠畫面不能確認所有原因。
+
+例如 log 顯示：
+
+```text
+ModuleNotFoundError: No module named 'dotenv'
+```
+
+這表示雲端找不到 `dotenv` 模組，需檢查套件安裝。依序處理：
+
+1. 確認 App 使用的 **Repo、分支與入口路徑**，避免修改到另一份專案。
+2. 依 9-1 找出 Cloud 實際採用的清單，確認包含 `python-dotenv`；版本依當週提供的清單，不因匯入名稱是 `dotenv` 就改裝其他套件。
+3. 若清單只放在入口上方的中間資料夾，依 9-1 複製到 Repo 根目錄，或改用入口同層的清單；已有清單時先比較，避免覆蓋其他需求。
+4. Commit、Push 到部署分支，並在 GitHub 網頁確認檔案位置與內容。
+5. 等待 Cloud 重新安裝，查看 log 是否已安裝所需套件，再開啟 App 驗證。仍失敗時，依新的完整錯誤繼續排查。
+
+<font color="#C62828"><b>本機執行 pip install 只會安裝到本機；雲端須透過部署分支的套件清單安裝。</b></font> Secrets 負責提供金鑰，不會安裝套件。缺少模組時先處理套件清單；能匯入套件但出現缺金鑰或驗證錯誤時，再檢查 Secrets。
 
 ## 十、常見問題與版本回復
 
@@ -343,7 +392,8 @@ OPENAI_API_KEY = "填入你自己的API金鑰"
 | Clone 後不能啟動 | 是否依當週 README 重建環境與本機設定 |
 | 金鑰或虛擬環境出現在 Changes | 根目錄忽略規則是否正確，檔案是否已被追蹤 |
 | Cloud 找不到程式或套件 | 入口路徑、分支、大小寫、套件清單位置與 Push 狀態 |
-| Cloud 顯示缺少設定 | Secrets 名稱、格式及程式讀取方式是否一致 |
+| Cloud 顯示 ModuleNotFoundError | 查看完整 log；依9-6確認實際採用的套件清單與安裝結果 |
+| Cloud 顯示缺少設定 | Secrets 名稱、英文雙引號、TOML格式及程式讀取方式是否一致 |
 
 在 GitHub Desktop 的 <font color="#1565C0"><b>History</b></font> 選取提交，可以查看當次差異。需要取消某筆提交時，先保存目前進度，再請老師協助判斷是否使用 **Revert Changes in Commit**。
 
@@ -362,6 +412,7 @@ Revert 會新增一筆反向修改，並非直接回到所選提交當時的完�
 - [ ] <font color="#2E7D32"><b>已 Push，並在 GitHub 網頁確認最新程式。</b></font>
 - [ ] README 寫明操作方式、完成情形、實測與未測項目。
 - [ ] 老師可從已登記的 Repo 找到當週資料夾；有部署要求時依公告提供 App 網址與驗證紀錄。
+- [ ] 需要部署時，已確認部署分支、入口、套件清單位置、必要Secrets及雲端實際操作結果。
 - [ ] 離開共用電腦前依教室規定處理帳號與本機私密設定。
 
 ## 附錄：常用操作對照
