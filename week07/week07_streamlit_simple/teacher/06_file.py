@@ -13,30 +13,34 @@
 
 import os
 
+# 將Streamlit簡稱為st；下方st.xxx用來建立網頁元件或存取狀態。
 import streamlit as st
 from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
 
-st.title("文字檔預覽與摘要")
+st.title("文字檔預覽與摘要")  # st.title顯示頁面的主標題。
 
 
 # ---------- 1. API開關與狀態初始化 ----------
+# st.checkbox建立勾選框並回傳True／False；value=False讓它預設不勾選，勾選本身不會呼叫API。
 enable_api = st.checkbox("啟用真實API（按摘要才請求1次）", value=False)
+# st.caption用較小字體顯示補充說明，適合放操作提示與限制。
 st.caption(
     "僅收UTF-8的txt/md、最多64KB及6000字元；"
     "離線只顯示原文片段，沒有做AI摘要。"
 )
 
 # file_record保存最近一次成功的結果、模式與原文，供顯示與換檔比對。
+# st.session_state是目前工作階段的保存空間；下方先檢查鍵是否存在，避免每次重跑都重設。
 if "file_record" not in st.session_state:
     st.session_state.file_record = None
 
 
 # ---------- 2. 上傳與檢查檔案 ----------
-# 無檔案時回傳None；有檔案時取得UploadedFile，可讀取大小與位元組。
 # type限制可接受的副檔名，不保證內容一定是合格文字，仍須檢查。
+# st.file_uploader建立上傳元件；未選檔回傳None，選檔後回傳UploadedFile，仍須自行檢查內容。
 uploaded = st.file_uploader("上傳文字檔", type=["txt", "md"])
 
 # 只有通過所有檢查的原文才放進text；None表示目前沒有可用原文。
@@ -57,11 +61,13 @@ if uploaded is not None:
             raise ValueError("原文須為1到6000字元")
 
         # 通過檢查才預覽；disabled=True表示這個文字框供唯讀檢視。
+        # st.text_area在這裡顯示多行原文；height=180設定高度，disabled=True讓使用者只能閱讀。
         st.text_area("原文預覽", text, height=180, disabled=True)
 
     except (UnicodeDecodeError, ValueError):
         # 任一檢查失敗就清除text；下方摘要按鈕會因此停用。
         text = None
+        # st.error顯示錯誤提示；不會自行丟出例外或停止程式，也不代表結果已保存。
         st.error("請使用UTF-8文字檔，並確認大小、長度與內容。")
 
 
@@ -74,6 +80,7 @@ if st.session_state.file_record and st.session_state.file_record["input"] != tex
 
 # ---------- 4. 按鈕觸發摘要 ----------
 # 只上傳或預覽不呼叫API；有合格原文時才允許按摘要。
+# st.button建立按鈕；只有點擊當次回傳True，其餘重新執行為False，供下方if判斷。
 if st.button("摘要檔案", disabled=text is None):
     # 先清掉舊結果；這次失敗不能留下前次摘要，造成成功的錯覺。
     st.session_state.file_record = None
@@ -125,11 +132,14 @@ if st.button("摘要檔案", disabled=text is None):
 
     except Exception as exc:
         # 只回報失敗，沒有保存新結果；前次結果也已清掉。
+        # st.error顯示錯誤提示；不會自行丟出例外或停止程式，也不代表結果已保存。
         st.error("這次未保存摘要，請檢查設定或回應。錯誤類型：" + type(exc).__name__)
 
 
 # ---------- 5. 顯示結果 ----------
 # 顯示區放在按鈕外；其他互動造成rerun時，保存的結果仍可重畫。
 if st.session_state.file_record is not None:
+    # st.info以提示框標示目前是離線原文片段或真實API摘要。
     st.info(st.session_state.file_record["mode"])
+    # st.write讀取已保存的文字並顯示；這裡不會重新產生摘要。
     st.write(st.session_state.file_record["answer"])

@@ -2,6 +2,22 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第7週初學者Streamlit用途註解（2026-10-28）
+
+- 使用者說明第7週是第一次教Streamlit，要求在程式中用到st.xxx之處註解用途。於目前授課的 `week07/week07_streamlit_simple/student/` 與 `teacher/` 各7份範例補上繁體中文說明，涵蓋st別名、20種函式的顯示／回傳／提交／串流行為，以及sidebar容器與session_state保存空間；134處直接st函式呼叫均有就近用途註解。重複使用時依當下顯示的原文、歷史、問題或回答說明，整併既有重複註解。
+- 就近說明按鈕只在點擊當次為True、表單批次送出、輸入框回傳值、提示本身不停止流程、JSON顯示不等於Schema驗證、聊天容器不自動保存前文、全為文字的write_stream回傳串接字串，以及分頁預設各區程式皆執行。學生A／B／C TODO與教師答案分工保留，沒有提供新的學生答案、函式、跨檔依賴或API行為。
+- 同步兩份40-cell Notebook與Markdown、README、教師導讀及 `scripts/build_week07_simple.py`。14份App AST逐一與本次修改前相同；將Notebook程式來源換成AST摘要後整份比對相同，文字格／色彩／標題分格／ID／metadata與輸出狀態均未改。
+- 既有專案環境Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2通過完整verify_week07_simple.py：JSON／ID／來源與Markdown對齊、14份離線AppTest、假SDK成功／失敗／狀態／串流與替代上傳物件檢查；另檢查134處函式註解覆蓋與git diff --check。238份非本次目標檔案SHA-256與工作前一致，包括原教材、其他週次與上個請求新增的Git學期共用Repo講義。
+- 未安裝或升級套件，未重測固定1.63.0獨立環境、真實API、真人瀏覽器、Cloud、Colab或試教，未commit／push。前一請求尚未提交的Git教材與專案紀錄保留；這次未製作學生發放包，也未改原整合App或其他週次。
+
+## 第7週Git實作教材：學期共用Repo新版（2026-10-28）
+
+- 依使用者確認的流程，另存 `week07/生成式AI應用開發_第07週_Git實作教材_學期共用Repo版.md`；原Git教材保留。每位學生在自己的GitHub建立 `115_1_GenAI-APP-Development`，教室先Clone自己的Repo（既有副本先Fetch／Pull），再複製老師發放的 `week07-streamlit-app/`，保存教材起點後進行Streamlit講解與student的A／B／C TODO，完成後Commit／Push並繳交當週資料夾連結。
+- 新版補上根目錄.gitignore（涵蓋各週金鑰／虛擬環境且保留範例設定）、每週本機環境、TODO完成條件、README實測紀錄、跨電腦同步、補發教材避免覆蓋作業、共用電腦帳號與本機私密設定處理；未另寫Chat Completions App，未提供學生TODO答案。
+- 部署列為延伸，沿用第8週簡化版部署選做。以 `week07-streamlit-app/student/03_form_ai.py` 為入口，明訂Cloud查找入口同層或Repo根目錄套件清單，中間一層requirements不會自動採用；初期複製第7週清單至學生Repo根目錄，已有檔案先比較，不逐週覆蓋。補上從Repo根目錄啟動、Python版本另驗、平台Secrets、Private Repo授權、Push後實際確認及公開App API開關不等於存取控制。
+- 附教師發放前檢核，明確區分備課來源 `week07/week07_streamlit_simple/` 與學生端發放名稱。本次僅新增Git講義與同步本檔；學生教材包尚未產出，既有README／Notebook／程式檔頭／重建腳本與其他週次未改。正式發放前仍須整理學生端路徑、相對連結與不含教師答案的教材包。
+- 已核對官方GitHub Desktop與Streamlit部署文件；新版UTF-8／9組命令與資料圍欄／4個本機連結／7份範例路徑／第7、8週套件版本一致，4段PowerShell語法檢查通過。暫存Repo實測14個應忽略路徑與8個應保留路徑通過；原Git教材SHA-256與修改前一致，檔案空白與git diff --check通過。未安裝套件、呼叫真實API、操作學生帳號、真人瀏覽器、Community Cloud或課堂試教，未commit／push。
+
 ## 第8週詳細註解與教學格式長期規則（2026-10-27）
 
 - 依使用者要求，第8週課堂簡化版學生起點與教師摘要器app.py沿用第7週格式：檔頭用途／教學重點／啟動／模式與請求數、編號分段、適當空行與長參數／Schema拆行；說明設計→設定與驗證函式→狀態→表單→檢查與API→成功保存→顯示。學生A／B／C保持個人設計自由，教師答案旁標記學生TODO對應提醒。

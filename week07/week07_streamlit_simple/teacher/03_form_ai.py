@@ -15,33 +15,40 @@
 import os
 import json
 
+# 將Streamlit簡稱為st；下方st.xxx用來建立網頁元件或存取狀態。
 import streamlit as st
 from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()  # 從本專案的.env讀取；不把金鑰顯示在畫面。
 
-st.title("活動文字整理")
+st.title("活動文字整理")  # st.title顯示頁面的主標題。
 
 
 # ---------- 1. API開關與結果狀態 ----------
 # 就地開關預設關閉；只有開啟後按表單送出，才會發出1次請求。
+# st.checkbox建立勾選框並回傳True／False；value=False讓它預設不勾選，勾選本身不會呼叫API。
 enable_api = st.checkbox("啟用真實API（每次送出1次請求）", value=False)
+# st.caption用較小字體顯示補充說明，適合放操作提示與限制。
 st.caption("離線模式只顯示固定活動卡，不會抽取你輸入的文字。")
 
 # 保存原輸入、資料與模式，讓其他操作造成rerun時仍知道結果的來源。
+# st.session_state是目前工作階段的保存空間；下方先檢查鍵是否存在，避免每次重跑都重設。
 if "event_record" not in st.session_state:
     st.session_state.event_record = None
 
 
 # ---------- 2. 表單集中收集原文 ----------
-# 表單內的輸入在提交時一起送到Python；在表單外處理submitted。
+# event_form是這個表單的識別名稱；submitted在表單外控制是否開始處理。
+# st.form建立表單容器；框內輸入在提交時一起送到Python，不因逐次編輯就重跑程式。
 with st.form("event_form"):
+    # st.text_area建立多行文字框；這裡將提交的原文存入source，max_chars限制可輸入字元數。
     source = st.text_area(
         "活動原文",
         value="下週三14:00在A203教室討論AI專題，沒有指定負責人。",
         max_chars=3000,
     )
+    # st.form_submit_button是表單送出按鈕；本次提交回傳True，存入submitted供表單外判斷。
     submitted = st.form_submit_button("整理活動")
 
 
@@ -50,6 +57,7 @@ if submitted:
     st.session_state.event_record = None  # 失敗不能留下前次成功結果。
 
     if not source.strip():
+        # st.warning顯示警告提示；本身不會停止程式，後續流程由條件判斷控制。
         st.warning("請先輸入活動文字。")
     else:
         try:
@@ -136,20 +144,26 @@ if submitted:
 
         except Exception as exc:
             # 前面已清空舊結果；錯誤只顯示原因類型，不假裝有新成果。
+            # st.error顯示錯誤提示；不會自行丟出例外或停止程式，也不代表結果已保存。
             st.error("本次未保存結果，請檢查金鑰、網路或回應。錯誤類型：" + type(exc).__name__)
 
 # ---------- 4. 顯示已保存的結果與對應原文 ----------
 # 顯示放在送出區外，其他操作rerun後仍可看到上次保存的結果與其原文。
 if st.session_state.event_record is not None:
     record = st.session_state.event_record
+    # st.info以提示框標示這筆結果的來源模式，區分離線示範與真實API。
     st.info(record["mode"])
+    # st.write顯示這筆結果對應的原輸入，供使用者核對內容。
     st.write("這筆紀錄的輸入：", record["input"])
+    # st.json將dict以可展開的JSON格式顯示，方便檢視欄位；不會替資料做Schema驗證。
     st.json(record["data"])
     # 教師提醒（學生TODO C）：學生版只補顯示區，先讓學生嘗試再揭示答案。
+    # st.write在結果區顯示已驗證的活動名稱。
     st.write("活動名稱：", record["data"]["title"])
     owner = record["data"]["owner"]
 
     # owner欄位一定存在，但None表示原文未提供；畫面改用易讀的說法。
     if owner is None:
         owner = "尚未指定"
+    # st.write顯示負責人文字；上方先處理原文未提供的情況。
     st.write("負責人：", owner)

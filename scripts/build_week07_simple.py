@@ -102,47 +102,53 @@ def app_sources(teacher=False):
     sources = {}
     title = '我的第一個活動工具' if teacher else 'TODO：填入你的App標題'
     sources['01_inputs.py'] = clean(f'''
+    # 將Streamlit簡稱為st；下方st.xxx用來建立網頁元件或存取狀態。
     import streamlit as st
 
     # ---------- 1. 畫面標題與用途 ----------
     # A練習只改標題與說明，先看見一個可以操作的畫面。
-    st.title("{title}")
+    st.title("{title}")  # st.title顯示頁面的主標題。
+    # st.write把文字或變數的值顯示到網頁；本身不會保存資料或呼叫模型。
     st.write("輸入稱呼，按送出才顯示問候；本例不呼叫API。")
 
     # ---------- 2. 取得輸入 ----------
-    # text_input回傳目前的文字；限制長度是介面防呆，尚未處理送出。
+    # st.text_input建立單行文字框，將目前內容回傳給name；max_chars=30限制長度。
     name = st.text_input("你的稱呼", max_chars=30)
 
 
     # ---------- 3. 按下按鈕才顯示問候 ----------
-    # button只在該次點擊造成的rerun回傳True；其他rerun不保留這個結果。
+    # st.button建立按鈕；只有點擊當次回傳True，其餘重新執行為False，供下方if判斷。
     if st.button("送出"):
         # strip只用來檢查是否全空白；問候仍顯示原本輸入的name。
         if name.strip():
+            # st.write將提示文字與name依序顯示，形成這次的問候。
             st.write("你好，", name)
         else:
+            # st.warning顯示警告提示；本身不會停止程式，後續流程由條件判斷控制。
             st.warning("請先輸入稱呼。")
     ''')
     if not teacher:
         sources['01_inputs.py'] = sources['01_inputs.py'].replace('# A練習只改', '# TODO A：修改')
-    reset = 'st.session_state.count = 0  # 教師提醒（學生TODO B）：此處為歸零參考答案。' if teacher else 'st.info("TODO B：把session_state中的count改為0。")'
+    reset = 'st.session_state.count = 0  # 教師提醒（學生TODO B）：此處為歸零參考答案。' if teacher else 'st.info("TODO B：把session_state中的count改為0。")  # st.info顯示練習提示框；提示本身不會修改狀態。'
     sources['02_state.py'] = clean('''
+    # 將Streamlit簡稱為st；下方st.xxx用來建立網頁元件或存取狀態。
     import streamlit as st
 
-    st.title("按鈕與狀態保存")
+    st.title("按鈕與狀態保存")  # st.title顯示頁面的主標題。
 
 
     # ---------- 1. 比較普通變數與跨rerun狀態 ----------
     # 普通變數每次都重設；session_state在同一工作階段的rerun間保留。
     ordinary_count = 0
 
-    # 只在第一次沒有count時初始化；每次都指定0，就無法累加。
+    # st.session_state是目前工作階段的保存空間；下方先檢查鍵是否存在，避免每次重跑都重設。
     if "count" not in st.session_state:
         st.session_state.count = 0
 
 
     # ---------- 2. 按一次，分別修改兩種計數 ----------
     # 點加一會重新執行整份程式；普通變數從0開始，保存值接續上次。
+    # st.button建立按鈕；只有點擊當次回傳True，其餘重新執行為False，供下方if判斷。
     if st.button("加一"):
         ordinary_count += 1
         st.session_state.count += 1
@@ -150,60 +156,74 @@ def app_sources(teacher=False):
 
     # ---------- 3. 歸零小練習 ----------
     # B只處理保存的次數；不新增函式或第二份狀態。
+    # st.button建立按鈕；只有點擊當次回傳True，其餘重新執行為False，供下方if判斷。
     if st.button("歸零"):
         '''+reset+'''
 
 
     # ---------- 4. 顯示對照結果 ----------
     # 連按兩次加一：普通值仍1、保存值為2。歸零後保存值為0。
+    # st.write顯示這次重新執行得到的普通變數值。
     st.write("普通變數：", ordinary_count)
+    # st.write讀取並顯示session_state中的保存值，方便與普通變數比較。
     st.write("保存的次數：", st.session_state.count)
+    # st.caption用較小字體顯示補充說明，適合放操作提示與限制。
     st.caption("關閉／重新整理瀏覽器可能開始新工作階段；這不是資料庫。")
     ''')
     display = '''
     # 教師提醒（學生TODO C）：學生版只補顯示區，先讓學生嘗試再揭示答案。
+    # st.write在結果區顯示已驗證的活動名稱。
     st.write("活動名稱：", record["data"]["title"])
     owner = record["data"]["owner"]
 
     # owner欄位一定存在，但None表示原文未提供；畫面改用易讀的說法。
     if owner is None:
         owner = "尚未指定"
+    # st.write顯示負責人文字；上方先處理原文未提供的情況。
     st.write("負責人：", owner)
     ''' if teacher else '''
     # TODO C：以st.write顯示活動名稱與負責人；owner為None時顯示「尚未指定」。
+    # st.info提供一般提示；這裡提醒學生完成結果顯示練習。
     st.info("欄位顯示尚未完成，請完成TODO C。")
     '''
     sources['03_form_ai.py'] = clean('''
 import os
 import json
 
+# 將Streamlit簡稱為st；下方st.xxx用來建立網頁元件或存取狀態。
 import streamlit as st
 from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()  # 從本專案的.env讀取；不把金鑰顯示在畫面。
 
-st.title("活動文字整理")
+st.title("活動文字整理")  # st.title顯示頁面的主標題。
 
 
 # ---------- 1. API開關與結果狀態 ----------
 # 就地開關預設關閉；只有開啟後按表單送出，才會發出1次請求。
+# st.checkbox建立勾選框並回傳True／False；value=False讓它預設不勾選，勾選本身不會呼叫API。
 enable_api = st.checkbox("啟用真實API（每次送出1次請求）", value=False)
+# st.caption用較小字體顯示補充說明，適合放操作提示與限制。
 st.caption("離線模式只顯示固定活動卡，不會抽取你輸入的文字。")
 
 # 保存原輸入、資料與模式，讓其他操作造成rerun時仍知道結果的來源。
+# st.session_state是目前工作階段的保存空間；下方先檢查鍵是否存在，避免每次重跑都重設。
 if "event_record" not in st.session_state:
     st.session_state.event_record = None
 
 
 # ---------- 2. 表單集中收集原文 ----------
-# 表單內的輸入在提交時一起送到Python；在表單外處理submitted。
+# event_form是這個表單的識別名稱；submitted在表單外控制是否開始處理。
+# st.form建立表單容器；框內輸入在提交時一起送到Python，不因逐次編輯就重跑程式。
 with st.form("event_form"):
+    # st.text_area建立多行文字框；這裡將提交的原文存入source，max_chars限制可輸入字元數。
     source = st.text_area(
         "活動原文",
         value="下週三14:00在A203教室討論AI專題，沒有指定負責人。",
         max_chars=3000,
     )
+    # st.form_submit_button是表單送出按鈕；本次提交回傳True，存入submitted供表單外判斷。
     submitted = st.form_submit_button("整理活動")
 
 
@@ -212,6 +232,7 @@ if submitted:
     st.session_state.event_record = None  # 失敗不能留下前次成功結果。
 
     if not source.strip():
+        # st.warning顯示警告提示；本身不會停止程式，後續流程由條件判斷控制。
         st.warning("請先輸入活動文字。")
     else:
         try:
@@ -286,38 +307,46 @@ if submitted:
 
         except Exception as exc:
             # 前面已清空舊結果；錯誤只顯示原因類型，不假裝有新成果。
+            # st.error顯示錯誤提示；不會自行丟出例外或停止程式，也不代表結果已保存。
             st.error("本次未保存結果，請檢查金鑰、網路或回應。錯誤類型：" + type(exc).__name__)
 
 # ---------- 4. 顯示已保存的結果與對應原文 ----------
 # 顯示放在送出區外，其他操作rerun後仍可看到上次保存的結果與其原文。
 if st.session_state.event_record is not None:
     record = st.session_state.event_record
+    # st.info以提示框標示這筆結果的來源模式，區分離線示範與真實API。
     st.info(record["mode"])
+    # st.write顯示這筆結果對應的原輸入，供使用者核對內容。
     st.write("這筆紀錄的輸入：", record["input"])
+    # st.json將dict以可展開的JSON格式顯示，方便檢視欄位；不會替資料做Schema驗證。
     st.json(record["data"])
 '''+textwrap.indent(clean(display),'    ')
 
     prefix = clean('''
 import os
 
+# 將Streamlit簡稱為st；下方st.xxx用來建立網頁元件或存取狀態。
 import streamlit as st
 from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
 
-st.title("課程聊天助理")
+st.title("課程聊天助理")  # st.title顯示頁面的主標題。
 
 
 # ---------- 1. API開關與聊天狀態 ----------
 # 預設只做離線畫面示範；勾選後還要送出問題才會請求。
+# st.checkbox建立勾選框並回傳True／False；value=False讓它預設不勾選，勾選本身不會呼叫API。
 enable_api = st.checkbox("啟用真實API（每則問題1次請求）", value=False)
+# st.caption用較小字體顯示補充說明，適合放操作提示與限制。
 st.caption(
     "預設離線固定回覆，只測畫面與保存；"
     "不代表模型理解或記住前文。切換模式會清空紀錄。"
 )
 
 # messages保存完成的user／assistant配對；chat_mode記錄它們來自哪個模式。
+# st.session_state是目前工作階段的保存空間；下方先檢查鍵是否存在，避免每次重跑都重設。
 if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.chat_mode = enable_api
@@ -330,21 +359,27 @@ if st.session_state.chat_mode != enable_api:
 
 # ---------- 2. 清空或重畫已完成的對話 ----------
 # 清空只修改本機history，不會發出API請求，也不會取消先前費用。
+# st.button建立按鈕；只有點擊當次回傳True，其餘重新執行為False，供下方if判斷。
 if st.button("清空聊天紀錄"):
     st.session_state.messages = []
 
 # 每次rerun都重畫保存的紀錄；畫面上看到歷史，不代表API自動取得它。
 for message in st.session_state.messages:
+    # st.chat_message依角色建立聊天訊息容器；with區塊內的元件會放進這則訊息，不會自動保存前文。
     with st.chat_message(message["role"]):
+        # st.write將這筆歷史訊息的文字放進目前的聊天容器。
         st.write(message["content"])
 
 
 # ---------- 3. 取得這次問題，準備要送出的前文 ----------
 # 沒有提交時prompt為None；空白問題也不進入下方處理。
+# st.chat_input建立聊天輸入框；送出時回傳本次文字，未送出時為None，這裡最多1000字元。
 prompt = st.chat_input("請輸入問題（最多1000字元）", max_chars=1000)
 if prompt and prompt.strip():
     # 先顯示本次問題，但尚未加入正式紀錄；本輪失敗就不保存半輪。
+    # st.chat_message依角色建立聊天訊息容器；with區塊內的元件會放進這則訊息，不會自動保存前文。
     with st.chat_message("user"):
+        # st.write把本次問題放進user容器；正式紀錄仍在成功後保存。
         st.write(prompt)
 
     # 畫面紀錄不是模型記憶；必須將最近五輪與本輪問題放進API的input。
@@ -356,6 +391,7 @@ if prompt and prompt.strip():
     suffix = '''
     except Exception as exc:
         # 可能已顯示使用者問題或部分回答，但不會因此寫入正式history。
+        # st.error顯示錯誤提示；不會自行丟出例外或停止程式，也不代表結果已保存。
         st.error("這輪未加入紀錄；請檢查設定或回應。錯誤類型：" + type(exc).__name__)
 
     else:
@@ -393,7 +429,9 @@ if prompt and prompt.strip():
             # 固定文字只測介面與保存流程；不能用來證明模型記得前文。
             answer = "離線畫面示範：已收到「" + prompt + "」，沒有呼叫模型。"
 
+        # st.chat_message依角色建立聊天訊息容器；with區塊內的元件會放進這則訊息，不會自動保存前文。
         with st.chat_message("assistant"):
+            # st.write把完整回答放進assistant容器。
             st.write(answer)
 '''
     sources['04_chat.py'] = prefix+body+suffix
@@ -454,14 +492,16 @@ if prompt and prompt.strip():
     stream_prefix = prefix.replace('st.title("課程聊天助理")', generator+'\nst.title("課程聊天助理：串流版")')
     sources['05_streaming.py'] = stream_prefix+'''
         # ---------- 4. 逐段顯示回答，檢查完整字串 ----------
+        # st.chat_message依角色建立聊天訊息容器；with區塊內的元件會放進這則訊息，不會自動保存前文。
         with st.chat_message("assistant"):
             if enable_api:
-                # 消費上方generator，逐段顯示；全為文字時回傳串接後字串。
                 # 若generator中途拋錯，就直接交給except，不會進入成功保存。
+                # st.write_stream逐段取用並顯示文字；本例全是文字，所以正常結束後回傳串接完成的字串。
                 answer = st.write_stream(stream_answer(messages))
 
             else:
                 # 固定片段只示範串接，不是模型成果，也不測量回應速度。
+                # st.write_stream逐段取用並顯示文字；本例全是文字，所以正常結束後回傳串接完成的字串。
                 answer = st.write_stream(["離線片段示範：", "已收到「", prompt, "」，沒有呼叫模型。"])
 
         # 函式正常完成後，再確認得到非空文字；畫面片段不等於正式紀錄。
@@ -471,30 +511,34 @@ if prompt and prompt.strip():
     sources['06_file.py'] = clean('''
 import os
 
+# 將Streamlit簡稱為st；下方st.xxx用來建立網頁元件或存取狀態。
 import streamlit as st
 from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
 
-st.title("文字檔預覽與摘要")
+st.title("文字檔預覽與摘要")  # st.title顯示頁面的主標題。
 
 
 # ---------- 1. API開關與狀態初始化 ----------
+# st.checkbox建立勾選框並回傳True／False；value=False讓它預設不勾選，勾選本身不會呼叫API。
 enable_api = st.checkbox("啟用真實API（按摘要才請求1次）", value=False)
+# st.caption用較小字體顯示補充說明，適合放操作提示與限制。
 st.caption(
     "僅收UTF-8的txt/md、最多64KB及6000字元；"
     "離線只顯示原文片段，沒有做AI摘要。"
 )
 
 # file_record保存最近一次成功的結果、模式與原文，供顯示與換檔比對。
+# st.session_state是目前工作階段的保存空間；下方先檢查鍵是否存在，避免每次重跑都重設。
 if "file_record" not in st.session_state:
     st.session_state.file_record = None
 
 
 # ---------- 2. 上傳與檢查檔案 ----------
-# 無檔案時回傳None；有檔案時取得UploadedFile，可讀取大小與位元組。
 # type限制可接受的副檔名，不保證內容一定是合格文字，仍須檢查。
+# st.file_uploader建立上傳元件；未選檔回傳None，選檔後回傳UploadedFile，仍須自行檢查內容。
 uploaded = st.file_uploader("上傳文字檔", type=["txt", "md"])
 
 # 只有通過所有檢查的原文才放進text；None表示目前沒有可用原文。
@@ -515,11 +559,13 @@ if uploaded is not None:
             raise ValueError("原文須為1到6000字元")
 
         # 通過檢查才預覽；disabled=True表示這個文字框供唯讀檢視。
+        # st.text_area在這裡顯示多行原文；height=180設定高度，disabled=True讓使用者只能閱讀。
         st.text_area("原文預覽", text, height=180, disabled=True)
 
     except (UnicodeDecodeError, ValueError):
         # 任一檢查失敗就清除text；下方摘要按鈕會因此停用。
         text = None
+        # st.error顯示錯誤提示；不會自行丟出例外或停止程式，也不代表結果已保存。
         st.error("請使用UTF-8文字檔，並確認大小、長度與內容。")
 
 
@@ -532,6 +578,7 @@ if st.session_state.file_record and st.session_state.file_record["input"] != tex
 
 # ---------- 4. 按鈕觸發摘要 ----------
 # 只上傳或預覽不呼叫API；有合格原文時才允許按摘要。
+# st.button建立按鈕；只有點擊當次回傳True，其餘重新執行為False，供下方if判斷。
 if st.button("摘要檔案", disabled=text is None):
     # 先清掉舊結果；這次失敗不能留下前次摘要，造成成功的錯覺。
     st.session_state.file_record = None
@@ -571,37 +618,45 @@ if st.button("摘要檔案", disabled=text is None):
 
     except Exception as exc:
         # 只回報失敗，沒有保存新結果；前次結果也已清掉。
+        # st.error顯示錯誤提示；不會自行丟出例外或停止程式，也不代表結果已保存。
         st.error("這次未保存摘要，請檢查設定或回應。錯誤類型：" + type(exc).__name__)
 
 
 # ---------- 5. 顯示結果 ----------
 # 顯示區放在按鈕外；其他互動造成rerun時，保存的結果仍可重畫。
 if st.session_state.file_record is not None:
+    # st.info以提示框標示目前是離線原文片段或真實API摘要。
     st.info(st.session_state.file_record["mode"])
+    # st.write讀取已保存的文字並顯示；這裡不會重新產生摘要。
     st.write(st.session_state.file_record["answer"])
 '''
     sources['07_layout.py'] = clean('''
+    # 將Streamlit簡稱為st；下方st.xxx用來建立網頁元件或存取狀態。
     import streamlit as st
 
-    st.title("側欄與分頁：先看版面用途")
+    st.title("側欄與分頁：先看版面用途")  # st.title顯示頁面的主標題。
 
 
     # ---------- 1. 側欄集中放顯示設定 ----------
     # with只決定元件放在哪個容器；選單目前值存入display。
+    # st.sidebar是側欄容器；with區塊內的元件會顯示在側欄，不會因此延後執行。
     with st.sidebar:
+        # st.selectbox建立下拉選單，回傳目前選到的項目，讓display決定下方顯示哪些內容。
         display = st.selectbox("顯示方式", ["詳細", "精簡"])
 
 
     # ---------- 2. 建立分頁容器 ----------
-    # tabs回傳兩個容器，依序交給card、notes，供下方放入各自內容。
+    # st.tabs依名稱建立分頁並回傳對應容器；此處依序交給card、notes，預設各分頁的程式都會執行。
     card, notes = st.tabs(["活動卡", "操作說明"])
 
 
     # ---------- 3. 依設定顯示活動卡 ----------
     # 修改選單後重新執行，程式讀到新display，再決定是否顯示細節。
     with card:
+        # st.subheader顯示次標題，用來標示區塊名稱，字級小於頁面主標題。
         st.subheader("AI專題討論")
         if display == "詳細":
+            # st.write顯示活動細節；外層if決定詳細模式才顯示這段文字。
             st.write("下週三14:00，A203；負責人尚未指定。")
 
 
@@ -609,7 +664,9 @@ if st.session_state.file_record is not None:
     # 本例依一般tabs行為執行分頁內容；沒有另外設定延遲執行。
     # 切到哪一頁不是API請求條件，付費工作仍需明確的按鈕或提交判斷。
     with notes:
+        # st.write把操作說明顯示在notes分頁容器中。
         st.write("側欄放設定；分頁整理內容。本例0次API。")
+        # st.caption用較小字體顯示補充說明，適合放操作提示與限制。
         st.caption("分頁不是API開關；付費工作仍要放在明確送出動作之後。")
     ''')
 
@@ -906,6 +963,8 @@ def readme():
 
     每個.py獨立啟動，彼此沒有import關係。student保留A/B/C小練習，teacher有參考答案；其餘範例完整提供。
     原`../week07_streamlit_app/`保留整合參考；不要把這裡的程式拼到原app.py。
+    本週是第一次接觸Streamlit；每份程式在`st.xxx`使用位置旁說明元件用途、輸入回傳值、容器與狀態。
+    先看註解預測畫面，再實際操作；顯示、保存與呼叫API是不同動作，不能互相取代。
 
     ## 安裝與啟動
 
@@ -963,6 +1022,13 @@ def guide():
     # 第07週課堂簡化版｜教師導讀與修訂紀錄
 
     2026-10-19。另存雙版Notebook／Markdown與week07_streamlit_simple配對獨立範例；原教材、原App與Claude參考保留。
+
+    ## 2026-10-28初學者st.xxx用途註解
+
+    第7週是第一次接觸Streamlit，teacher／student各7份範例在st.xxx使用處補上繁體中文用途說明，不只在檔頭列API名稱。
+    註解涵蓋st別名、title／subheader／write／caption、文字輸入與按鈕回傳、checkbox、form與提交、info／warning／error、JSON檢視、session_state、聊天容器與輸入、write_stream、檔案上傳、sidebar／selectbox／tabs。
+    帶讀時先指出元件出現在何處、回傳值存到哪裡，再說明條件與狀態；表單批次提交、提示不會自行停止程式、聊天容器不會自動保存／送出前文、JSON顯示不等於Schema驗證、分頁預設皆執行等限制就近說明。學生TODO仍由學生完成，註解不補出歸零或結果顯示的參考答案。
+    同步雙版Notebook完整程式、Markdown、README與重建來源。14份App的AST與工作前逐一對照相同；雙版40格、文字格／色彩／ID／metadata與既有學生練習保留。驗證以本次專案紀錄為準，註解更新不代表新增真實API、真人瀏覽器或雲端部署證據。
 
     ## 2026-10-27範例教學註解與排版
 

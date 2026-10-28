@@ -13,24 +13,28 @@
 
 import os
 
+# 將Streamlit簡稱為st；下方st.xxx用來建立網頁元件或存取狀態。
 import streamlit as st
 from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
 
-st.title("課程聊天助理")
+st.title("課程聊天助理")  # st.title顯示頁面的主標題。
 
 
 # ---------- 1. API開關與聊天狀態 ----------
 # 預設只做離線畫面示範；勾選後還要送出問題才會請求。
+# st.checkbox建立勾選框並回傳True／False；value=False讓它預設不勾選，勾選本身不會呼叫API。
 enable_api = st.checkbox("啟用真實API（每則問題1次請求）", value=False)
+# st.caption用較小字體顯示補充說明，適合放操作提示與限制。
 st.caption(
     "預設離線固定回覆，只測畫面與保存；"
     "不代表模型理解或記住前文。切換模式會清空紀錄。"
 )
 
 # messages保存完成的user／assistant配對；chat_mode記錄它們來自哪個模式。
+# st.session_state是目前工作階段的保存空間；下方先檢查鍵是否存在，避免每次重跑都重設。
 if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.chat_mode = enable_api
@@ -43,21 +47,27 @@ if st.session_state.chat_mode != enable_api:
 
 # ---------- 2. 清空或重畫已完成的對話 ----------
 # 清空只修改本機history，不會發出API請求，也不會取消先前費用。
+# st.button建立按鈕；只有點擊當次回傳True，其餘重新執行為False，供下方if判斷。
 if st.button("清空聊天紀錄"):
     st.session_state.messages = []
 
 # 每次rerun都重畫保存的紀錄；畫面上看到歷史，不代表API自動取得它。
 for message in st.session_state.messages:
+    # st.chat_message依角色建立聊天訊息容器；with區塊內的元件會放進這則訊息，不會自動保存前文。
     with st.chat_message(message["role"]):
+        # st.write將這筆歷史訊息的文字放進目前的聊天容器。
         st.write(message["content"])
 
 
 # ---------- 3. 取得這次問題，準備要送出的前文 ----------
 # 沒有提交時prompt為None；空白問題也不進入下方處理。
+# st.chat_input建立聊天輸入框；送出時回傳本次文字，未送出時為None，這裡最多1000字元。
 prompt = st.chat_input("請輸入問題（最多1000字元）", max_chars=1000)
 if prompt and prompt.strip():
     # 先顯示本次問題，但尚未加入正式紀錄；本輪失敗就不保存半輪。
+    # st.chat_message依角色建立聊天訊息容器；with區塊內的元件會放進這則訊息，不會自動保存前文。
     with st.chat_message("user"):
+        # st.write把本次問題放進user容器；正式紀錄仍在成功後保存。
         st.write(prompt)
 
     # 畫面紀錄不是模型記憶；必須將最近五輪與本輪問題放進API的input。
@@ -106,11 +116,14 @@ if prompt and prompt.strip():
             # 固定文字只測介面與保存流程；不能用來證明模型記得前文。
             answer = "離線畫面示範：已收到「" + prompt + "」，沒有呼叫模型。"
 
+        # st.chat_message依角色建立聊天訊息容器；with區塊內的元件會放進這則訊息，不會自動保存前文。
         with st.chat_message("assistant"):
+            # st.write把完整回答放進assistant容器。
             st.write(answer)
 
     except Exception as exc:
         # 可能已顯示使用者問題或部分回答，但不會因此寫入正式history。
+        # st.error顯示錯誤提示；不會自行丟出例外或停止程式，也不代表結果已保存。
         st.error("這輪未加入紀錄；請檢查設定或回應。錯誤類型：" + type(exc).__name__)
 
     else:
