@@ -46,6 +46,16 @@ Use the Week 6 classroom simplified edition as the design reference for future t
 - Compare tools using the same familiar data after introducing each tool. Focus student TODOs on fields, constraints, simple rules, and result interpretation; preserve necessary response checks, field validation, and distinctions between offline and real-model evidence.
 - Start each heading in its own Markdown/text cell, with its related prose and tables. Separate the previous example's observations from the next heading, and synchronize student/teacher editions, reading copies, cell references, and rebuild sources.
 
+### Teaching comments and spacing
+
+Follow `PROJECT_MEMORY.md` section「教學程式註解與排版原則（2026-10-27）」for future course-code creation and revision. Use the [Week 7 file example](../../week07/week07_streamlit_simple/teacher/06_file.py) and [Week 8 teacher app](../../week08/week08_midterm_simple_teacher/app.py) as formatting references.
+
+- Begin runnable examples with a Traditional Chinese header: purpose, teaching points, a correct launch command, default API mode, and request count when relevant.
+- Use numbered section comments and blank lines to expose the data flow. Explain triggers, state lifetime, input/response checks, success-only saving, failure handling, and offline/live evidence where they occur; avoid line-by-line syntax translations.
+- Separate imports and processing stages; wrap long API arguments, Schema objects, and event lists without changing values or behavior. Detailed comments do not justify adding helpers, classes, or cross-file dependencies.
+- Retain student TODOs and design freedom. Mark completed teacher reference sections as corresponding to student TODOs; do not fill student answers through comments.
+- Synchronize paired apps, notebook code, reading copies, guides, and rebuild sources when present. For annotation-only edits, compare Python ASTs with the pre-edit versions and preserve unrelated changes.
+
 ## Edit safely
 
 - Preserve unrelated user changes.

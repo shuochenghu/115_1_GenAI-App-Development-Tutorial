@@ -8,14 +8,14 @@
 VS Code開啟本資料夾。Windows PowerShell：
 
 ```powershell
-py -3.12 -m venv .venv
+py -3.14 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m pip check
 python -m streamlit run student/01_inputs.py
 ```
 
-macOS/Linux使用`python3.12 -m venv .venv`、`source .venv/bin/activate`，再安裝與啟動。
+macOS/Linux使用`python3.14 -m venv .venv`、`source .venv/bin/activate`，再安裝與啟動。
 想換範例，先在終端機Ctrl+C停止，將命令檔名替換為下表檔案。教師示範把student改為teacher。
 不使用Notebook或直接`python 某檔.py`執行App。若從課程根目錄操作，先`cd week07/week07_streamlit_simple`。
 
@@ -41,7 +41,12 @@ API max_retries=0、timeout=60，60秒是網路等待起始值；手動重跑另
 
 ## 課前與驗證
 
-requirements沿用原第7週目標版本，請在課堂Python3.12環境確認安裝。現有本機離線檢查環境可能不同，詳見教師導讀。
+本機授課採Python3.14，Windows／Python3.14.0獨立環境已驗證固定直接套件：Streamlit1.63.0／OpenAI2.49.0／python-dotenv1.2.3。
+VS Code用Python: Select Interpreter選本資料夾的`.venv/Scripts/python.exe`，以`python --version`及`python -m pip --version`確認。
+系統Python與專案.venv各自管理套件；請先啟用正確環境，再安裝與啟動。
+既有.venv若非3.14，保留它並另建`.venv-py314`；建立與啟動指令相應改用新名稱，不直接覆寫舊環境。
+詳見[第7、8週Python3.14環境指南](../../docs/第07_08週_Python314環境指南.md)，可用Windows完整快照重現間接依賴。
+雲端Python版本由平台可選範圍與部署實測決定，不能由本機3.14推定；本次未做Cloud部署。
 檢查方式：在課程repo根目錄用已安裝Streamlit的環境執行`scripts/verify_week07_simple.py`。
 未以真實API、真人瀏覽器、目標環境安裝、雲端部署或150分鐘試教驗證時，不宣稱這些已通過。
 詳見上層雙版講義與[教師導讀](../第07週_課堂簡化版_教師導讀與修訂紀錄.md)。

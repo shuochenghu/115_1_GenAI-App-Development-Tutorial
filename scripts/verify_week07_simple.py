@@ -115,7 +115,9 @@ def check():
         books.append(book)
         reports.append(f'{role}：40格／7個完整App，JSON／ID／標題分格／AST／輸出清空／來源與Markdown對齊通過。')
     assert [c['id'] for c in books[0]['cells']]==[c['id'] for c in books[1]['cells']]
-    diff=[a['id'] for a,b in zip(books[0]['cells'],books[1]['cells']) if a['cell_type']=='code' and a['source']!=b['source']]
+    # 檔頭啟動路徑與教師提醒可不同；真正的練習答案只允許A／B／C三格不同。
+    diff=[a['id'] for a,b in zip(books[0]['cells'],books[1]['cells'])
+          if a['cell_type']=='code' and ast.dump(ast.parse(''.join(a['source'])))!=ast.dump(ast.parse(''.join(b['source'])))]
     assert diff==['w07s-01','w07s-02','w07s-03']
     responses=FakeResponses()
     fake=ModuleType('openai')
@@ -220,7 +222,7 @@ def check():
     print('PASS 14份App預設離線0請求、輸入／歸零／表單保留、兩輪聊天／五輪視窗／清空、模式隔離、串流完成／失敗不保存與關閉連線。')
     print('PASS 假API格式／history／store=False／重試與timeout、拒答／未完成／空回應／解析與欄位失敗、缺金鑰與空輸入0請求。')
     print('PASS 替代上傳物件測試UTF-8／空檔／超大小／超字數、離線預覽與假摘要；非真人瀏覽器上傳驗證。')
-    print('範圍：AppTest與假SDK，0次真實模型API；未啟動伺服器，未做瀏覽器、目標安裝、部署或試教。')
+    print('範圍：AppTest與假SDK，0次真實模型API；未啟動伺服器，未做瀏覽器、其他平台安裝、部署或試教。')
 
 
 if __name__=='__main__':
