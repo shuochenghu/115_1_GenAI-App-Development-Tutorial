@@ -2,6 +2,26 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第9週課堂簡化版與學生練習／作業（2026-10-28）
+
+- 依使用者「依照先前原則修改第9週，留意學生練習或回家作業」要求，另存 `week09/生成式AI應用開發_第09週_文件處理與資料前處理_課堂簡化版_學生版.ipynb`／教師版及同名Markdown、`week09/week09_document_simple/`學生／教師App與README、固定需求、TXT／CSV範例及`第09週_課堂簡化版_教師導讀與修訂紀錄.md`。原第9週23份檔案（原36格雙版、原App與Claude比較參考）SHA-256與工作前一致。後續授課修訂在簡化版接續，不自動改第10週。
+- 雙版各40格（26文字、14程式），標題各自起始文字格。採bytes→str與各格式獨立短例，再以A引導清理、B獨立固定長度切塊→JSON與App整合；每格明列必要先備。PDF／DOCX短例沒有實際檔案時只提示未測，不能以示意文字冒充抽取成果。App只有三個函式與直接UI流程，學生沿用Notebook同一A/B實作，不再重寫reader或第二套App；教師答案標記對應TODO。
+- 核心150分鐘＋休息10分鐘＋排障20分鐘。A／B必做，段落優先與AI摘要選做。回家作業45～60分鐘沿用課堂App換一份合法無敏感資料文件，固定size比較兩個overlap、兩份可回查JSON、一個錯誤／邊界與處理、一個日期／數字原文核對及README反思；題目與文件開放，最低驗收固定，不再增加第三個主實作、API或部署要求。沿用學生整學期Repo及既有Google表單登記，不另交每週資料夾連結。
+- 新版chunk保留切片原樣，保證text對應cleaned_text[start:end]；Word依本文段落與表格交錯順序讀取。CSV用內建csv、保留欄名與引號，拒絕空／重複欄名與多缺欄；UTF-8-SIG／CP950由使用者選擇，不忽略錯誤。App限制1MB、PDF50頁、CSV200列、清理後20000字元，超限拒絕不暗截斷；表單提交先清舊結果，全部成功才保存與下載。App全程離線0次API；選做Notebook摘要預設False、有效執行最多1次，max_retries=0／timeout=60／store=False、6000字元上限，先拒答／完成／非空檢查再保存；每次執行先清舊摘要。
+- 第10週現有App仍重新讀原文件，沒有匯入本週JSON的功能；保留原文件，本週JSON只提供可回查資料及Notebook手動銜接，不將下載視為Embedding／搜尋完成。本次未修改第8週或第10週教學內容，保留開始前及工作期間其他工作的變動。
+- 重建來源`scripts/build_week09_simple.py`，驗證`scripts/verify_week09_simple.py`。獨立Windows CPython3.14.0環境安裝Streamlit1.63.0／pypdf6.18.1／python-docx1.2.0與選做OpenAI2.49.0／python-dotenv1.2.3，pip check通過。雙版JSON／ID／清空輸出／AST／章節分格／先備獨立與順序執行／配對／學生答案分離、App與Notebook A/B、Markdown原碼、重建及本機連結通過；真實reader套件的文字PDF／空白頁／加密／超頁／損壞、交錯DOCX與CSV／編碼邊界、AppTest替代上傳／下載／狀態／失敗清舊結果、移入A/B成功與假SDK分流通過。既有1.60.0環境亦做過主要離線檢查；不混稱兩環境的套件版本。
+- 未呼叫真實API、啟動伺服器、真人瀏覽器操作、實際掃描OCR／繁中複雜PDF版面、Colab、Cloud、macOS／Linux或150分鐘試教；英文文字PDF與空白PDF測試資料不能冒充上述證據。未commit／push。課前依導讀以合法實際文件確認抽取品質、畫面與課堂／作業時間。
+
+## 第8週新增Pydantic學生起點與教師範例（2026-10-28）
+
+- 依使用者明確要求保留現有JSON Schema版，新增 `week08/week08_midterm_simple_pydantic_starter/` 與 `week08/week08_midterm_simple_pydantic_teacher/`，各含app.py、README、requirements、.env.example、.gitignore及Secrets範例。原兩個JSON Schema簡化專案、原版教材、Claude參考與verify_week08_simple.py均保留原檔。
+- 新增 `week08/第08週_課堂簡化版_JSON_Schema與Pydantic對照.md`；同步目前授課說明書、設計與驗收紀錄、教師導讀及第7／8週Python3.14指南。第8週現在提供兩種等價起點，學生擇一或自行實作，沿用相同最低成果、測試紀錄與rubric，不要求完成兩版、不因選版增減分。僅調整第8週與共用環境補充，未修改第9週以後。
+- 兩份教師摘要器使用相同APP_TITLE／instructions／原文輸入／title、summary、key_points／標籤。Pydantic採ProjectResult＋ConfigDict(extra="forbid",strict=True)、responses.parse(text_format=ProjectResult)、output_parsed與model_dump；SDK產生strict JSON Schema及驗證型別，短check_result只補查非空文字。全部欄位必填、空清單合法；SDK可能在parse內先拋ValidationError，取得回應後仍查拒答／completed／非空／解析物件，成功才保存原文＋dict。
+- 新學生版A／B／C保留個人設計自由，ProjectResult未填教師欄位，未完成在請求前停止；教師完成答案附對應提醒。皆維持兩個短函式與一個規格類別，沒有共用執行模組或額外API。保留6000字元、預設關閉、每次有效提交最多1次、max_retries=0／timeout=60／store=False、rerun保存及失敗／切換／清除時清舊結果。教師選一版示範1次；學生正常與資訊不足各1次共2次，額外重測另計。
+- 新requirements直接明列Pydantic2.14.1，與原Windows完整快照一致，其他固定直接依賴不變。沿用既有Windows／CPython3.14.0獨立環境，確認Streamlit1.63.0／OpenAI2.49.0／Pydantic2.14.1／python-dotenv1.2.3與pip check通過；本次沒有重新安裝、升級或修改任何原環境／快照。
+- 新增scripts/verify_week08_pydantic.py，真實SDK＋httpx.MockTransport測試完全離線：四份App使用相同成功／失敗資料，驗證契約與畫面一致、strict Schema序列化／Pydantic解析、零請求啟動與設計阻擋、缺金鑰、拒答／未完成／failed／缺status／空回應／JSON／欄位／型別／空白、空清單、rerun／清除／模式／失敗清舊結果、逾時／429不重試；另查缺解析物件、學生自訂兩欄與模型設計限制。新舊兩支驗證全部通過，使用可寫暫存目錄；原驗證先載入Streamlit設定以避開其清空環境後的使用者目錄問題，原腳本未改。
+- Python語法、UTF-8、TOML、文件連結、原檔SHA-256保留與git diff --check通過。未執行真實API、真人瀏覽器、Cloud、Colab、其他平台安裝或課堂試教；沒有commit／push／遠端寫入。離線驗證不代表模型品質或已部署。
+
 ## Git通用教材補強部署與缺少套件排查（2026-10-28）
 
 - 使用者在Cloud遇到ModuleNotFoundError／dotenv匯入失敗後要求修改Git教材部署部分。更新既有 `week07/生成式AI應用開發_第07週_Git實作教材_學期共用Repo版.md` 第9節、常見問題及部署確認項目，保留第7週起通用定位、Google表單登記自己的Repo及每週不另交資料夾連結的規則；原Git教材與教學程式未改。
