@@ -2,6 +2,12 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第8週Pydantic串流對照範例（2026-11-01，在家）
+
+- 依使用者要求新增 `week08/week08_midterm_simple_pydantic_streaming_teacher/` 完整教師範例與設定範本、README，原非串流版及學生起點保留。沿用相同任務、instructions、ProjectResult三欄及標籤；只將parse流程改為responses.stream(text_format=ProjectResult)與get_final_response。
+- 生成時以st.empty/code逐段更新原始JSON預覽，完成後移除預覽、驗證並以原畫面逐欄呈現；未加入部分JSON解析器，個別欄位並非各自逐字更新。預設API關閉、有效提交最多1次、6000字元、無重試、60秒網路等待、store=False與失敗清舊結果保留。此為選讀，不改最低要求。
+- `scripts/verify_week08_streaming.py` 使用假SDK與真實Pydantic／Streamlit AppTest驗證：離線0請求、成功、rerun、清除、拒答、未完成、中斷、空白、型別失敗與串流收尾通過。使用本機暫存隔離Python3.13.7／Streamlit1.63.0／OpenAI2.49.0／Pydantic2.14.1／python-dotenv1.2.3；非原課程Python3.14環境，不混稱。未使用真實金鑰或API，未驗證真實SSE、真人瀏覽器、Cloud、Colab或試教，未commit／push。
+
 ## 第9週課堂簡化版與學生練習／作業（2026-10-28）
 
 - 依使用者「依照先前原則修改第9週，留意學生練習或回家作業」要求，另存 `week09/生成式AI應用開發_第09週_文件處理與資料前處理_課堂簡化版_學生版.ipynb`／教師版及同名Markdown、`week09/week09_document_simple/`學生／教師App與README、固定需求、TXT／CSV範例及`第09週_課堂簡化版_教師導讀與修訂紀錄.md`。原第9週23份檔案（原36格雙版、原App與Claude比較參考）SHA-256與工作前一致。後續授課修訂在簡化版接續，不自動改第10週。
