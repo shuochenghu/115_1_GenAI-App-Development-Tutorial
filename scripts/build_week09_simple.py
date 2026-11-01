@@ -453,7 +453,7 @@ def cells_for(teacher):
         `iter_inner_content()`依Word本文順序回傳段落或表格，`isinstance()`在此用來選讀法。
         這些用途直接對應下格，不需新增類別。
 
-        三格自帶匯入與資料／路徑，彼此獨立。PDF／DOCX需先準備無敏感資料的sample.pdf／sample.docx，放在Notebook目前目錄。
+        三格自帶匯入與資料／路徑，彼此獨立。已附sample_tata/sample.pdf與sample_tata/sample.docx。請以week09為目前工作目錄；Colab需建立sample_tata資料夾並上傳兩份範例，或自行調整下方路徑。
         沒有檔案時只提示，不以固定文字冒充抽取結果。完整App的extract_text另加入欄數、頁數與格式檢查。
     """)
     code("reader-demo", """
@@ -474,13 +474,13 @@ def cells_for(teacher):
     md("pdf-how", """
         ### 3-2 PDF：逐頁讀文字層
 
-        本格自帶路徑與匯入，需自行提供sample.pdf及安裝pypdf。預期每頁印出頁碼與文字片段；無文字頁明確提示。
+        本格自帶路徑與匯入，使用隨附sample_tata/sample.pdf並需安裝pypdf。範例含2頁中文文字層，可核對活動日期、時間及32人名額；不是掃描PDF。預期每頁印出頁碼與文字片段；無文字頁明確提示。
         雙欄順序、表格與漏字仍需回原檔確認；空白頁與掃描頁都可能沒有可抽取文字，不能只由空輸出判定掃描。
     """)
     code("pdf-demo", """
         # 用途：只觀察PDF文字層；Notebook獨立執行，0次API。
         from pathlib import Path
-        path = Path("sample.pdf")
+        path = Path("sample_tata/sample.pdf")
         if path.exists():
             from pypdf import PdfReader
             reader = PdfReader(path)
@@ -490,18 +490,18 @@ def cells_for(teacher):
                 text = (page.extract_text() or "").strip()
                 print(f"[第{number}頁]", text[:300] or "無文字層，請回原檔確認")
         else:
-            print("請先準備sample.pdf；本次未執行真實PDF抽取")
+            print("找不到sample_tata/sample.pdf；請確認目前目錄與範例檔路徑")
     """)
     md("docx-how", """
         ### 3-3 DOCX：保留本文段落與表格順序
 
-        本格需sample.docx與python-docx；獨立於PDF格。預期段落／表格按照本文交錯出現，不把表格全部移到最後。
+        本格使用隨附sample_tata/sample.docx並需安裝python-docx；獨立於PDF格。預期段落／表格按照本文交錯出現，不把表格全部移到最後。
         `isinstance(item, Paragraph)`區分段落與表格；圖片、頁首頁尾與巢狀表格不在此短例處理範圍。
     """)
     code("docx-demo", """
         # 用途：Word本文順序觀察；Notebook獨立執行，0次API。
         from pathlib import Path
-        path = Path("sample.docx")
+        path = Path("sample_tata/sample.docx")
         if path.exists():
             from docx import Document
             from docx.text.paragraph import Paragraph
@@ -512,7 +512,7 @@ def cells_for(teacher):
                     for row in item.rows:
                         print(" | ".join(cell.text for cell in row.cells))
         else:
-            print("請先準備sample.docx；本次未執行真實Word抽取")
+            print("找不到sample_tata/sample.docx；請確認目前目錄與範例檔路徑")
     """)
     md("clean-demo", """
         ## 4. 完整示範：逐行清理，保留段落

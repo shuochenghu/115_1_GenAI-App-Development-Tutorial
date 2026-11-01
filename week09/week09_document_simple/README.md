@@ -94,3 +94,11 @@ python -X utf8 scripts/verify_week09_simple.py
 重建來源為`../../scripts/build_week09_simple.py`；以Repo根目錄執行`python -X utf8 scripts/build_week09_simple.py`。重建會產生兩份Notebook／Markdown、兩份App與TXT／CSV範例，README與教師導讀保留人工編修。
 
 實際驗證版本、結果與未測環境以[教師導讀與修訂紀錄](../第09週_課堂簡化版_教師導讀與修訂紀錄.md)為準；不可把離線或AppTest當成真人瀏覽器、API、Colab、Cloud或試教通過。
+
+## PDF與Word讀取範例
+
+隨附[兩頁中文PDF](../sample_tata/sample.pdf)與[含段落及表格的Word](../sample_tata/sample.docx)，皆為虛構活動資料，不含個資。資料夾名稱為`sample_tata`。
+
+Notebook以`week09`為目前工作目錄，使用`Path("sample_tata/sample.pdf")`或`Path("sample_tata/sample.docx")`；Colab需建立`sample_tata`並上傳範例檔，或自行調整路徑。App請取消「使用內建TXT範例」，上傳PDF或Word後按「處理文件」。
+
+核對活動日期2026年11月11日、時間14:00至16:00、每組4人、8組及總名額32人；Word需核對「段落 → 表格 → 段落」的本文順序。PDF含文字層，不是掃描檔，不能用來驗證OCR。
