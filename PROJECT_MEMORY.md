@@ -2,7 +2,37 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
-## 第9週Notebook補讀取TXT與sample.txt（2026-11-03）
+## 第8週教師摘要器紀錄改為完整虛構填寫示例（2026-11-03同日後續）
+
+- 使用者明確要求在教師摘要器參考紀錄中填入虛構範例與虛構部署網址，減少大量未測欄位。更新既有 `week08/第08週_課堂簡化版_專題設計與驗收紀錄_教師摘要器參考範例.md`，保留四區塊、教師原任務與三欄，填妥假想測試日期、正常／不足JSON、狀態／故障測試、版本、Repo／分支／入口、部署驗收、請求數及反思；同步教師導讀入口與版本說明。
+- 全篇起首及表內清楚標示虛構，網址為 `https://week08-notes-demo.example.com`，不是實際Cloud App。假想Repo名稱course-demo/115_1_GenAI-APP-Development、入口week08-notes/app.py；假想2026-11-03兩筆雲端案例各1次共2次，部署驗收沿用，追加0次。實際本次仍是0次API、沒有部署／帳號操作；不能把此份示例當學生實測證據。
+- 此為使用者授權的教學虛構紀錄，取代本文件原先大量未測的呈現方式；不改空白表真實填寫規則、不降低Cloud必做要求，也不修改App／套件／其他週。較早未測與0次記錄仍是歷史，與本次虛構內容區分。
+- 已核對JSON與原check_result契約、欄位標籤、四區塊、測試與請求數一致、相對連結／UTF-8／圍欄與git diff --check；其他既有檔案雜湊保留。未重新執行AppTest、真實API或部署，未commit／push。
+
+## 第8週Streamlit Community Cloud部署改為必做（2026-11-03）
+
+- 依使用者明確要求，現行第8週課堂簡化版JSON Schema／Pydantic兩條路線都必須部署到Streamlit Community Cloud。同步目前授課專題說明書、四個簡化專案README、設計與驗收紀錄、教師摘要器參考範例、選版對照、教師導讀、第7／8週環境指南，以及課綱第8週與期中交付列。原始比較教材、Claude參考與第7週通用指南保留；當週要求以新版說明書為準。
+- 必做完成條件為老師可開啟App網址、雲端介面可操作、至少一筆雲端真實API成功且可核對原文；README／驗收表記網址、驗收日期與結果、Repo／分支／入口、Cloud實際Python版本與觀看權限。未部署／未測如實列待補，依老師公告期限完成，本機或模擬不能取代。參考範例仍誠實標示未部署與0次真實API，不杜撰網址或成果。
+- 正常／資訊不足兩筆可直接於Cloud完成，不要求本機重做，仍規劃2次；若已只有本機紀錄，須補至少一筆雲端成功，追加次數另計。部署規範含Push後確認、requirements入口同層／Repo根目錄、平台Secrets及Python選項、分享權限與雲端實測，依當日Streamlit官方文件查核；不把本機Windows快照當Cloud驗證。
+- 150分鐘核心重新分配為15／20／15／50／20／20／10分鐘，保留20分鐘部署與驗收；rubric百分比不變，功能完整度與README／Demo證據加入部署要求。上傳、串流、聊天等延伸仍選做；不強制改用Pydantic，也不要求完成兩版。
+- 本次僅修改文件要求，不修改App、驗證腳本、套件／環境或已在進行的第9週工作。完成UTF-8、Markdown結構／連結、150分鐘合計、評分100%、兩條路線一致、無現行部署選做矛盾、原檔SHA-256保留與git diff --check；未執行實際部署、帳號操作、真人瀏覽器或API，未安裝套件、commit／push。
+
+## 第8週設計與驗收紀錄新增教師摘要器參考範例（2026-11-03）
+
+- 依使用者指定，以week08/week08_midterm_simple_teacher/現有JSON Schema摘要器為依據，另存 `week08/第08週_課堂簡化版_專題設計與驗收紀錄_教師摘要器參考範例.md`；沿用空白表的設計、欄位契約、測試紀錄、環境交付反思四區塊，補title／summary／key_points三欄用途、限制與查原文方式。原空白表與所有App均保留，新增教師導讀入口；既有第9週未提交工作保留。
+- 正常／資訊不足各一筆完整虛構原文與手寫JSON供填寫參考，明標非模型輸出；真實日期／模型／輸出與請求欄保持未測、真實API0次，補測規劃共2次與額外重測分開。明說本例直接使用教師版，沒有個人改造，不杜撰作者、Repo或部署網址；學生須填自己的設計與實測，不能交教師範例。
+- 使用既有Windows／Python3.14.0、Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2，兩筆JSON透過原check_result驗證；AppTest確認空白、6001字元、離線提示、缺key與手動放入record後的rerun保存、失敗清除、清除按鈕及模式切換，client建立0次、真實API0次。範例區分實際本機版本與requirements的1.63.0／1.2.3固定目標，不稱為重測固定環境。
+- 已核對文件結構、JSON、UTF-8、連結、原檔雜湊保留與git diff --check。未測服務失敗、真實API輸出、真人瀏覽器、Cloud、Colab或試教；未安裝套件、修改教學程式、commit／push。
+
+## 第9週Notebook分步對齊app.py的讀取與前處理（2026-11-03）
+
+- 使用者確認本週ipynb應分步驟說明app.py，核心方法、資料型態與流程保持一致，授權修改Notebook。在現有課堂簡化版雙版接續，不改原教材、App功能、範例資料或其他週。
+- TXT改用Path("sample.txt").read_bytes()→data.decode("utf-8-sig")；CSV改用read_bytes→decode→StringIO→DictReader，沿用App欄名／欄數／列數檢查並組成帶欄名文字；PDF／Word改用read_bytes→BytesIO→reader，沿用相同頁碼／空頁／本文順序與空白列處理。範例仍只寫檔名，sample_tata檔案先複製到Notebook目前工作目錄，Colab直接上傳。
+- 新增第3-4節將展開的分支整理為App同一extract_text，完整提供、不新增TODO；雙版現在各46格（30文字、16程式），保留原43個ID與相對順序。第35格實際讀sample.txt，按App順序經extract_text、clean_text、chunk_text，檢查1MB、清理後1～20000字元及有效片段，全成功才保存同欄位JSON；size=120、overlap=20沿用App預設。App內建資料仍為course_notes.txt，若要比同份文件，需上傳sample.txt。
+- Notebook用普通變數／print呈現步驟，App再加表單、session_state與網頁顯示；不能因此換一套核心讀取方法。獨立選做API仍只在Notebook，不宣稱為App內建功能。A清理TODO、完整B與學生觀察紀錄保留；完整reader只是對照與整合來源，不增加另一套主練習或作業負擔。
+- 同步雙版Markdown、重建／驗證腳本、教師導讀格號與兩個README。公司既有Python3.14環境通過雙版JSON／ID／清空輸出／AST／章節／獨立先備與順序／答案分離／Markdown、重建與連結；四格式實際範例的分步raw_text與App一致，三函式AST與App一致，整合紀錄與App同資料／參數流程相同，文件reader邊界及損壞檔重跑通過。App程式與範例資料雜湊保留，不重測未修改的UI或API；0次真實API，未測瀏覽器、Colab、Cloud或試教，未安裝套件、commit／push。
+
+## 歷史：第9週Notebook補讀取TXT與sample.txt（2026-11-03，同日較早版本）
 
 - 依使用者指定，在現行課堂簡化版學生／教師Notebook編碼示範後新增「2-1 實際讀取文字檔案」、讀檔程式與結果判讀三格。雙版現為43格（28文字、15程式），原40格內容／ID／相對順序保留；目前學生A清理、B完整切塊與觀察的分工維持，不恢復舊版B程式TODO。
 - 文字檔依使用者最新更正，將simple.txt改名並移到`week09/sample_tata/sample.txt`，移除原simple_tata空資料夾，移動前後SHA-256相同；與既有CSV／PDF／Word集中存放。UTF-8三段虛構活動說明，含2026年11月11日、每組4人、總名額32人及未提供報名網址／費用。Notebook第9格只用`open("sample.txt", encoding="utf-8-sig")`、file.read保存raw_text、顯示字元數與原文，不含資料夾路徑。教材提醒先複製到Notebook目前工作目錄，Colab直接上傳。

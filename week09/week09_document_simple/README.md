@@ -12,7 +12,9 @@
 
 教師使用`teacher/app.py`完整參考；請勿把教師程式或教師Notebook放入學生發放資料。
 
-Notebook第2-1節新增讀取TXT範例，檔案為[sample.txt](../sample_tata/sample.txt)。執行前先複製到Notebook目前工作目錄，Colab則直接上傳；程式只用`open("sample.txt", encoding="utf-8-sig")`，不含路徑，讀入的完整文字保存為`raw_text`。
+Notebook依序拆解app.py：先用`Path("sample.txt").read_bytes()`取得bytes，再用`data.decode("utf-8-sig")`轉成文字。TXT／CSV／PDF／Word都沿用App的相同處理方法，CSV用StringIO、PDF與Word用BytesIO；第3-4節整理為與App相同的extract_text，最後接清理、切塊、檢查與JSON。Notebook用print觀察，App再加表單、狀態與畫面，不另外教一套讀取流程。
+
+範例為[sample.txt](../sample_tata/sample.txt)及同資料夾的CSV／PDF／Word。執行前先複製到Notebook目前工作目錄，Colab直接上傳；範例程式只寫檔名、不含路徑。第6節以sample.txt與App預設size=120／overlap=20整合；App若選內建範例會讀course_notes.txt，請上傳sample.txt才是比較同份資料。
 
 ## Windows／Python 3.14安裝與啟動
 

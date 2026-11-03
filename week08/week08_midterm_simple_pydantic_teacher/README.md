@@ -66,6 +66,12 @@ python -X utf8 scripts/verify_week08_pydantic.py
 離線通過不代表真實模型品質、真人瀏覽器、Cloud、Colab、其他平台或課堂時間已驗證。
 2026-10-28 已在既有 Windows／CPython 3.14.0 固定環境通過兩支驗證與 pip check：Streamlit 1.63.0、OpenAI 2.49.0、Pydantic 2.14.1、python-dotenv 1.2.3。本次未重新安裝或升級套件。
 
-部署屬選做。入口為 `week08/week08_midterm_simple_pydantic_teacher/app.py`，獨立 Repo 則為 `app.py`；檢查部署分支的 requirements 位置與平台 Secrets。若改成自己的 Repo，請調整 README 內連結。
+## Cloud部署（必做）
+
+第8週必須部署到Streamlit Community Cloud；驗收依[說明書第3-1節](../生成式AI應用開發_第08週_期中個人小專題_課堂簡化版_專題說明書.md)。老師須能開啟App網址，雲端介面可操作，並至少有一筆雲端真實API成功紀錄。
+入口為 `week08/week08_midterm_simple_pydantic_teacher/app.py`，獨立 Repo 則為 `app.py`；requirements須在入口同層或Repo根目錄，包含Pydantic且已Push至部署分支。
+依 `.streamlit/secrets.example.toml` 設定平台Secrets，Cloud Python按平台選項與實測確認；自己的README與驗收表必填App網址、分支／入口、Cloud實際Python版本、老師觀看權限、驗收日期與結果。
+正常／資訊不足兩筆可直接在雲端完成，不需本機再重做；若先前只有本機紀錄，補一筆雲端成功測試並記錄追加請求。未部署或未通過須如實記錄並依公告期限補驗。
+若改成自己的Repo，請調整README內連結。上傳、串流與聊天仍為選做。
 
 API 寫法依[OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses)，模型／字典分工依[Pydantic Models](https://docs.pydantic.dev/latest/concepts/models/)。

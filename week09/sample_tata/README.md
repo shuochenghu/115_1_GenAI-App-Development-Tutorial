@@ -9,6 +9,6 @@
 
 範例集中保存在本資料夾；執行Notebook前，複製到Notebook目前工作目錄。短例直接開啟`sample.txt`、`sample.csv`、`sample.pdf`及`sample.docx`，程式只寫檔名、不加路徑；Colab直接上傳檔案即可。Streamlit請取消內建TXT範例，透過上傳元件選取檔案。
 
-CSV預期逐列讀出6個字典，每筆5欄；日期與名額也會先讀成字串。CSV已直接提供，教材只讀檔，不需先執行產檔程式。
+CSV先由DictReader讀出6個字典，每筆5欄，日期與名額也會先讀成字串；再沿用App格式組成6行帶欄名的活動文字，供原文核對、清理與切塊。四種格式先以read_bytes取得bytes，CSV解碼後用StringIO，PDF與Word用BytesIO，與App的extract_text一致。CSV已直接提供，教材只讀檔，不需先執行產檔程式。
 
 2026-11-03補充：CSV每筆活動已有完整欄位，可用來討論「一列作為一個檢索單位」；本週App仍以固定字元切塊供觀察，不要求另寫CSV切塊器，也不表示已完成向量搜尋。

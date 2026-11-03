@@ -59,9 +59,15 @@ VS Code 的 Python: Select Interpreter 須選本資料夾的 `.venv/Scripts/pyth
 
 沿用同一份[設計與驗收紀錄](../第08週_課堂簡化版_專題設計與驗收紀錄.md)：至少保留正常、資訊不足各一筆真實 API 紀錄，逐欄查原文；學生規劃共 2 次，額外修正另計。
 README 說明採用 Pydantic 的理由、自己的欄位與限制、實際版本及實測／未測項目。不可直接交本教學 README，也不可只換教師範例名稱。
-未完成真實測試就填未測，假回應不算成果。上傳、串流、聊天與部署皆為選做。
+未完成真實測試就填未測，假回應不算成果。上傳、串流與聊天仍為選做；Cloud部署為必做。
 
+## Cloud部署（必做）
+
+第8週必須部署到Streamlit Community Cloud；驗收依[說明書第3-1節](../生成式AI應用開發_第08週_期中個人小專題_課堂簡化版_專題說明書.md)。老師須能開啟App網址，雲端介面可操作，並至少有一筆雲端真實API成功紀錄。
 Cloud 的入口依 Repo 結構選 `week08/week08_midterm_simple_pydantic_starter/app.py` 或獨立 Repo 的 `app.py`；確認部署分支的入口、套件清單與 Secrets。
+requirements須在入口同層或Repo根目錄，包含Pydantic且已Push；設定依 `.streamlit/secrets.example.toml` 放平台Secrets，Cloud Python須按平台選項與實測確認。
+自己的README與驗收表必填App網址、分支／入口、Cloud實際Python版本、老師觀看權限、驗收日期與結果。
+正常／資訊不足兩筆可直接在雲端完成，不需本機再重做；若先前只有本機紀錄，補一筆雲端成功測試並記錄追加請求。未部署或未通過須如實記錄並依公告期限補驗。
 複製到自己的學期 Repo 時，依[Git 通用指南](../../week07/生成式AI應用開發_第07週_Git實作教材_學期共用Repo版.md)調整路徑與清單，不要直接覆蓋既有套件清單。
 
 教師離線檢查：`python -X utf8 scripts/verify_week08_pydantic.py`（由課程根目錄執行）。

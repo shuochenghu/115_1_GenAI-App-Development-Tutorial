@@ -50,6 +50,7 @@ def expect_error(call, error=ValueError):
 
 def check_notebooks():
     student, teacher = read_book(False), read_book(True)
+    reference = app_functions(True)
     assert [c["id"] for c in student["cells"]] == [c["id"] for c in teacher["cells"]]
     for s_cell, t_cell in zip(student["cells"], teacher["cells"]):
         if s_cell["id"] not in ["w09s-cover", "w09s-a", "w09s-b-result"]:
@@ -85,8 +86,27 @@ def check_notebooks():
                     with redirect_stdout(StringIO()):
                         exec(source, fresh)
                     if cell["id"] == "w09s-txt-demo":
-                        assert fresh["raw_text"] == (WEEK / "sample_tata/sample.txt").read_text(encoding="utf-8-sig")
+                        assert fresh["raw_text"] == (WEEK / "sample_tata/sample.txt").read_bytes().decode("utf-8-sig")
                         assert "2026年11月11日" in fresh["raw_text"] and "總名額32人" in fresh["raw_text"]
+                    # 同份實際檔案，四個分步示範須與App抽取結果一致。
+                    format_names = {
+                        "w09s-txt-demo": "sample.txt", "w09s-reader-demo": "sample.csv",
+                        "w09s-pdf-demo": "sample.pdf", "w09s-docx-demo": "sample.docx",
+                    }
+                    if cell["id"] in format_names:
+                        name = format_names[cell["id"]]
+                        assert isinstance(fresh["data"], bytes)
+                        assert fresh["raw_text"] == reference["extract_text"](name, fresh["data"], "utf-8-sig")
+                    if cell["id"] == "w09s-integrate-run" and is_teacher:
+                        actual = fresh["document_result"]
+                        raw = reference["extract_text"]("sample.txt", Path("sample.txt").read_bytes(), "utf-8-sig")
+                        cleaned = reference["clean_text"](raw)
+                        assert actual == {
+                            "filename": "sample.txt", "encoding": "utf-8-sig", "raw_text": raw,
+                            "cleaned_text": cleaned, "character_count": len(cleaned),
+                            "chunk_size": 120, "overlap": 20,
+                            "chunks": reference["chunk_text"](cleaned, 120, 20),
+                        }
                     if cell["id"] == "w09s-b-check":
                         # 同份文字、固定size，只改overlap；片段數相同也可能有不同邊界。
                         first, second = fresh["comparison_result"]
@@ -102,13 +122,13 @@ def check_notebooks():
                 assert (sequential["document_result"] is not None) == is_teacher
             finally:
                 os.chdir(old)
-        # Markdown閱讀版逐格保留原碼，App的A與完整切塊函式和Notebook相同。
+        # Markdown逐格保留原碼；Notebook的三個函式與App來源一致。
         ending = "教師版" if is_teacher else "學生版"
         reading = next(WEEK.glob(f"*課堂簡化版_{ending}.md")).read_text(encoding="utf-8")
         app_tree = ast.parse((PACKAGE / ("teacher" if is_teacher else "student") / "app.py").read_text(encoding="utf-8"))
         for cell in cells:
             assert "".join(cell["source"]) in reading
-        for tag, function in [("a", "clean_text"), ("b", "chunk_text")]:
+        for tag, function in [("a", "clean_text"), ("b", "chunk_text"), ("reader-function", "extract_text")]:
             book_tree = ast.parse("".join(by_tag[tag]["source"]))
             expected = next(n for n in book_tree.body if isinstance(n, ast.FunctionDef))
             actual = next(n for n in app_tree.body if isinstance(n, ast.FunctionDef) and n.name == function)
@@ -117,10 +137,11 @@ def check_notebooks():
         assert "raise NotImplementedError" not in "".join(by_tag["b"]["source"])
         for tag in ["txt-demo", "reader-demo", "pdf-demo", "docx-demo"]:
             assert "sample_tata" not in "".join(by_tag[tag]["source"])
-        assert 'open("sample.txt", encoding="utf-8-sig")' in "".join(by_tag["txt-demo"]["source"])
+        assert 'Path("sample.txt").read_bytes()' in "".join(by_tag["txt-demo"]["source"])
+        assert 'data.decode("utf-8-sig")' in "".join(by_tag["txt-demo"]["source"])
         assert "File Search" in "".join(by_tag["bridge"]["source"])
         assert "本週只需理解兩種路線" in "".join(by_tag["bridge"]["source"])
-    print(f"Notebook：雙版各{len(teacher['cells'])}格，JSON／ID／輸出／AST／獨立先備／順序／閱讀版／答案分離通過")
+    print(f"Notebook：雙版各{len(teacher['cells'])}格，JSON／ID／輸出／AST／先備／順序／閱讀版／答案分離、四格式與App結果及三函式一致通過")
 
 
 def fixtures():
