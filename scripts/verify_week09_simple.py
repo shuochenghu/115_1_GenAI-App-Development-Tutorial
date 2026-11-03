@@ -52,7 +52,7 @@ def check_notebooks():
     student, teacher = read_book(False), read_book(True)
     assert [c["id"] for c in student["cells"]] == [c["id"] for c in teacher["cells"]]
     for s_cell, t_cell in zip(student["cells"], teacher["cells"]):
-        if s_cell["id"] not in ["w09s-cover", "w09s-a", "w09s-b"]:
+        if s_cell["id"] not in ["w09s-cover", "w09s-a", "w09s-b-result"]:
             assert s_cell == t_cell, s_cell["id"]
     for book, is_teacher in [(student, False), (teacher, True)]:
         cells = book["cells"]
@@ -60,6 +60,9 @@ def check_notebooks():
         by_tag = {c["id"].removeprefix("w09s-"): c for c in cells}
         sequential = {}
         with tempfile.TemporaryDirectory(dir=TEMP) as folder, patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
+            for name in ["sample.csv", "sample.pdf", "sample.docx"]:
+                (Path(folder) / name).write_bytes((WEEK / "sample_tata" / name).read_bytes())
+            (Path(folder) / "sample.txt").write_bytes((WEEK / "sample_tata/sample.txt").read_bytes())
             old = Path.cwd()
             os.chdir(folder)
             try:
@@ -81,12 +84,25 @@ def check_notebooks():
                         exec("".join(by_tag[dependency]["source"]), fresh)
                     with redirect_stdout(StringIO()):
                         exec(source, fresh)
+                    if cell["id"] == "w09s-txt-demo":
+                        assert fresh["raw_text"] == (WEEK / "sample_tata/sample.txt").read_text(encoding="utf-8-sig")
+                        assert "2026年11月11日" in fresh["raw_text"] and "總名額32人" in fresh["raw_text"]
+                    if cell["id"] == "w09s-b-check":
+                        # 同份文字、固定size，只改overlap；片段數相同也可能有不同邊界。
+                        first, second = fresh["comparison_result"]
+                        assert [first["overlap"], second["overlap"]] == [0, 4]
+                        assert len(first["chunks"]) == len(second["chunks"]) == 3
+                        assert not any("圖書館討論室" in item["text"] for item in first["chunks"])
+                        assert "地點是圖書館討論室" in second["chunks"][1]["text"]
+                        for group in fresh["comparison_result"]:
+                            for item in group["chunks"]:
+                                assert item["text"] == fresh["check_text"][item["start"]:item["end"]]
                 assert sequential["summary_result"] is None
                 assert sequential["summary_error"] is None
                 assert (sequential["document_result"] is not None) == is_teacher
             finally:
                 os.chdir(old)
-        # Markdown閱讀版逐格保留原碼，App的A/B與Notebook相同。
+        # Markdown閱讀版逐格保留原碼，App的A與完整切塊函式和Notebook相同。
         ending = "教師版" if is_teacher else "學生版"
         reading = next(WEEK.glob(f"*課堂簡化版_{ending}.md")).read_text(encoding="utf-8")
         app_tree = ast.parse((PACKAGE / ("teacher" if is_teacher else "student") / "app.py").read_text(encoding="utf-8"))
@@ -98,7 +114,12 @@ def check_notebooks():
             actual = next(n for n in app_tree.body if isinstance(n, ast.FunctionDef) and n.name == function)
             assert ast.dump(expected) == ast.dump(actual)
         assert ("raise NotImplementedError" in "".join(by_tag["a"]["source"])) != is_teacher
-        assert ("raise NotImplementedError" in "".join(by_tag["b"]["source"])) != is_teacher
+        assert "raise NotImplementedError" not in "".join(by_tag["b"]["source"])
+        for tag in ["txt-demo", "reader-demo", "pdf-demo", "docx-demo"]:
+            assert "sample_tata" not in "".join(by_tag[tag]["source"])
+        assert 'open("sample.txt", encoding="utf-8-sig")' in "".join(by_tag["txt-demo"]["source"])
+        assert "File Search" in "".join(by_tag["bridge"]["source"])
+        assert "本週只需理解兩種路線" in "".join(by_tag["bridge"]["source"])
     print(f"Notebook：雙版各{len(teacher['cells'])}格，JSON／ID／輸出／AST／獨立先備／順序／閱讀版／答案分離通過")
 
 
@@ -189,8 +210,9 @@ def check_functions(data):
     assert word_text.index("段落前") < word_text.index("人數 | 4") < word_text.index("段落後")
     expect_error(lambda: extract("broken.pdf", b"invalid"), Exception)
     expect_error(lambda: extract("broken.docx", b"invalid"), Exception)
-    for name in ["clean_text", "chunk_text"]:
-        expect_error(lambda: app_functions(False)[name]("學生未完成"), NotImplementedError)
+    student_functions = app_functions(False)
+    expect_error(lambda: student_functions["clean_text"]("學生未完成"), NotImplementedError)
+    assert student_functions["chunk_text"]("ABCDEFGHIJ", 4, 1) == chunk("ABCDEFGHIJ", 4, 1)
     with tempfile.TemporaryDirectory(dir=TEMP) as folder:
         directory = Path(folder)
         (directory / "sample.pdf").write_bytes(data["pdf"])
@@ -203,7 +225,7 @@ def check_functions(data):
                 captured = StringIO()
                 with redirect_stdout(captured):
                     exec(source, {})
-                assert "未執行真實" not in captured.getvalue()
+                assert ("Club meeting" if tag == "pdf-demo" else "段落前") in captured.getvalue()
         finally:
             os.chdir(old)
     print("函式：清理、切塊邊界、UTF-8／CP950、CSV欄數／引號／上限、PDF文字／空白／加密／頁數、DOCX順序與損壞檔通過")
@@ -286,10 +308,10 @@ def check_apps(data):
         submit(student)
         assert student.warning and not downloads and student.session_state["document_result"] is None
 
-        # 模擬學生把Notebook已完成A/B移入App，驗證轉移操作可直接成功。
+        # 學生只移入A即可成功；切塊函式已完整提供，不應再要求移入B答案。
         student_source = (PACKAGE / "student/app.py").read_text(encoding="utf-8")
         teacher_source = (PACKAGE / "teacher/app.py").read_text(encoding="utf-8")
-        for name in ["clean_text", "chunk_text"]:
+        for name in ["clean_text"]:
             tree = ast.parse(student_source)
             target = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == name)
             answer = next(node for node in ast.parse(teacher_source).body if isinstance(node, ast.FunctionDef) and node.name == name)
@@ -303,7 +325,7 @@ def check_apps(data):
             assert downloads and not completed_at.warning
         finally:
             completed.unlink(missing_ok=True)
-    print("AppTest：雙版啟動、TODO阻擋、移入A/B成功、多格式替代上傳、下載來源、rerun保存、錯誤清舊結果及清除通過")
+    print("AppTest：雙版啟動、A未完成阻擋、只移入A即成功、多格式替代上傳、下載來源、rerun保存、錯誤清舊結果及清除通過")
 
 
 def check_api():
@@ -358,7 +380,7 @@ def check_api():
 
 
 def check_rebuild_and_links():
-    targets = list(WEEK.glob("*課堂簡化版_*.ipynb")) + list(WEEK.glob("*課堂簡化版_*.md")) + list(PACKAGE.rglob("app.py")) + list((PACKAGE / "sample_data").iterdir())
+    targets = list(WEEK.glob("*課堂簡化版_*.ipynb")) + list(WEEK.glob("*課堂簡化版_*.md")) + list(PACKAGE.rglob("app.py")) + list((PACKAGE / "sample_data").iterdir()) + [WEEK / "sample_tata/sample.txt"]
     before = {path: path.read_bytes() for path in targets}
     subprocess.run([sys.executable, "-X", "utf8", str(ROOT / "scripts/build_week09_simple.py")], check=True, capture_output=True)
     assert all(path.read_bytes() == content for path, content in before.items())

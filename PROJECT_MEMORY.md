@@ -2,6 +2,69 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第9週Notebook補讀取TXT與sample.txt（2026-11-03）
+
+- 依使用者指定，在現行課堂簡化版學生／教師Notebook編碼示範後新增「2-1 實際讀取文字檔案」、讀檔程式與結果判讀三格。雙版現為43格（28文字、15程式），原40格內容／ID／相對順序保留；目前學生A清理、B完整切塊與觀察的分工維持，不恢復舊版B程式TODO。
+- 文字檔依使用者最新更正，將simple.txt改名並移到`week09/sample_tata/sample.txt`，移除原simple_tata空資料夾，移動前後SHA-256相同；與既有CSV／PDF／Word集中存放。UTF-8三段虛構活動說明，含2026年11月11日、每組4人、總名額32人及未提供報名網址／費用。Notebook第9格只用`open("sample.txt", encoding="utf-8-sig")`、file.read保存raw_text、顯示字元數與原文，不含資料夾路徑。教材提醒先複製到Notebook目前工作目錄，Colab直接上傳。
+- 同步雙版Markdown、scripts/build_week09_simple.py、verify_week09_simple.py、App README與教師導讀格號；重建會直接提供TXT，學生不需先跑產檔程式。本次App程式、原第9週教材、既有CSV／PDF／Word與其他週未改。
+- 現有Python3.14環境以實際TXT執行雙版新增格、全本順序及依先備獨立執行成功，保存文字與檔案完全一致；43格JSON／ID／清空輸出／AST／章節／答案分離／Markdown、重建與本機連結通過。未重測App或API，0次真實API，未測真人瀏覽器、Colab、Cloud或試教，未commit／push。
+
+## 教材生成前先盤點實作方法與跨週安排（2026-11-03，後續製作通用原則）
+
+- 使用者要求：製作教材前，先檢查每個主題目前有哪些主要且可實作的方法，比較不同方法的差異，再給予實作建議。不得只沿用既有程式或單一路線而漏掉有教學價值的替代方案；此原則適用後續各主題，不限RAG。
+- 先讀課綱、既有教材與前後週能力，盤點直接API／平台代管、自行建置、必要時的套件或框架等合理路線；只列與學習目標有關且確實可行的方法，不為湊數擴充。涉及服務能力、API、模型、支援格式或成本時，以當時官方文件查核，區分現行可用、需權限、限制與未驗證部分。
+- 在生成前的規畫／建議中，提供簡明比較：運作原理與誰負責哪些步驟、學生先備、程式與維護負擔、可控制／可觀察程度、資料與部署限制、費用與資源生命週期、成果與失敗如何驗證，以及適用情境。避免把方便、程式較短或較新直接當成適合授課的理由。
+- 明確推薦課堂主線、教師對照示範、學生擇一或選做，以及暫不納入的方案與理由；連同課時、作業份量及跨週安排一起判斷。多路線盡量使用同一資料、問題、輸出與驗收，保留學生選擇，不要求每種方法都做一份作品。使用者已授權生成時，完成必要查核與方案判斷後繼續執行，不因此額外要求確認。
+- 第9～11週為具體例子：自行建置RAG需理解資料處理、片段、Embedding、檢索與context；OpenAI File Search由平台承接部分流程，仍須理解資料品質、實際證據、引用、不足情境、成本與清理。應先比較並安排各週的共同基礎及路線差異，避免重演原教材漏掉File Search的情況。這是方法盤點與選擇原則，不表示所有主題都必須套用這兩種工具。
+- 交付前再核對：主要可行方法是否遺漏、取捨理由是否明確、前後週是否銜接、不同路線的評量是否公平、官方查核與實測範圍是否如實標示。
+
+## 第12週新增圖片理解與Vision課堂簡化版（2026-11-03）
+
+- 依使用者要求另製第12週學生／教師Notebook與同名Markdown，各26格（15文字、11程式），標題各自起始文字格、最長程式格45行；新增week12/week12_vision_simple/雙版單檔App、README、實作方法比較與建議、固定需求與設定範本、兩張虛構英文收據／人工manifest，以及教師導讀、scripts/build_week12_simple.py、scripts/verify_week12_simple.py。原正式第12週、Claude參考與第9～11週未提交成果均保留。
+- 先實踐新方法盤點原則：區分圖片傳輸（Base64／URL／Files ID）與任務處理（直接Vision／OCR／PDF／辨識後RAG／影像檢索），依官方文件比較先備、責任、成本、限制及跨週銜接。課堂主線為單張圖片Base64直接Vision；URL／file ID有不請求的完整content形狀，說明Files上傳、重用與清理，不混同第11週Vector Store。OCR、PDF、多模態RAG及其他平台只比較與延伸，不要求多套App或資源實作。
+- 圖片→檢查→A的文字＋圖片content→問答或收據抽取→回應檢查→原圖核對。學生唯一程式TODO為build_image_content，B為正常與不足兩筆證據判讀；完整提供prepare_image、read_answer、Schema與read_receipt。雙版App各五函式、單檔約230行，只需移入同一A。抽取保留merchant／date／total的null與warnings、visible_text供回查，未知不補0或推算總額；格式通過及模型自產文字不能替代原圖證據。
+- 本機驗證實際PNG／JPEG／WEBP／單張GIF、原檔2 MB／每邊2048像素；EXIF轉正、透明白底與新PNG不沿用原metadata，轉換後4 MB上限，不自動縮圖或裁切。預覽與API使用同一PNG，下載分開記原始與傳送SHA，不含圖片bytes／Base64／key；metadata移除不等於畫面匿名。正常圖日期2026-11-11、總額300；缺總額圖不得用品項反推，人工manifest不是模型成果。
+- 沿用gpt-5.4-mini；官方現行detail有original，主線auto並提供high／low選擇，original僅說明適用情境。強調low不保證更省，記錄實際usage／當時計價。兩任務各一次有效提交最多1次Responses，API／安裝／Colab讀Secrets均預設關閉，max_retries=0／timeout=60／max_output_tokens=1200／store=False；無Files上傳、索引或第二次隱藏請求。A／輸入／缺key在付費前阻擋，拒答／未完成／空白／JSON／欄位失敗清舊答案；切任務／來源／API模式、清除、新提交也清舊結果，rerun與下載0次。
+- 核心150分鐘＋休息10＋排障20；課後45～60分鐘沿同App選問答或收據抽取、換自製／合法無敏感圖，交Notebook、App、原圖、正常與不足兩筆紀錄、日期／數字與證據位置核對、一個錯誤／邊界的修正重測及README。最低要求固定、題目與設計開放，40／30／20／10評量一致；課堂B與作業兩筆可合用，不重複要求付費，換圖／detail選做／重跑按實際計次。無API先交功能與預期，真實欄明記未測，由教師安排共看。
+- 公司既有Windows／CPython3.14.0、Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／Pillow12.3.0／httpx0.28.1離線驗證通過：雙版JSON／ID／輸出／AST／先備獨立與順序／答案分離／App及Markdown對齊；真實四格式／動畫／EXIF／metadata／白底／損壞／超限、A還原與Schema型別缺值；真實SDK＋MockTransport三種傳輸形狀、0／1次請求、拒答／未完成／缺status／空白／JSON／欄位／429／逾時不重試；雙版AppTest預設關閉、移入A成功、兩任務與缺值、真正傳送圖與預覽SHA、替代上傳／狀態／清除舊下載。重建、連結、語法、TOML、原有339份檔案雜湊保留及git diff --check通過。
+- requirements沿用課程1.63.0／2.49.0／1.2.3／12.3.0直接依賴，未另建固定版本環境；不將本機1.60.0結果稱為1.63.0、Cloud或Colab驗證。0次真實API，未上傳／建立／刪除平台資源，未測真實辨識／URL可取用／Files重用／OCR／PDF／影像檢索／繁中手寫／真人瀏覽器／試教，未安裝／升級套件、commit／push。課前須確認帳號、正常與不足圖片、usage與課時；第13週接Function Calling與Skill-like任務，本週無語音、圖片生成或自動操作截圖。
+
+## 第11週新增RAG與File Search課堂簡化版（2026-11-03）
+
+- 依使用者前述規畫另製第11週學生／教師Notebook與同名Markdown，各27格（18文字、9程式），標題各自起始文字格；新增week11/week11_rag_simple/雙版單檔App、README、設定範本、同第10週的活動TXT與問題、resources.py、教師導讀，以及scripts/build_week11_simple.py與scripts/verify_week11_simple.py。原第11週ChromaDB教材及Claude參考、第9、10週現有未提交成果均保留。
+- 主線為檢索片段→context→生成→來源查核。自行建置沿用第10週普通list、同批Embedding與cosine；平台路線實作Responses的File Search，使用同一文件／問題作對照。學生只選一路、做同一個App，使用相同驗收與40／30／20／10評量；A只實作build_context，B查核同題證據與不足情境，API／工具結果檢查完整提供，不增加第二套專題或向量資料庫安裝。File Search中的A整理實際取回證據供人查，不控制平台內部context。
+- 雙版App各五個函式；學生只移入Notebook同一A。預設真實API關閉，離線僅人工選前兩段作context預覽、不產生假答案。自行建置每題1次Embedding＋最多1次Responses，無證據本機回不足且標記未生成；File Search使用既有索引，每題1次Responses＋最多1次工具，以include取得實際結果，檢查completed、file_id、引用與非空答案。兩路不跨比相似度分數，肯定答案缺引用或來源不符不保存。
+- File Search資源生命週期獨立於App：resources.py無參數0請求，--create建立專用store、上傳同TXT、附加後最多10次輪詢；逐步保存收到的ID、記錄來源SHA與狀態、阻擋重複建立、store設最後活動後1日過期。--cleanup只刪本機紀錄中的store與原始file，部分失敗保留待清理ID供重試，404視已不存在；不列舉帳號。過期、清畫面與store=False不等於刪原始檔；逾時未收到ID需平台核對。上傳／索引／輪詢／儲存與清理另計次數及費用。
+- 輸入文件3000字元／8段／每段1000，問題300上限，超限拒絕；新提交、模式／API開關變更、清除與失敗清舊答案，rerun與下載0新請求。下載包含路線、模型、問題、文件SHA、參數、實際hits／context／sources／引用及答案，不存key或向量。App只讀completed且SHA一致的索引紀錄，不在rerun上傳文件或建索引。
+- 核心150分鐘＋休息10＋排障20，課後45～60分鐘沿用同App換合法小文件，選一路完成三類問題、日期／數字與引用原文查核、一個錯誤或邊界的修正重測與README反思；File Search另記建立／清理結果，不交金鑰或真實資源ID。無API可交功能與限制，模型品質明記未測，由教師另安排實測。
+- 公司既有Windows／CPython3.14.0、Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1離線驗證通過：雙版結構／語法／先備獨立與順序／答案分離／Markdown與App對齊／同文件；A完整片段與來源；真實SDK＋MockTransport兩路0／1／2請求、拒答／未完成／空答案／錯來源與引用／429／逾時；資源逐步保存、輪詢上限、失敗與清理重試；雙版AppTest預設關閉、只移入A成功、預覽／狀態／SHA／工具結果與來源檢查、rerun0請求與失敗清舊結果。重建一致、連結及原有檔案SHA-256保留通過。
+- requirements沿用課程1.63.0／2.49.0／1.2.3固定直接依賴，新目錄尚未另建固定環境驗證；不將本機1.60.0結果混稱1.63.0、Cloud或Colab。0次真實API，未上傳／建立索引／刪除平台資源、未測真實檢索及模型品質、真人瀏覽器或試教；未安裝／升級套件、commit／push。課前須核對模型權限、真實引用與不足題表現、索引完成及清理結果。
+
+## 第10週新增Embedding與語意搜尋課堂簡化版（2026-11-03）
+
+- 依使用者前述規畫另製第10週學生／教師Notebook與同名Markdown，各29格（18文字、11程式），標題各自起始文字格；新增week10/week10_semantic_search_simple/雙版App、README、需求與安全設定範本、活動文字／問題清單，以及教師導讀、scripts/build_week10_simple.py與scripts/verify_week10_simple.py。原第10週及Claude參考、先前第9週未提交成果、第11週保留。
+- 主線為已確認片段→同模型文件／問題向量→cosine→附來源排名→原文證據。只保留A計分／來源複製／門檻／排序／top_k實作，B為同資料原句／改寫／文件外問題與兩組參數觀察；cosine與人工規則完整提供。App四函式、學生只移入同一A，不重寫reader、切塊或第二個App；貼第9週文字以空白行分段，不宣稱匯入第9週JSON。
+- 離線為人工4組關鍵字計數，明說非語意Embedding；不混用或跨模式比較分數。真實使用embeddings.create，預設關閉；Notebook教師固定3段＋3問題合批1次，學生App三種新問題各1次規畫共3次，重跑另計；滑桿只對已存向量重排0次。為課堂直線流程，App每次新提交重算文件＋問題，明說正式服務應保存文件向量。本週無Responses生成、無File Search或向量資料庫安裝；第11週尚待另製simplified兩路對照。
+- 本機6000字元／12段／每段1000、問題300上限，超限拒絕；start/end回查標準化換行後貼入文字。A未完成／缺key／輸入失敗0請求；max_retries=0、timeout=60，同批同模型依index還原順序，檢查筆數／維度／有限數字／非零後才保存；模式切換／清除／失敗清舊結果。下載保留模式、模型、問題、原文、參數與hits，不含key或整批向量。
+- 核心150分鐘＋休息10＋排障20，課後45～60分鐘沿用同App換合法小文件、三類問題與兩組參數、兩份搜尋紀錄、一個不足情境與一個錯誤／邊界、日期或數字核對與README反思；最低要求固定、題目自由，不加第二套作品。無API先交功能與限制，真語意欄未測，教師另安排共看實測，不用假結果補齊。
+- 公司既有Windows／CPython3.14.0、Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1完整離線驗證通過：雙版JSON／ID／輸出／AST／章節／先備獨立與順序／答案分離／Markdown與App對齊，排名邊界與來源保留，真實SDK＋MockTransport的0或1次合批、index重排、回應檢查／缺key／429／逾時不重試；AppTest只移入A成功、滑桿／rerun無新請求、輸入限制、來源位置與失敗清舊結果；重建、連結及原有已追蹤檔案SHA-256保留通過。
+- requirements沿用課程1.63.0／2.49.0／1.2.3固定直接依賴，新目錄尚未另建固定環境驗證；不將本機1.60.0結果混稱1.63.0、Cloud或Colab。0次真實API，未測真實語意品質、真人瀏覽器、伺服器、Colab、Cloud、其他平台或試教；未安裝／升級套件、commit／push。課前須驗證模型權限、實際排名與時間。
+
+## 第9週調整為RAG前處理準備：A清理與B片段觀察（2026-11-03）
+
+- 依使用者確認的第9～11週規畫，先修訂第9週現有課堂簡化版，保留原版與Claude參考。學生A仍完成清理；B改為完整提供chunk_text與固定中文比較格，不再要求手寫切塊迴圈。學生記兩組參數的片段數、交界、重複內容與支持答案的原文；教師判讀只放教師版。雙版仍各40格（26文字、14程式），原ID與順序保留。
+- 新主線為資料品質、檢索單位、片段與來源；說明CSV整列可作為單位，固定字元切塊是觀察示範。補自行建置與OpenAI File Search兩條流程，依官方文件確認平台可自動切塊／向量化／索引；本週不建立平台資源、不做向量搜尋，也不保證CSV可直接上傳。第10、11週尚無simple／File Search教材，本次不修改，後續規畫不寫成已完成。
+- 同步兩份Notebook／Markdown、學生與教師App、README、範例操作說明、教師導讀、build_week09_simple.py與verify_week09_simple.py。學生App只需移入A清理；完整reader／切塊／UI已提供。保留sample.csv的6筆5欄與sample.xxx直接開檔方式，並把昨日僅改Notebook的路徑決定同步回重建來源，避免覆蓋。
+- 核心150分鐘＋休息10＋排障20；課後45～60分鐘沿用同一App換文件、固定size比較兩個overlap、兩份JSON、一個問題的來源證據、日期／數字核對及一個錯誤／邊界。不加第二套App、第三套切法、API或部署；40／30／20／10改對應讀取清理、比較來源、錯誤修正、可重現反思。
+- 公司現有Windows／CPython3.14.0、Streamlit1.60.0／pypdf6.18.1／python-docx1.2.0／OpenAI2.49.0／python-dotenv1.2.2完成完整離線驗證：雙版JSON／ID／輸出／AST／獨立先備與順序、A答案分離／共同完整B、實際CSV／PDF／DOCX讀取、固定比較與來源切片、App只移入A成功、reader邊界、AppTest狀態與失敗清舊下載、假SDK分流、重建一致與相對連結通過。原第9週23份檔案保留；不將此舊環境的結果稱為1.63.0環境驗證。
+- 0次真實API，未測真人瀏覽器、Colab、Cloud、其他平台、真實檢索品質或試教，未安裝／升級套件、commit或push。使用者既有修改與Word暫存鎖定檔保留。後續第10、11週應另製simple版，不直接覆蓋原正式教材。
+
+## 第9週CSV短例改為直接讀檔（2026-11-02，公司，歷史快照；現行開檔方式以上節為準）
+
+- 依使用者澄清，第9週課堂簡化版學生／教師Notebook第10格只用open＋csv.DictReader讀取`sample_tata/sample.csv`並逐列顯示，使用utf-8-sig與newline=""；移除exists分支與assert。CSV已直接提供，不在教材或重建腳本產檔；以week09為目前工作目錄，Colab需上傳對應檔案。
+- 依追加要求，CSV擴充為6筆虛構活動，含活動／日期／時間／地點／名額5欄，保留引號內逗號的觀察。同步雙版Markdown、重建來源、範例README、教師導讀及驗證腳本暫存工作目錄的CSV準備。雙版仍各40格，ID／順序不變，僅CSV相關3格改動；學生A/B、原版及App保留。
+- 公司既有Windows／Python3.14.0環境執行CSV實際讀檔與雙版Notebook／重建檢查；0次真實API，未測真人瀏覽器、Colab、Cloud或試教；未commit／push。
+
 ## 第8週Pydantic串流對照範例（2026-11-01，在家）
 
 - 依使用者要求新增 `week08/week08_midterm_simple_pydantic_streaming_teacher/` 完整教師範例與設定範本、README，原非串流版及學生起點保留。沿用相同任務、instructions、ProjectResult三欄及標籤；只將parse流程改為responses.stream(text_format=ProjectResult)與get_final_response。

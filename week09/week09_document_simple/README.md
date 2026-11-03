@@ -1,16 +1,18 @@
 # 第9週文件處理｜課堂簡化版
 
-授課主線是「讀取 → 清理 → 切塊 → 檢查 → 匯出」，先理解資料再接AI。搭配上層檔名含「課堂簡化版」的學生／教師Notebook與Markdown閱讀版；原教材及原App保留比較。
+授課主線是「讀取 → 清理 → 觀察片段 → 回查來源 → 匯出」，為第10週搜尋與第11週RAG作準備。切塊函式完整提供，學生練習使用與判讀。搭配上層檔名含「課堂簡化版」的學生／教師Notebook與Markdown閱讀版；原教材及原App保留比較。
 
 ## 學生從這裡開始
 
-1. Notebook先看完整短示範，再完成引導練習A（清理）與獨立練習B（切塊），跑各自固定檢查。
-2. 把同一份A/B函式放入`student/app.py`對應位置，保留頂部`import re`。這是整合同一成果，不必再寫第二套程式。讀取與UI已提供。
+1. Notebook先看短示範，完成引導練習A（清理）與自測；活動B使用完整切塊函式，執行固定比較並填寫片段觀察，不重寫迴圈。
+2. 只把已完成的A清理函式放入`student/app.py`對應位置，保留`import re`。切塊、讀取與UI已完整提供，不必再寫第二套程式。
 3. 啟動學生App，先跑內建TXT，再上傳`sample_data/events.csv`。學生TODO未完成時會提示，沒有假成功結果。
-4. 同份文件固定chunk_size，改overlap比較；下載JSON後依Notebook讀回並核對來源。
+4. 同份文件固定chunk_size，只改overlap；下載兩份JSON並讀回，挑一個問題指出支持答案的片段與原文，核對日期或數字。這是人工回查，還沒執行搜尋。
 5. 回家作業沿用App，換一份無敏感資料文件、比較兩組參數並記錄一個錯誤／邊界案例。完整規格與評分在Notebook第7節。
 
 教師使用`teacher/app.py`完整參考；請勿把教師程式或教師Notebook放入學生發放資料。
+
+Notebook第2-1節新增讀取TXT範例，檔案為[sample.txt](../sample_tata/sample.txt)。執行前先複製到Notebook目前工作目錄，Colab則直接上傳；程式只用`open("sample.txt", encoding="utf-8-sig")`，不含路徑，讀入的完整文字保存為`raw_text`。
 
 ## Windows／Python 3.14安裝與啟動
 
@@ -37,7 +39,7 @@ Colab僅執行Notebook短例子；平台Python與Windows不同，套件安裝／
 
 | 檔案 | 內容 |
 |---|---|
-| `student/app.py` | 學生A/B骨架；完整reader與UI |
+| `student/app.py` | 學生A清理骨架；完整切塊、reader與UI |
 | `teacher/app.py` | 相同流程的完整參考答案 |
 | `sample_data/course_notes.txt` | 內建無敏感資料活動文字 |
 | `sample_data/events.csv` | UTF-8 BOM、含引號逗號的CSV |
@@ -67,9 +69,9 @@ App沒有API功能，全程0次請求，也不需要`.env`或Secrets。上傳與
 
 ## 練習、作業與繳交
 
-核心150分鐘另留休息10分鐘與排障20分鐘。練習只有A/B兩項；App整合沿用答案。回家作業預估45～60分鐘，提交同一App、完成A/B的Notebook或函式程式、原文件、兩組JSON與README實測紀錄；不另做第二個App。題目與文件開放，最低驗收固定。
+核心150分鐘另留休息10分鐘與排障20分鐘。A是清理實作，B是參數比較與來源判讀；App只需移入A。回家作業45～60分鐘，交同一App、完成A與B觀察紀錄的學生Notebook、原文件、兩組JSON與README；不另做第二個App或手寫切塊。題目與文件開放，最低驗收固定。
 
-README至少寫：用途／來源、啟動方式與實際版本、兩組參數結果、邊界實例、一個錯誤／邊界與處理、人工查核的日期或數字、仍存限制與未測項目。程式與結果推送整學期自己的Repo，由老師既有表單登記的Repo查閱，不另交每週資料夾連結。
+README至少寫：用途／來源、啟動方式與實際版本、兩組參數與邊界實例、一個問題及兩組支持答案的chunk_id／原文、一個錯誤／邊界與處理、查核的日期或數字、限制與未測項目。程式與結果推送整學期自己的Repo，由老師既有表單登記的Repo查閱，不另交每週資料夾連結。
 
 ## 選做摘要
 
@@ -99,6 +101,15 @@ python -X utf8 scripts/verify_week09_simple.py
 
 隨附[兩頁中文PDF](../sample_tata/sample.pdf)與[含段落及表格的Word](../sample_tata/sample.docx)，皆為虛構活動資料，不含個資。資料夾名稱為`sample_tata`。
 
-Notebook以`week09`為目前工作目錄，使用`Path("sample_tata/sample.pdf")`或`Path("sample_tata/sample.docx")`；Colab需建立`sample_tata`並上傳範例檔，或自行調整路徑。App請取消「使用內建TXT範例」，上傳PDF或Word後按「處理文件」。
+Notebook短例只使用`sample.csv`、`sample.pdf`、`sample.docx`檔名；將`sample_tata`內範例複製到Notebook目前工作目錄，Colab直接上傳檔案。App請取消「使用內建TXT範例」，上傳PDF或Word後按「處理文件」。
 
 核對活動日期2026年11月11日、時間14:00至16:00、每組4人、8組及總名額32人；Word需核對「段落 → 表格 → 段落」的本文順序。PDF含文字層，不是掃描檔，不能用來驗證OCR。
+
+
+## RAG路線與本週界線（2026-11-03）
+
+自行建置可用現成工具或自訂規則形成片段，之後交給Embeddings API與向量索引；OpenAI File Search則由平台處理支援文件的切塊、向量化、索引與檢索。兩者都要檢查原文件與回答證據；CSV可按整筆活動形成檢索單位，不必一律依字元切。
+
+本週只做文件品質與片段觀察，不建立向量或平台資源。後續規畫在第11週用同文件／問題對照兩路；目前第10、11週尚未製作simple或File Search範例。本週JSON不直接匯入現有第10週App，也不保證可直接上傳File Search。File Search仍需處理支援格式、文件上傳及儲存／工具費用，不能當成完全離線或零成本。
+
+官方依據：[OpenAI Retrieval](https://developers.openai.com/api/docs/guides/retrieval)、[File Search](https://developers.openai.com/api/docs/guides/tools-file-search)。

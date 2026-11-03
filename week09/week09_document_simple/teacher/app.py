@@ -4,7 +4,7 @@
 # 啟動：在week09/week09_document_simple內執行
 # python -m streamlit run teacher/app.py
 # 本App全程離線，0次API；AI選做另見Notebook，不需金鑰。
-# 學生只完成A/B，沿用Notebook同一實作，不重寫reader或UI。
+# 學生完成A清理；B用完整切塊函式觀察參數，不重寫reader或UI。
 # ============================================================
 
 import csv
@@ -15,7 +15,7 @@ from pathlib import Path
 
 import streamlit as st
 
-# ---------- 1. 學生練習：清理與切塊 ----------
+# ---------- 1. A清理練習與完整切塊示範 ----------
 def clean_text(text: str) -> str:
     """保留段落，只合併行內空白；回傳新字串，不修改原始輸入。"""
     # 教師參考已完成：對應學生TODO A。重點是清理後仍能辨識段落。
@@ -32,7 +32,7 @@ def clean_text(text: str) -> str:
 
 def chunk_text(text: str, chunk_size: int = 800, overlap: int = 120) -> list[dict]:
     """以字元滑動視窗切塊；位置指向清理後文字，end不包含在片段內。"""
-    # 教師參考已完成：對應學生TODO B。先查參數，再處理空白輸入。
+    # 完整提供的切塊示範：學生用於活動B，不需改寫迴圈。
     if chunk_size <= 0:
         raise ValueError("chunk_size必須大於0")
     if overlap < 0 or overlap >= chunk_size:

@@ -1,0 +1,5 @@
+# Python3.14課程直接依賴；實際驗證環境見教師導讀。
+streamlit==1.63.0
+openai==2.49.0
+python-dotenv==1.2.3
+pillow==12.3.0

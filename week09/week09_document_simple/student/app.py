@@ -4,7 +4,7 @@
 # 啟動：在week09/week09_document_simple內執行
 # python -m streamlit run student/app.py
 # 本App全程離線，0次API；AI選做另見Notebook，不需金鑰。
-# 學生只完成A/B，沿用Notebook同一實作，不重寫reader或UI。
+# 學生完成A清理；B用完整切塊函式觀察參數，不重寫reader或UI。
 # ============================================================
 
 import csv
@@ -15,7 +15,7 @@ from pathlib import Path
 
 import streamlit as st
 
-# ---------- 1. 學生練習：清理與切塊 ----------
+# ---------- 1. A清理練習與完整切塊示範 ----------
 def clean_text(text: str) -> str:
     """TODO A：傳入str，回傳保留段落且合併行內空白的新字串。"""
     # 已提供換行標準化；只需補行內清理與最後的空行整理。
@@ -24,8 +24,8 @@ def clean_text(text: str) -> str:
     raise NotImplementedError("請完成TODO A：文字清理")
 
 def chunk_text(text: str, chunk_size: int = 800, overlap: int = 120) -> list[dict]:
-    """TODO B：回傳含chunk_id、start、end、text的list[dict]。"""
-    # 已提供防呆：type hints不會自動檢查參數，仍須明確拒絕不合法值。
+    """以字元滑動視窗切塊；位置指向清理後文字，end不包含在片段內。"""
+    # 完整提供的切塊示範：學生用於活動B，不需改寫迴圈。
     if chunk_size <= 0:
         raise ValueError("chunk_size必須大於0")
     if overlap < 0 or overlap >= chunk_size:
@@ -33,9 +33,25 @@ def chunk_text(text: str, chunk_size: int = 800, overlap: int = 120) -> list[dic
     if not text.strip():
         return []
 
-    # TODO B：用迴圈決定start/end，建立片段清單，最後return。
-    # 注意結尾停止條件、重疊前進量與切片原樣；不需要新增類別或helper。
-    raise NotImplementedError("請完成TODO B：固定長度切塊")
+    # 1. 從起點前進，保留切片原樣，讓來源位置可以精確核對。
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = min(start + chunk_size, len(text))
+        content = text[start:end]
+        if content.strip():
+            chunks.append({
+                "chunk_id": len(chunks),
+                "start": start,
+                "end": end,
+                "text": content,
+            })
+
+        # 2. 已到結尾就停止，避免把最後一段再切成重複的小尾巴。
+        if end == len(text):
+            break
+        start = end - overlap
+    return chunks
 
 # ---------- 2. 完整示範：多格式讀取 ----------
 def extract_text(filename: str, data: bytes, encoding: str = "utf-8-sig") -> str:
