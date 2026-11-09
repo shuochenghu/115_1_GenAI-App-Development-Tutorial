@@ -18,6 +18,7 @@ load_dotenv(Path(__file__).resolve().parent / '.env')
 st.set_page_config(page_title='文件片段搜尋', layout='centered')
 
 # ---------- 1. 完整提供的短函式與A練習 ----------
+# name 是設定名稱；找不到該設定時回傳 default，省略時用空字串。
 def read_setting(name, default=""):
     """完整提供：平台Secrets優先，本機使用環境變數或App旁.env。"""
     try:
@@ -25,6 +26,7 @@ def read_setting(name, default=""):
     except FileNotFoundError:
         return os.getenv(name, default)
 
+# text：單段原文或單個查詢字串；每次只處理一筆。
 def demo_vector(text):
     """完整提供：人工指定4組關鍵字計數，不是模型學到的語意向量。"""
     groups = [
@@ -36,6 +38,7 @@ def demo_vector(text):
         vector.append(float(sum(text.count(word) for word in words)))
     return vector
 
+# a、b：兩份非空、等長的有限數字清單；本週通常依序傳入片段向量與問題向量。
 def cosine_similarity(a, b):
     """完整提供：計算方向相似度；零向量回傳0，不能解讀為有語意證據。"""
     import math
@@ -50,6 +53,10 @@ def cosine_similarity(a, b):
         return 0.0
     return max(-1.0, min(1.0, dot / (norm_a * norm_b)))
 
+# chunks：帶 chunk_id、source、text 的片段字典清單；也可帶 start、end 等來源欄位。
+# vectors：文件向量清單；vectors[i] 必須來自 chunks[i]["text"]。
+# query_vector：一個問題的向量，與文件向量使用同一套轉換方式及相同維度。
+# top_k：最多回傳幾筆（正整數，預設 3）。min_score：保留分數的下限（預設 0.0，含等於）。
 def rank_chunks(chunks, vectors, query_vector, top_k=3, min_score=0.0):
     """傳入片段與同順序向量，回傳附score的來源資料；不呼叫API。"""
     if type(top_k) is not int or top_k <= 0:
@@ -131,6 +138,8 @@ if submitted:
             model = read_setting("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
             # 小型教學批次：文件＋問題合併為1次；每次新提交會重新向量化。
             # 正式服務應保存文件向量，後續只向量化新問題；本例不做跨次快取。
+            # api_key 提供認證；max_retries=0 關閉 SDK 自動重試；timeout=60.0 設定網路逾時秒數。
+            # model 選向量模型；input 傳整批文字；encoding_format="float" 要求數字清單。
             with OpenAI(api_key=key, max_retries=0, timeout=60.0) as client:
                 response = client.embeddings.create(
                     model=model, input=inputs, encoding_format="float",
@@ -162,6 +171,7 @@ if submitted:
         st.session_state.error = "本次未保存結果，請檢查模型、網路或額度。錯誤類型：" + type(exc).__name__
 
 # ---------- 6. 只在本機改排名：不再次呼叫API ----------
+# 滑桿依序接收標籤、最小值、最大值、初始值、步長。整數滑桿省略步長時每次加減 1。
 top_k = st.slider("最多顯示幾段（top_k）", 1, 5, 2)
 min_score = st.slider("最低分數（不是正確機率）", 0.0, 1.0, 0.0, 0.05)
 if st.session_state.error:
@@ -169,6 +179,7 @@ if st.session_state.error:
 if st.session_state.record is not None:
     record = st.session_state.record
     try:
+        # 建立批次時把問題放最後，所以 [:-1] 是全部文件向量，[-1] 是問題向量。
         hits = rank_chunks(
             record["chunks"], record["vectors"][:-1],
             record["vectors"][-1], top_k, min_score,

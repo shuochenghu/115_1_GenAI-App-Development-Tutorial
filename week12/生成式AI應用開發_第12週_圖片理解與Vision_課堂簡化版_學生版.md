@@ -147,7 +147,8 @@ def prepare_image(raw):
 <!-- 第9格 | w12s-preview -->
 
 ```python
-# 先備：prepare；沒有實際圖片就標記未測，不生成假辨識答案。
+# 需要：先執行第 4 節定義 prepare_image 的程式碼格。
+# 沒有實際圖片就標記未測，不生成假辨識答案。
 from pathlib import Path
 image = None
 sample_path = Path("receipt_clear.png")
@@ -175,6 +176,7 @@ A只寫build_image_content：輸入prepare_image回傳的dict、問題str及deta
 <!-- 第11格 | w12s-a -->
 
 ```python
+# 需要：呼叫 build_image_content 前，先執行第 4 節圖片準備格，取得 base64 匯入。
 def build_image_content(image, question, detail="auto"):
     """A：回傳同一user訊息中的文字＋圖片content，不呼叫API。"""
     question = question.strip()
@@ -192,7 +194,8 @@ def build_image_content(image, question, detail="auto"):
 <!-- 第12格 | w12s-a-check -->
 
 ```python
-# 先備：A。用人工bytes測傳輸組裝；此資料不是可送模型的圖片。
+# 需要：先執行第 5 節的 build_image_content 定義格。本格自行匯入 base64。
+# 學生版完成或修改 TODO A 後，請重跑定義格再自測。人工 bytes 只用來測組裝。
 import base64
 content_result, content_error = None, None
 fake_image = {"bytes": b"classroom-fixture", "mime_type": "image/png"}
@@ -258,7 +261,9 @@ RECEIPT_PROMPT = "抽取這張收據的商家、日期與總額，列關鍵可�
 <!-- 第16格 | w12s-qa-run -->
 
 ```python
-# 先備：prepare、A、answer；目前目錄有receipt_clear.png。
+# 需要：先執行第 4 節定義 prepare_image 並匯入 SDK 的程式碼格，
+# 再執行第 5 節的 build_image_content 與第 7 節的 read_answer、INSTRUCTIONS 定義格。
+# 學生版須完成 TODO A 並重跑定義格。開啟 API 時，將 receipt_clear.png 放在目前目錄。
 # 預設0次API；開啟後一次提交最多1次，不自動重試。
 RUN_VISION_API = False
 qa_result, qa_error = None, None
@@ -299,6 +304,7 @@ total只抄總額，不由品項推算。visible_text保留原文字與幣別，
 <!-- 第18格 | w12s-schema -->
 
 ```python
+# 需要：呼叫 read_receipt 前，先執行第 4 節圖片準備格，取得 json 與 math 匯入。
 # 沿用第6／8週JSON Schema；抽取模式的五個欄位均必須出現。
 RECEIPT_SCHEMA = {
     "type": "object",
@@ -345,7 +351,9 @@ def read_receipt(answer):
 <!-- 第19格 | w12s-receipt-run -->
 
 ```python
-# 先備：prepare、A、answer、schema；不依賴前一格API結果。
+# 需要：先執行第 4 節的 prepare_image 與匯入、第 5 節的 build_image_content，
+# 第 7 節的 read_answer、INSTRUCTIONS、RECEIPT_PROMPT，以及第 8 節的 RECEIPT_SCHEMA、read_receipt 定義格。
+# 學生版須完成 TODO A 並重跑定義格。本格從 receipt_clear.png 讀圖，可跳過第 7 節的問答 API 格。
 # 預設0次；開啟後同圖抽取最多1次Responses。
 RUN_RECEIPT_API = False
 receipt_result, receipt_error = None, None
