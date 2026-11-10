@@ -3,6 +3,7 @@
 原課堂簡化版（build_week13_simple.py與week13_web_tools_simple）保留不動。
 修訂重點：模型改寫search_query、離線看協定、Skill對照、來源比對放寬、用語與排版。
 """
+from notebook_cell_notes import annotate_dependencies
 import json
 from pathlib import Path
 from textwrap import dedent, indent
@@ -345,6 +346,11 @@ UI = block('''
 SAMPLE_ARGUMENTS = '{"search_query": "requirements.txt Community Cloud dependencies", "scope": "Streamlit"}'
 
 
+# 程式格的口語名稱；節次由前一個標題自動決定（標註見notebook_cell_notes.py）
+CELL_NOUNS = {"install": "安裝格", "colab": "Colab金鑰格", "policy": "規格資料格", "sample-call": "手寫function_call格", "a": "A格", "a-check": "A自我檢查格", "call-reader": "提案檢查函式格", "roundtrip": "離線來回格", "first": "第一階段API格", "url": "網址函式格", "reader": "搜尋結果檢查格", "second": "第二階段API格", "direct-code": "選讀直接搜尋格"}
+TAG_ALIASES = {"A": "a"}   # 先備裡的舊寫法
+
+
 def cells_for(teacher):
     cells = []
 
@@ -406,6 +412,7 @@ def cells_for(teacher):
         本機沿用Python3.14與自己的虛擬環境，安裝方式見App的[README](week13_web_tools_revised/README.md)；Colab只跑Notebook，不啟動Streamlit。
         下面兩格的INSTALL_PACKAGES與LOAD_COLAB_KEY預設False，直接全部執行也不會安裝套件或讀金鑰。
         只有呼叫API的格子才會讀取.env或環境變數中的金鑰；金鑰不要寫進Notebook。
+        **程式格開頭的註解：**「先備」是要先執行的格子（包含間接需要的）；「用到前面格子定義的變數／函式」列出這格直接用到的名稱與出處，例如`build_search_task ← 第8節A格`；「模組：」那一行是前面格子匯入的套件。出現NameError時，先回去執行那一格。
         <font color="#1565C0">費用提示：</font>網路搜尋除了token，另有工具費。本課不寫固定價格，請依[官方計價](https://developers.openai.com/api/docs/pricing)與實際usage核對。
     ''')
     code("install", block('''
@@ -819,7 +826,7 @@ def cells_for(teacher):
         第14週會沿用本週的工具，讓模型在有限次數內自己選工具、觀察結果並決定何時停止；本週固定兩階段，不寫無上限的while迴圈。
         官方文件：[Function calling](https://developers.openai.com/api/docs/guides/function-calling)、[Web search](https://developers.openai.com/api/docs/guides/tools-web-search)、[模型頁](https://developers.openai.com/api/docs/models/gpt-5.4-mini)。
     ''')
-    return cells
+    return annotate_dependencies(cells, PREFIX, CELL_NOUNS, TAG_ALIASES)
 
 
 IMPORTS = block('''

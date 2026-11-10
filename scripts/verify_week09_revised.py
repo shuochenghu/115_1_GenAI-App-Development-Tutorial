@@ -62,7 +62,7 @@ def check_notebooks():
             assert s_cell == t_cell, s_cell["id"]
     for book, is_teacher in [(student, False), (teacher, True)]:
         cells = book["cells"]
-        assert len(cells) == 49 and len({c["id"] for c in cells}) == len(cells)
+        assert len(cells) == 50 and len({c["id"] for c in cells}) == len(cells)
         by_tag = {c["id"].removeprefix(PREFIX): c for c in cells}
         for missing_files in (False, True):
             sequential = {}
@@ -415,7 +415,18 @@ def check_rebuild_and_links():
     print("重建一致、範例檔複製一致、UTF-8、Markdown與本機連結通過")
 
 
+def check_dependency_notes():
+    """每個用到前面格子變數／函式的程式格，都在格首寫出名稱與出處；出處（含間接）都在先備與requires。"""
+    from notebook_cell_notes import check_dependency_notes as check
+    total = 0
+    for path in sorted(WEEK.glob("*修訂版_*.ipynb")):
+        cells = json.loads(path.read_text(encoding="utf-8"))["cells"]
+        total += check(cells, PREFIX, BUILD["CELL_NOUNS"], BUILD["TAG_ALIASES"])
+    print(f"格首標註：雙版共{total}個程式格，用到前面的變數／函式與模組都寫出出處，出處（含間接）都在先備與requires，先備使用看得懂的格名通過")
+
+
 def main():
+    check_dependency_notes()
     check_notebooks()
     data = fixtures()
     check_functions(data)

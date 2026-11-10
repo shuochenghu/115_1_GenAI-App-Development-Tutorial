@@ -9,7 +9,7 @@
 
 <!-- 第2格 | w13r-goals -->
 
-## 1. 學習目標與150分鐘安排
+## 1 學習目標與150分鐘安排
 
 完成本週後，你能夠：
 - 說出Tool Calling一次來回中，模型、程式與人各自做什麼。
@@ -31,7 +31,7 @@
 
 <!-- 第3格 | w13r-methods -->
 
-## 2. 先比較：讓App「上網查資料」有哪些做法
+## 2 先比較：讓App「上網查資料」有哪些做法
 
 | 方法 | 誰負責搜尋、結果怎麼來 | 本週安排 |
 |---|---|---|
@@ -46,11 +46,12 @@
 
 <!-- 第4格 | w13r-environment -->
 
-## 3. 環境與付費開關
+## 3 環境與付費開關
 
 本機沿用Python3.14與自己的虛擬環境，安裝方式見App的[README](week13_web_tools_revised/README.md)；Colab只跑Notebook，不啟動Streamlit。
 下面兩格的INSTALL_PACKAGES與LOAD_COLAB_KEY預設False，直接全部執行也不會安裝套件或讀金鑰。
 只有呼叫API的格子才會讀取.env或環境變數中的金鑰；金鑰不要寫進Notebook。
+**程式格開頭的註解：**「先備」是要先執行的格子（包含間接需要的）；「用到前面格子定義的變數／函式」列出這格直接用到的名稱與出處，例如`build_search_task ← 第8節A格`；「模組：」那一行是前面格子匯入的套件。出現NameError時，先回去執行那一格。
 <font color="#1565C0">費用提示：</font>網路搜尋除了token，另有工具費。本課不寫固定價格，請依[官方計價](https://developers.openai.com/api/docs/pricing)與實際usage核對。
 
 <!-- 第5格 | w13r-install -->
@@ -83,7 +84,7 @@ else:
 
 <!-- 第7格 | w13r-flow -->
 
-## 4. Tool Calling的一次來回
+## 4 Tool Calling的一次來回
 
 Tool Calling不是模型自己去執行程式，而是「模型提出要求，程式決定要不要執行」。本週一次完整提交的順序如下：
 
@@ -104,7 +105,7 @@ Tool Calling不是模型自己去執行程式，而是「模型提出要求，�
 
 <!-- 第8格 | w13r-schema-intro -->
 
-## 5. Function schema：告訴模型「這個函式要哪些參數」
+## 5 Function schema：告訴模型「這個函式要哪些參數」
 
 TOOL是我們定義的工具：
 - name：工具名稱。模型要呼叫時，會在function_call裡回報這個名字。
@@ -154,7 +155,7 @@ TOOL = {
 
 <!-- 第10格 | w13r-skill-map -->
 
-## 6. 把上學期的Skill轉成Python模組
+## 6 把上學期的Skill轉成Python模組
 
 上學期在Claude Desktop用過Skill：一個資料夾裡有SKILL.md說明用途與步驟，必要時附上腳本。放進應用程式時，同樣的設計會變成這些Python元件：
 
@@ -172,7 +173,7 @@ TOOL = {
 
 <!-- 第11格 | w13r-sample-intro -->
 
-## 7. 離線看一次function_call長什麼樣子
+## 7 離線看一次function_call長什麼樣子
 
 下一格是手寫範例，模仿第一次Responses回傳的function_call，不需要金鑰、0次API。請注意三件事：
 1. name是我們在TOOL定義的工具名稱。
@@ -204,7 +205,7 @@ print("call_id：", sample_call["call_id"])
 
 <!-- 第13格 | w13r-a-intro -->
 
-## 8. A：寫出程式負責執行的本機函式
+## 8 A：寫出程式負責執行的本機函式
 
 模型提出prepare_search後，真正執行的是build_search_task。它先檢查模型給的參數，再產生搜尋規格；這一格不需要前面的程式格，也不呼叫API。
 已提供：search_query與scope的檢查。你負責：建立官方網域對照，回傳規定格式的dict。
@@ -251,7 +252,9 @@ def build_search_task(search_query, scope):
 <!-- 第15格 | w13r-a-check -->
 
 ```python
-# 先備：A；0次API。自我檢查：正確輸入、兩種範圍、三種不合格輸入。
+# 先備：第8節A格；0次API。自我檢查：正確輸入、兩種範圍、三種不合格輸入。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   build_search_task ← 第8節A格
 a_checked = False
 try:
     task_preview = build_search_task("  requirements.txt dependencies  ", "Streamlit")
@@ -276,7 +279,7 @@ except NotImplementedError as exc:
 
 <!-- 第16格 | w13r-call-reader-intro -->
 
-## 9. 程式如何檢查模型的提案
+## 9 程式如何檢查模型的提案
 
 真實回應的function_call放在response.output裡。read_function_call完整提供，和第12週的read_answer一樣，先看拒答與完成狀態，再看內容：
 1. 有拒答或回應未完成，就不執行任何函式。
@@ -327,7 +330,7 @@ def read_function_call(response, scope):
 
 <!-- 第18格 | w13r-roundtrip-intro -->
 
-## 10. 離線走一次：執行函式並準備第二次請求
+## 10 離線走一次：執行函式並準備第二次請求
 
 延續第7節的手寫提案，這次真的執行A，看第二次請求的input要放哪些東西。0次API。
 1. 原本的使用者輸入。
@@ -339,7 +342,9 @@ def read_function_call(response, scope):
 <!-- 第19格 | w13r-roundtrip -->
 
 ```python
-# 先備：A；0次API。手寫提案＋真正執行A，組出第二次請求的input。
+# 先備：第8節A格；0次API。手寫提案＋真正執行A，組出第二次請求的input。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   build_search_task ← 第8節A格
 import json
 
 demo_input = [{"role": "user", "content": json.dumps(
@@ -366,7 +371,7 @@ except NotImplementedError as exc:
 
 <!-- 第20格 | w13r-first-intro -->
 
-## 11. 第一階段：請模型提出函式呼叫
+## 11 第一階段：請模型提出函式呼叫
 
 先備：policy、A、call-reader。RUN_TOOL_STEP預設False；改成True且問題、A、金鑰都合格時，最多1次Responses，失敗不自動重試。
 這一步只拿到模型的「呼叫提案」，並由程式執行A；**還沒有搜尋任何網頁**。
@@ -377,7 +382,11 @@ except NotImplementedError as exc:
 <!-- 第21格 | w13r-first -->
 
 ```python
-# 先備：policy、A、call-reader；請求：開啟後最多1次Responses，失敗不重試。
+# 先備：第5節規格資料格、第8節A格、第9節提案檢查函式格；請求：開啟後最多1次Responses，失敗不重試。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   INSTRUCTIONS、SCOPES、TOOL ← 第5節規格資料格
+#   build_search_task ← 第8節A格
+#   read_function_call ← 第9節提案檢查函式格
 import json
 import os
 
@@ -435,7 +444,7 @@ else:
 
 <!-- 第22格 | w13r-search-intro -->
 
-## 12. 第二階段前：先看程式怎麼檢查搜尋結果
+## 12 第二階段前：先看程式怎麼檢查搜尋結果
 
 搜尋後的回應裡有三種證據，意義不同：
 
@@ -473,7 +482,9 @@ def page_of(url):
 <!-- 第24格 | w13r-reader -->
 
 ```python
-# 先備：url；0次API。完整提供，第二階段API格、選讀與App都使用。
+# 先備：第12節網址函式格；0次API。完整提供，第二階段API格、選讀與App都使用。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   allowed_url、page_of ← 第12節網址函式格
 
 
 def read_search_result(response, domains):
@@ -526,7 +537,7 @@ def read_search_result(response, domains):
 
 <!-- 第25格 | w13r-second-intro -->
 
-## 13. 第二階段：回傳函式結果，讓模型搜尋
+## 13 第二階段：回傳函式結果，讓模型搜尋
 
 先備：第11節成功（first、call、task都有值）、url、reader。RUN_WEB_STEP預設False；開啟後最多再1次Responses＋1次內建搜尋工具呼叫。
 第二次請求的input和第10節離線範例相同：原輸入＋第一次的完整輸出＋function_call_output。差別在第一次的輸出是真實回應，可能含reasoning項目，要整份原樣帶回。
@@ -538,7 +549,12 @@ max_tool_calls=1代表最多呼叫1次搜尋工具；但這1次裡可能查好�
 <!-- 第26格 | w13r-second -->
 
 ```python
-# 先備：第一階段成功、url、reader；請求：開啟後最多1次Responses＋1次搜尋工具。
+# 先備：第5節規格資料格、第8節A格、第9節提案檢查函式格、第11節第一階段API格、第12節網址函式格、第12節搜尋結果檢查格、第一階段成功；請求：開啟後最多1次Responses＋1次搜尋工具。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   INSTRUCTIONS ← 第5節規格資料格
+#   call、first、model、task、user_input ← 第11節第一階段API格
+#   模組：json、load_dotenv、OpenAI、os ← 第11節第一階段API格
+#   read_search_result ← 第12節搜尋結果檢查格
 RUN_WEB_STEP = False   # 改成True才會真的呼叫API
 search_result, search_error = None, None
 if RUN_WEB_STEP:
@@ -586,7 +602,7 @@ else:
 
 <!-- 第27格 | w13r-b -->
 
-## 14. B：打開來源，核對內容與日期
+## 14 B：打開來源，核對內容與日期
 
 完成兩筆紀錄：一個官方文件應該查得到的「正常問題」，以及一個官方資料可能不足的「不足問題」。不預設模型一定答對或一定查不到，照實際結果記錄。
 
@@ -602,7 +618,7 @@ else:
 
 <!-- 第28格 | w13r-app -->
 
-## 15. 放進同一個App
+## 15 放進同一個App
 
 依week13_web_tools_revised的README啟動student/app.py，把Notebook完成的A貼到App的同名函式即可；教師版完整，不依賴學生完成。
 - **API未啟用（預設）**：你扮演模型，在「離線練習」欄自己填search_query，App用A顯示搜尋規格。0次API。
@@ -613,7 +629,7 @@ else:
 
 <!-- 第29格 | w13r-direct -->
 
-## 16. 選讀：只需要搜尋時，可以省掉第一階段
+## 16 選讀：只需要搜尋時，可以省掉第一階段
 
 如果產品只是要查網頁，不必為了形式先呼叫prepare_search：直接給web_search，由程式決定網域，一次Responses就能完成。
 本週走兩階段是為了學Tool Calling的來回協定；兩種做法的來源檢查與驗收方式相同，不要求再做第二個App。
@@ -622,7 +638,10 @@ RUN_DIRECT_SEARCH預設False；開啟後另外最多1次Responses＋1次搜尋�
 <!-- 第30格 | w13r-direct-code -->
 
 ```python
-# 先備：policy、url、reader；請求：開啟後最多1次Responses＋1次搜尋工具，不需要A。
+# 先備：第5節規格資料格、第12節網址函式格、第12節搜尋結果檢查格；請求：開啟後最多1次Responses＋1次搜尋工具，不需要A。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   INSTRUCTIONS、SCOPES ← 第5節規格資料格
+#   read_search_result ← 第12節搜尋結果檢查格
 import os
 
 from dotenv import load_dotenv
@@ -663,7 +682,7 @@ else:
 
 <!-- 第31格 | w13r-homework -->
 
-## 17. 課後作業與驗收
+## 17 課後作業與驗收
 
 課後45～60分鐘，沿用同一個App，從Python或Streamlit選一個方向，自訂兩個不含個資或機密的問題（一正常、一可能不足）。
 繳交：學生Notebook、App、兩筆查核紀錄（失敗也照實記錄）、[B紀錄表](week13_web_tools_revised/來源查核紀錄.md)與自己的README。
@@ -685,7 +704,7 @@ else:
 
 <!-- 第32格 | w13r-next -->
 
-## 18. 完成檢核與第14週
+## 18 完成檢核與第14週
 
 - [ ] 我能說出一次Tool Calling來回中，模型、程式與人各自負責什麼。
 - [ ] 我知道arguments是JSON字串，call_id用來對應函式結果。

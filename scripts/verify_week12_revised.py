@@ -550,14 +550,28 @@ def check_rebuild_and_preservation():
         for target in re.findall(r"\]\(([^)]+)\)", text):
             if not target.startswith(("https://", "http://", "#")):
                 assert (path.parent / target.split("#")[0]).exists(), (path, target)
-    status = subprocess.run(["git", "status", "--porcelain", "--", "week12"], cwd=ROOT, capture_output=True,
+    status = subprocess.run(["git", "-c", "core.quotepath=false", "status", "--porcelain", "--", "week12"], cwd=ROOT, capture_output=True,
                             text=True, encoding="utf-8", check=True).stdout
     changed = [line for line in status.splitlines() if line.strip()]
-    assert all(line.startswith("??") for line in changed), changed
+    # 修訂版可能已提交，之後重建會顯示M；只要求原版（非修訂版）檔案沒有被改
+    originals = [line for line in changed if not line.startswith("??")
+                 and "修訂版" not in line and "_revised/" not in line]
+    assert not originals, originals
     print("重建一致、UTF-8、Markdown圍欄與本機連結、原第12週檔案無修改通過")
 
 
+def check_dependency_notes():
+    """每個用到前面格子變數／函式的程式格，都在格首寫出名稱與出處；出處（含間接）都在先備與requires。"""
+    from notebook_cell_notes import check_dependency_notes as check
+    total = 0
+    for path in sorted(WEEK.glob("*修訂版_*.ipynb")):
+        cells = json.loads(path.read_text(encoding="utf-8"))["cells"]
+        total += check(cells, PREFIX, BUILD["CELL_NOUNS"], BUILD["TAG_ALIASES"])
+    print(f"格首標註：雙版共{total}個程式格，用到前面的變數／函式與模組都寫出出處，出處（含間接）都在先備與requires，先備使用看得懂的格名通過")
+
+
 def main():
+    check_dependency_notes()
     check_samples()
     check_notebooks()
     check_images_and_content()

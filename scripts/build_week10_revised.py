@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from textwrap import dedent
 
+from notebook_cell_notes import annotate_dependencies
+
 ROOT = Path(__file__).resolve().parents[1]
 WEEK = ROOT / "week10"
 PACKAGE = WEEK / "week10_semantic_search_revised"
@@ -246,6 +248,14 @@ APP = block('''
 ''')
 
 
+CELL_NOUNS = {   # 程式格的口語名稱；節次由前一個標題自動決定
+    "install": "環境格", "data": "資料格", "cosine-fn": "cosine函式格", "cosine-example": "手寫向量計算格",
+    "a": "A格", "a-check": "A自我檢查格", "demo-fn": "離線規則函式格", "offline-run": "離線對照格",
+    "real-run": "真實API格", "real-rank": "真實排名格", "teacher-record-run": "教師紀錄格",
+}
+TAG_ALIASES = {"A": "a"}   # 舊寫法「先備：A」
+
+
 def cells_for(teacher):
     cells = []
 
@@ -305,6 +315,7 @@ def cells_for(teacher):
         - **會呼叫幾次API：**需要付費的格子都有自己的開關，預設關閉。Notebook的真實示範把3段文件與4個問題合成1次請求；App每次有效提交1次。
         - **不能放什麼資料：**真實模式會把文件與問題送到OpenAI，不可放個資、機密或未授權資料。
         - timeout=60是每次網路等待的秒數，不保證整個任務在60秒內結束。
+        - **程式格開頭的註解：**「先備」是要先執行的格子（包含間接需要的）；「用到前面格子定義的變數／函式」列出這格直接用到的名稱與出處，例如`rank_chunks ← 第5節A格`；若有「模組：」那一行，是前面格子匯入的套件。出現NameError時，先回去執行那一格。
     """)
     code("install", """
         # 用途：顯示環境；先備：無；0次API。只有要用真實API或App時才需要安裝。
@@ -410,7 +421,7 @@ def cells_for(teacher):
         | 輸入 | chunks（list[dict]）、同順序的vectors、query_vector、top_k、min_score |
         | 回傳 | list[dict]，每筆保留原來源欄位並多一個score；沒有合格片段就回傳[] |
         | 結果保存 | 下一格自我檢查把結果存到hits_result |
-        | 執行順序 | cosine-fn → A定義 → A自我檢查；App使用同一個函式 |
+        | 執行順序 | 第4節cosine函式格 → A格 → A自我檢查格；App使用同一個函式 |
 
         要用return回傳，只print的話後面拿不到；不可直接在原本的dict加score。排序語法見4-1。
     """)
@@ -678,7 +689,7 @@ def cells_for(teacher):
         - [ ] 四種問題都有原文判讀，沒有證據不補造；教師紀錄有標明來源。
         - [ ] App改滑桿不新增API，失敗不留舊結果；README記了模式、版本與請求次數。
     """)
-    return cells
+    return annotate_dependencies(cells, PREFIX, CELL_NOUNS, TAG_ALIASES)
 
 
 def main():

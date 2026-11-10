@@ -130,6 +130,14 @@ def check_notebooks():
     print(f"Notebook：雙版各{len(books[0]['cells'])}格，JSON／ID／輸出／可見用途與先備／AST／先備獨立與順序／答案分離／離線對照結果／Markdown與App對齊通過")
 
 
+def check_dependency_notes():
+    """每個程式格用到前面格子的變數／函式，都要在格首註明出處，且出處（含間接）都列在先備。"""
+    from notebook_cell_notes import check_dependency_notes as check
+    for teacher in (False, True):
+        check(read_book(teacher)["cells"], PREFIX, BUILD["CELL_NOUNS"], BUILD["TAG_ALIASES"])
+    print("格首標註：每個用到前面變數／函式的程式格都寫出名稱與出處，出處（含間接）都在先備，先備改用看得懂的格名通過")
+
+
 def check_ranking():
     ns = functions(True)
     cosine, rank, demo = [ns[name] for name in ["cosine_similarity", "rank_chunks", "demo_vector"]]
@@ -401,6 +409,7 @@ def check_rebuild_and_links():
 def main():
     check_data_continuity()
     check_notebooks()
+    check_dependency_notes()
     check_ranking()
     check_notebook_api()
     check_apps()

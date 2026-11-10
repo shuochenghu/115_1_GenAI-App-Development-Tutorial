@@ -3,6 +3,7 @@
 原課堂簡化版（build_week09_simple.py、week09_document_simple、sample_tata）保留不動。
 修訂重點：範例檔統一、第10／11週銜接更新、A加入re.sub小示範、切塊概念拆格、B觀察表、用語與排版。
 """
+from notebook_cell_notes import annotate_dependencies
 import json
 from pathlib import Path
 import shutil
@@ -338,6 +339,36 @@ def integrate_expectation():
     return len(cleaned), len(ns["chunk_text"](cleaned, 120, 20))
 
 
+HOMEWORK_SIZE = 60                      # 作業第2項範例：App的chunk_size滑桿可選60
+HOMEWORK_ANSWER = "報名截止日期為2026年11月6日"
+
+
+def homework_example():
+    """用與App相同的函式計算作業第2項範例，並確認敘述（overlap=0切開、overlap=20完整）仍成立。"""
+    ns = {}
+    exec("import csv, re\nfrom io import BytesIO, StringIO\nfrom pathlib import Path\n" + CLEAN + CHUNK + READER, ns)
+    cleaned = ns["clean_text"](ns["extract_text"]("sample.txt", (SOURCE_SAMPLES / "sample.txt").read_bytes()))
+    start = cleaned.index(HOMEWORK_ANSWER)
+    end = start + len(HOMEWORK_ANSWER)
+    result = {}
+    for overlap in (0, 20):
+        chunks = ns["chunk_text"](cleaned, HOMEWORK_SIZE, overlap)
+        whole = [c for c in chunks if HOMEWORK_ANSWER in c["text"]]
+        touching = [c for c in chunks if c["start"] < end and c["end"] > start]
+        result[overlap] = {"count": len(chunks), "whole": whole, "touching": touching}
+    split, kept = result[0], result[20]
+    assert not split["whole"] and len(split["touching"]) == 2, "overlap=0的範例不再切開日期，請改寫作業範例"
+    first, second = split["touching"]
+    assert first["text"].endswith("報名截止日期為2026") and second["text"].startswith("年11月6日")
+    assert len(kept["whole"]) == 1, "overlap=20的範例不再有完整日期，請改寫作業範例"
+    return {"split": (first, second), "kept": kept["whole"][0], "counts": (split["count"], kept["count"])}
+
+
+# 程式格的口語名稱；節次由前一個標題自動決定（標註見notebook_cell_notes.py）
+CELL_NOUNS = {"install": "安裝格", "decode": "編碼對照格", "txt-demo": "讀TXT格", "reader-demo": "CSV格", "pdf-demo": "PDF格", "docx-demo": "Word格", "reader-function": "extract_text格", "clean-example": "逐行清理示範格", "regex-demo": "re.sub示範格", "a": "A格", "a-check": "A自我檢查格", "chunk-example": "手算切片格", "b": "B函式格", "b-check": "B比較格", "integrate-run": "整合格", "download-run": "下載回查格", "api": "選做摘要格"}
+TAG_ALIASES = {"A": "a", "B": "b", "A定義格": "a", "B函式格": "b", "extract_text": "reader-function"}   # 先備裡的舊寫法
+
+
 def cells_for(teacher):
     cells = []
     char_count, chunk_count = integrate_expectation()
@@ -405,6 +436,8 @@ def cells_for(teacher):
 
         Colab可用下一格安裝套件；Python版本由Colab決定，不必照本機的安裝清單。安裝後若提示重新啟動，重啟後再執行需要的定義格。
         安裝失敗時，請保留完整錯誤訊息；常見原因是網路，不一定是版本問題。
+
+        **程式格開頭的註解：**「先備」是要先執行的格子（包含間接需要的）；「用到前面格子定義的變數／函式」列出這格直接用到的名稱與出處，例如`clean_text ← 第4-2節A格`；「模組：」那一行是前面格子匯入的套件。出現NameError時，先回去執行那一格。
     """)
     code("install", """
         # 用途：只有讀PDF／Word或做選做摘要時才需要安裝；先備：無；0次API。
@@ -850,7 +883,7 @@ def cells_for(teacher):
         選一份有權使用、無敏感資料、和課堂範例不同的TXT／MD／CSV／文字型PDF／DOCX。沒有合適文件，可自己寫300～800字、兩段以上、含日期與數字的虛構活動說明。
 
         1. 固定同一份文件與chunk_size，只改overlap，記錄兩組的字元數、片段數與一個實際邊界；不以片段數決定好壞。
-        2. 自訂一個文件能回答的問題，分別指出兩組中支持答案的chunk_id與原文，並核對一個日期或數字。這是人工回查，還不是向量搜尋。
+        2. 自訂一個文件能回答的問題，分別指出兩組中支持答案的chunk_id與原文，並核對一個日期或數字。這是人工回查，還不是向量搜尋；做法與範例見7-1。
         3. 測一個錯誤或邊界情況（例如overlap=size、空白文件、編碼選錯），記錄預期、實際、修正與重測。
         4. 下載「清理後文字」並保留：**第10週會把它貼進語意搜尋App**（以空白行分段）。
 
@@ -868,8 +901,35 @@ def cells_for(teacher):
 
         不列入最低要求：重寫切塊、段落策略、API、File Search、部署、第二套App。
     """)
+    example = homework_example()
+    (first, second), kept = example["split"], example["kept"]
+    count_0, count_20 = example["counts"]
+    md("homework-example", f"""
+        ### 7-1 作業第2項怎麼做：人工回查範例
+
+        「人工回查」就是自己出一題，再自己回到片段裡找答案，確認切塊之後證據還在、找得到。不用寫程式，也不呼叫API；第10週才會讓程式依問題自動找出相近的片段。
+
+        1. **出題：**從自己的文件挑一個有明確答案、最好含日期或數字的問題。
+        2. **第一組：**在App上傳文件，設定chunk_size與第一個overlap，按「處理文件」。
+        3. **找片段：**用「預覽chunk_id」逐段翻，找出答案在哪個chunk_id，抄下start、end與原文。答案被切成兩段時，兩段都記，並註明「被切開」。
+        4. **第二組：**chunk_size不變，只改overlap，重新處理後再找一次。
+        5. **核對：**把片段裡的日期或數字和原始文件比對；也可以用下載JSON的讀回格，確認`cleaned_text[start:end]`等於片段原文。
+
+        範例：用課堂的sample.txt（App選內建範例sample.txt），chunk_size={HOMEWORK_SIZE}，問題「報名截止日期是哪一天？」
+
+        | overlap | 片段數 | 支持答案的chunk_id（start–end） | 原文 | 觀察 |
+        |---|---|---|---|---|
+        | 0 | {count_0} | {first['chunk_id']}（{first['start']}–{first['end']}）＋{second['chunk_id']}（{second['start']}–{second['end']}） | chunk {first['chunk_id']}結尾「…報名截止日期為2026」；chunk {second['chunk_id']}開頭「年11月6日。每組4人…」 | 日期被切成兩半，要兩段合起來才完整 |
+        | 20 | {count_20} | {kept['chunk_id']}（{kept['start']}–{kept['end']}） | 「…{HOMEWORK_ANSWER}。每組4人…」 | 重疊讓完整日期落在同一段 |
+
+        日期核對：原文寫「{HOMEWORK_ANSWER}」，兩組片段合起來都是這個日期，清理與切塊沒有改到它。
+
+        - 文件短或chunk_size太大時，可能只有一兩段、看不出差異：把chunk_size調小（例如60～120），讓交界落在答案附近。
+        - 答案剛好沒被切開也是有效的觀察，照實記「兩組都在同一段」即可，不必硬找被切開的例子。
+        - 不要寫成「搜尋準確率提高」：這裡沒有搜尋，只是人工確認證據在哪裡。
+    """)
     md("record", """
-        ### 7-1 README實測紀錄表（自己填寫）
+        ### 7-2 README實測紀錄表（自己填寫）
 
         | 項目 | 我的實測紀錄 |
         |---|---|
@@ -877,7 +937,7 @@ def cells_for(teacher):
         | Python與套件實際版本、啟動命令 | 待填 |
         | 原文日期／數字核對 | 待填 |
         | 同份文件：size、overlap、字元數、chunk數（兩組） | 待填 |
-        | 問題／兩組支持答案的chunk_id與原文 | 待填 |
+        | 問題／兩組支持答案的chunk_id（start–end）與原文（格式見7-1範例） | 待填 |
         | 邊界例子與選擇理由 | 待填 |
         | 錯誤或邊界：輸入→預期→實際→修正→重測 | 待填 |
         | 清理後文字是否已保留給第10週 | 待填 |
@@ -956,7 +1016,7 @@ def cells_for(teacher):
         - [OpenAI Retrieval](https://developers.openai.com/api/docs/guides/retrieval)
         - [OpenAI File Search](https://developers.openai.com/api/docs/guides/tools-file-search)
     """)
-    return cells
+    return annotate_dependencies(cells, PREFIX, CELL_NOUNS, TAG_ALIASES)
 
 
 def main():

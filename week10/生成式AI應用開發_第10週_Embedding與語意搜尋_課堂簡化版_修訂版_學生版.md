@@ -9,7 +9,7 @@
 
 <!-- 第2格 | w10r-goals -->
 
-## 0. 先備、學習目標與150分鐘安排
+## 0 先備、學習目標與150分鐘安排
 
 先備：第2週list／dict、函式、sorted與lambda；第7週表單與session_state；第9週片段與來源回查。
 不需要先學NumPy矩陣、ChromaDB／FAISS，也不用再寫PDF／Word讀取程式。
@@ -34,7 +34,7 @@
 
 <!-- 第3格 | w10r-setup -->
 
-## 1. 環境、金鑰與費用
+## 1 環境、金鑰與費用
 
 - **在哪裡執行：**Notebook看概念與短例子；Streamlit App在本機VS Code終端機啟動。本機沿用Python 3.14；Colab的Python版本由平台決定。
 - **需要哪些套件：**相似度與排序只用Python內建模組；真實API與App需要openai、python-dotenv與streamlit，不需要向量資料庫。
@@ -42,6 +42,7 @@
 - **會呼叫幾次API：**需要付費的格子都有自己的開關，預設關閉。Notebook的真實示範把3段文件與4個問題合成1次請求；App每次有效提交1次。
 - **不能放什麼資料：**真實模式會把文件與問題送到OpenAI，不可放個資、機密或未授權資料。
 - timeout=60是每次網路等待的秒數，不保證整個任務在60秒內結束。
+- **程式格開頭的註解：**「先備」是要先執行的格子（包含間接需要的）；「用到前面格子定義的變數／函式」列出這格直接用到的名稱與出處，例如`rank_chunks ← 第5節A格`；若有「模組：」那一行，是前面格子匯入的套件。出現NameError時，先回去執行那一格。
 
 <!-- 第4格 | w10r-install -->
 
@@ -55,7 +56,7 @@ print("Python：", sys.version)
 
 <!-- 第5格 | w10r-units -->
 
-## 2. 從第9週接入：片段與來源
+## 2 從第9週接入：片段與來源
 
 本週資料直接沿用第9週：`sample.txt`經過清理後的文字（也就是第9週App「下載清理後文字」的內容）。
 依空白行分段，每一段當作一個片段（檢索單位），保留chunk_id與來源，之後才能回到原文核對。
@@ -92,7 +93,7 @@ for item in chunks:
 
 <!-- 第7格 | w10r-embedding -->
 
-## 3. Embedding：把文字變成可以比較的數字
+## 3 Embedding：把文字變成可以比較的數字
 
 Embedding模型把一段文字轉成一串數字（向量）。關鍵直覺是：**意思相近的句子，向量的方向也會接近**；所以即使用字不同（「在哪裡」和「哪個空間」），也可能找到同一段。
 - 文件和問題必須用**同一個模型**轉成向量，維度相同才能比較。
@@ -111,7 +112,7 @@ Embedding模型把一段文字轉成一串數字（向量）。關鍵直覺是�
 
 <!-- 第8格 | w10r-cosine -->
 
-## 4. Cosine相似度：比較方向，不是正確率
+## 4 Cosine相似度：比較方向，不是正確率
 
 cosine＝兩個向量的內積 ÷ 兩個長度的乘積，範圍約在−1到1：方向相同接近1，互相垂直是0。
 它不是機率：0.8不代表「答案80%正確」，也沒有適用所有資料的固定門檻。
@@ -155,7 +156,9 @@ def cosine_similarity(a, b):
 <!-- 第11格 | w10r-cosine-example -->
 
 ```python
-# 用途：用第3節的手寫向量算相似度；先備：cosine-fn；0次API。
+# 用途：用第3節的手寫向量算相似度；先備：第4-1節cosine函式格；0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   cosine_similarity ← 第4-1節cosine函式格
 question = [1.0, 0.1]                         # 問題：活動在哪裡？
 sentences = {
     "地點為圖書館討論室": [0.9, 0.2],
@@ -176,7 +179,7 @@ print("全零向量：", cosine_similarity([0.0, 0.0], [1.0, 0.0]))
 
 <!-- 第13格 | w10r-ranking -->
 
-## 5. A：把分數變成可回查的排名（必做，約20分鐘含修正）
+## 5 A：把分數變成可回查的排名（必做，約20分鐘含修正）
 
 | 項目 | 說明 |
 |---|---|
@@ -185,14 +188,16 @@ print("全零向量：", cosine_similarity([0.0, 0.0], [1.0, 0.0]))
 | 輸入 | chunks（list[dict]）、同順序的vectors、query_vector、top_k、min_score |
 | 回傳 | list[dict]，每筆保留原來源欄位並多一個score；沒有合格片段就回傳[] |
 | 結果保存 | 下一格自我檢查把結果存到hits_result |
-| 執行順序 | cosine-fn → A定義 → A自我檢查；App使用同一個函式 |
+| 執行順序 | 第4節cosine函式格 → A格 → A自我檢查格；App使用同一個函式 |
 
 要用return回傳，只print的話後面拿不到；不可直接在原本的dict加score。排序語法見4-1。
 
 <!-- 第14格 | w10r-a -->
 
 ```python
-# 用途：練習A排名函式（App使用同一個函式）；先備：cosine-fn；0次API。
+# 用途：練習A排名函式（App使用同一個函式）；先備：第4-1節cosine函式格；0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   cosine_similarity ← 第4-1節cosine函式格
 
 
 def rank_chunks(chunks, vectors, query_vector, top_k=3, min_score=0.0):
@@ -222,7 +227,9 @@ def rank_chunks(chunks, vectors, query_vector, top_k=3, min_score=0.0):
 <!-- 第15格 | w10r-a-check -->
 
 ```python
-# 用途：A自我檢查（固定資料，不需修改）；先備：cosine-fn、A；0次API。
+# 用途：A自我檢查（固定資料，不需修改）；先備：第4-1節cosine函式格、第5節A格；0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   rank_chunks ← 第5節A格
 hits_result = None
 try:
     check_chunks = [
@@ -253,7 +260,7 @@ A應顯示通過訊息。常見錯誤：
 
 <!-- 第17格 | w10r-offline -->
 
-## 6. 離線對照：人工關鍵字規則
+## 6 離線對照：人工關鍵字規則
 
 沒有金鑰時，可以先用demo_vector跑通流程：它把文字中出現的關鍵字分4組計數，**不是模型學出來的語意向量**。
 下一格用第2節的4個問題跑一次，請特別注意「改寫」那題：原文寫「地點」，問題寫「哪個空間」，規則沒收這些字，就會找不到。
@@ -282,7 +289,11 @@ def demo_vector(text):
 <!-- 第19格 | w10r-offline-run -->
 
 ```python
-# 用途：用離線規則跑4個問題；先備：data、cosine-fn、A、demo-fn；0次API。
+# 用途：用離線規則跑4個問題；先備：第2節資料格、第4-1節cosine函式格、第5節A格、第6節離線規則函式格；0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   chunks、questions ← 第2節資料格
+#   rank_chunks ← 第5節A格
+#   demo_vector ← 第6節離線規則函式格
 offline_results = None
 try:
     vectors = [demo_vector(item["text"]) for item in chunks]
@@ -304,7 +315,7 @@ except NotImplementedError as exc:
 
 <!-- 第21格 | w10r-real -->
 
-## 7. 真實Embeddings API：同一批文件與問題
+## 7 真實Embeddings API：同一批文件與問題
 
 下一格把第2節的3段文件與4個問題，用同一個模型一次轉成向量。RUN_REAL_EMBEDDINGS預設False（0次）；改成True後執行一次是1次請求，不會產生回答。
 1. 7段文字（3段文件＋4個問題）一次送出。
@@ -316,7 +327,9 @@ except NotImplementedError as exc:
 <!-- 第22格 | w10r-real-run -->
 
 ```python
-# 用途：同一模型一次向量化3段文件與4個問題；先備：data；預設0次API，開啟後1次。
+# 用途：同一模型一次向量化3段文件與4個問題；先備：第2節資料格；預設0次API，開啟後1次。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   chunks、questions ← 第2節資料格
 import math
 import os
 import sys
@@ -381,7 +394,10 @@ else:
 <!-- 第24格 | w10r-real-rank -->
 
 ```python
-# 用途：用已保存的真實向量排名；先備：data、cosine-fn、A、real-run；0次新API。
+# 用途：用已保存的真實向量排名；先備：第2節資料格、第4-1節cosine函式格、第5節A格、第7節真實API格；0次新API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   rank_chunks ← 第5節A格
+#   embedding_result ← 第7節真實API格
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -440,7 +456,7 @@ else:
 
 <!-- 第27格 | w10r-b -->
 
-## 8. B：同一份資料，四種問題與兩組參數（必做觀察）
+## 8 B：同一份資料，四種問題與兩組參數（必做觀察）
 
 TODO B：沿用同一份資料，不另寫第二個搜尋器。把結果填入8-1的表格：
 1. 四種問題各記一列：預期片段、實際排名與分數、原文是否支持。沒有證據就寫「不足」。
@@ -467,7 +483,7 @@ Notebook的排名重用已保存的向量、App的滑桿在本機重排，都不
 
 <!-- 第29格 | w10r-app -->
 
-## 9. 把A移入同一個Streamlit App
+## 9 把A移入同一個Streamlit App
 
 student/app.py只有A待完成：把通過自我檢查的rank_chunks貼到同名函式。cosine、離線規則與畫面都已提供。
 - App的預設文字就是第2節的第9週清理後文字；也可以貼上自己第9週App下載的cleaned_text.txt。以空白行分段，最多12段。
@@ -478,7 +494,7 @@ student/app.py只有A待完成：把通過自我檢查的rank_chunks貼到同名
 
 <!-- 第30格 | w10r-homework -->
 
-## 10. 回家作業：同一個App的搜尋證據（45～60分鐘）
+## 10 回家作業：同一個App的搜尋證據（45～60分鐘）
 
 沿用A與同一個App，換一份合法、無敏感資料的小文件（可用自己第9週作業的清理後文字），或自己寫3～6段虛構內容。題目自選，最低要求固定。
 1. 用原句、改寫、文件外三種問題各搜尋一次；至少一題找到支持來源，一題判斷證據不足。
@@ -500,7 +516,7 @@ student/app.py只有A待完成：把通過自我檢查的rank_chunks貼到同名
 
 <!-- 第31格 | w10r-bridge -->
 
-## 11. 下一週：把檢索接到RAG與File Search
+## 11 下一週：把檢索接到RAG與File Search
 
 | 路線 | 第11週怎麼做 | 本週準備了什麼 |
 |---|---|---|
@@ -513,7 +529,7 @@ student/app.py只有A待完成：把通過自我檢查的rank_chunks貼到同名
 
 <!-- 第32格 | w10r-checklist -->
 
-## 12. 完成檢核
+## 12 完成檢核
 
 - [ ] 能說明「意思相近→向量方向接近」，以及文件和問題要用同一個模型。
 - [ ] 能分清片段、向量、相似度、檢索與回答。

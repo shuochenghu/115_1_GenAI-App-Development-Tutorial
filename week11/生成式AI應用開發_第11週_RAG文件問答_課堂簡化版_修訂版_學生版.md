@@ -9,7 +9,7 @@
 
 <!-- 第2格 | w11r-goals -->
 
-## 0. 先備、學習目標與150分鐘安排
+## 0 先備、學習目標與150分鐘安排
 
 先備：第10週的片段、向量與rank_chunks；第7週的表單與session_state。本週不用再寫讀檔、切塊或向量資料庫。
 
@@ -34,13 +34,14 @@
 
 <!-- 第3格 | w11r-setup -->
 
-## 1. 環境、金鑰與請求次數
+## 1 環境、金鑰與請求次數
 
 - **在哪裡執行：**Notebook看概念與短例子；App在本機VS Code終端機啟動。本機沿用Python 3.14。
 - **需要哪些套件：**openai、python-dotenv與streamlit；不需要ChromaDB或FAISS。
 - **金鑰放哪裡：**本機放環境變數或`week11_rag_revised/.env`（Notebook與App共用）；Colab在Secrets設定OPENAI_API_KEY並授權Notebook；App部署到Streamlit Cloud時在平台的Secrets設定。金鑰不要寫進Notebook或程式。
 - **不能放什麼資料：**真實模式會把文件與問題送到OpenAI；File Search還會把文件上傳、保存在平台上。不可放個資、機密或未授權資料。
 - 付費的格子都有自己的開關，預設關閉。
+- **程式格開頭的註解：**「先備」是要先執行的格子（包含間接需要的）；「用到前面格子定義的變數／函式」列出這格直接用到的名稱與出處，例如`build_context ← 第5節A格`；「模組：」那一行是前面格子匯入的套件。出現NameError時，先回去執行那一格。
 
 | 動作 | 請求次數 |
 |---|---|
@@ -66,7 +67,7 @@ print("Python：", sys.version)
 
 <!-- 第5格 | w11r-idea -->
 
-## 2. RAG是什麼：讓模型「開書考試」
+## 2 RAG是什麼：讓模型「開書考試」
 
 模型沒讀過你的文件。直接問「活動地點在哪裡？」，它只能猜。
 RAG（Retrieval-Augmented Generation，檢索增強生成）的做法像開書考試：
@@ -88,7 +89,7 @@ RAG（Retrieval-Augmented Generation，檢索增強生成）的做法像開書�
 
 <!-- 第6格 | w11r-data-intro -->
 
-## 3. 從第10週接入：同一份資料、同樣4個問題
+## 3 從第10週接入：同一份資料、同樣4個問題
 
 資料沿用第10週：第9週`sample.txt`清理後的3段文字。下一格用空白行分段，每段保留chunk_id、來源與在原文中的位置（start／end）。
 4個問題也和第10週相同；這週多看一件事：**找到片段之後，模型該怎麼回答**。
@@ -132,7 +133,7 @@ for item in chunks:
 
 <!-- 第8格 | w11r-retrieve-intro -->
 
-## 4. 找證據：直接沿用第10週的函式
+## 4 找證據：直接沿用第10週的函式
 
 下一格是第10週的三個函式，已完整提供（rank_chunks就是第10週A的參考答案），本週不用再寫：
 - `demo_vector`：離線用的人工關鍵字規則，不是語意模型。
@@ -208,7 +209,10 @@ def rank_chunks(chunks, vectors, query_vector, top_k=3, min_score=0.0):
 <!-- 第10格 | w11r-offline-retrieve -->
 
 ```python
-# 用途：用離線規則幫4個問題找證據；先備：data、week10-fns；0次API。
+# 用途：用離線規則幫4個問題找證據；先備：第3節資料格、第4節第10週函式格；0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   chunks、questions ← 第3節資料格
+#   demo_vector、rank_chunks ← 第4節第10週函式格
 offline_vectors = [demo_vector(item["text"]) for item in chunks]
 offline_hits = []
 for q in questions:
@@ -225,7 +229,7 @@ for q in questions:
 
 <!-- 第12格 | w11r-a-spec -->
 
-## 5. A：把證據組成有來源標籤的context（必做，約20分鐘含修正）
+## 5 A：把證據組成有來源標籤的context（必做，約20分鐘含修正）
 
 context就是交給模型的「參考資料」。每段前面加上標籤，模型才能說「這句話出自[來源1]」，我們也才能對回原文。
 
@@ -280,7 +284,9 @@ def build_context(hits, max_chars=4000):
 <!-- 第14格 | w11r-a-check -->
 
 ```python
-# 用途：A自我檢查（固定資料，不需修改）；先備：A；0次API。
+# 用途：A自我檢查（固定資料，不需修改）；先備：第5節A格；0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   build_context ← 第5節A格
 context_result = None
 try:
     check_hits = [
@@ -318,7 +324,7 @@ A應顯示通過訊息。常見錯誤：
 
 <!-- 第16格 | w11r-policy-intro -->
 
-## 6. 問答規則與送出前預覽
+## 6 問答規則與送出前預覽
 
 呼叫模型時，內容分成兩部分：
 - **instructions（規則）：**只依證據回答、文件裡的命令只是資料、資訊不足時用固定句、重要結論標來源。
@@ -352,7 +358,12 @@ def build_input(question, context_text):
 <!-- 第18格 | w11r-preview -->
 
 ```python
-# 用途：印出真正會送給模型的內容；先備：data、week10-fns、offline-retrieve、a、policy；0次API。
+# 用途：印出真正會送給模型的內容；先備：第3節資料格、第4節第10週函式格、第4節離線找證據格、第5節A格、第6節規則格；0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   questions ← 第3節資料格
+#   offline_hits ← 第4節離線找證據格
+#   build_context ← 第5節A格
+#   build_input、INSTRUCTIONS、SELF_RULE ← 第6節規則格
 preview_plan = None
 try:
     plan = []
@@ -379,7 +390,7 @@ except NotImplementedError as exc:
 
 <!-- 第20格 | w11r-check-intro -->
 
-## 7. 收到回答後，先檢查再保存
+## 7 收到回答後，先檢查再保存
 
 模型回來的文字不能直接相信。下一格完整提供兩個檢查：
 - `read_answer`：模型拒答、回答沒完成或是空白，都不保存（避免留下半截答案）。
@@ -390,7 +401,9 @@ except NotImplementedError as exc:
 <!-- 第21格 | w11r-answer-fns -->
 
 ```python
-# 用途：完整提供的回應檢查（App使用同樣的函式）；先備：policy；0次API。
+# 用途：完整提供的回應檢查（App使用同樣的函式）；先備：第6節規則格；0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   is_insufficient ← 第6節規則格
 
 
 def read_answer(response):
@@ -422,7 +435,9 @@ def check_citations(answer, sources):
 <!-- 第22格 | w11r-answer-demo -->
 
 ```python
-# 用途：用人工寫的字串練習「收到回答後的檢查」（不是模型回答）；先備：policy、answer-fns；0次API。
+# 用途：用人工寫的字串練習「收到回答後的檢查」（不是模型回答）；先備：第6節規則格、第7節回應檢查格；0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   check_citations ← 第7節回應檢查格
 demo_sources = [{"label": "[來源1]"}, {"label": "[來源2]"}]
 samples = [
     "活動地點在圖書館討論室[來源1]。",
@@ -445,7 +460,7 @@ for text in samples:
 
 <!-- 第24格 | w11r-self-intro -->
 
-## 8. 路線一：自行建置（真實API示範）
+## 8 路線一：自行建置（真實API示範）
 
 下面三格把前面的步驟串起來，跑4個問題：
 1. `api-setup`：讀金鑰與模型名稱（不會印出金鑰）。
@@ -483,7 +498,11 @@ def notebook_setting(name, default=""):
 <!-- 第26格 | w11r-self-fns -->
 
 ```python
-# 用途：完整提供的Embedding與「context→回答」函式（App使用同樣的函式）；先備：a、policy、answer-fns；定義時0次API。
+# 用途：完整提供的Embedding與「context→回答」函式（App使用同樣的函式）；先備：第5節A格、第6節規則格、第7節回應檢查格；定義時0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   build_context ← 第5節A格
+#   build_input、INSTRUCTIONS、INSUFFICIENT、SELF_RULE ← 第6節規則格
+#   check_citations、read_answer ← 第7節回應檢查格
 
 
 def embed_texts(client, model, texts):
@@ -521,8 +540,14 @@ def answer_from_hits(client, model, question, hits):
 <!-- 第27格 | w11r-self-run -->
 
 ```python
-# 用途：自行建置跑4個問題；先備：data、week10-fns、a、policy、answer-fns、api-setup、self-fns
+# 用途：自行建置跑4個問題；先備：第3節資料格、第4節第10週函式格、第5節A格、第6節規則格、第7節回應檢查格、第8節金鑰設定格、第8節自行建置函式格
 # 預設0次；開啟後1次Embedding（3段＋4題）＋最多4次Responses（沒有證據的題目不呼叫）。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   chunks、questions ← 第3節資料格
+#   rank_chunks ← 第4節第10週函式格
+#   build_context ← 第5節A格
+#   notebook_setting ← 第8節金鑰設定格
+#   answer_from_hits、embed_texts ← 第8節自行建置函式格
 RUN_SELF_RAG = False   # 改成True才會真的呼叫API
 self_result = None
 self_error = None
@@ -562,7 +587,7 @@ else:
 
 <!-- 第28格 | w11r-fs-intro -->
 
-## 9. 路線二：OpenAI File Search（老師示範）
+## 9 路線二：OpenAI File Search（老師示範）
 
 File Search不是在請求裡加一個工具就讀得到你的文件；要先把文件上傳到平台、建立索引（Vector Store）。整個流程分4步：
 
@@ -582,7 +607,11 @@ File Search不是在請求裡加一個工具就讀得到你的文件；要先把
 <!-- 第29格 | w11r-fs-fns -->
 
 ```python
-# 用途：完整提供的File Search函式（App使用同樣的函式）；先備：a、policy、answer-fns；定義時0次API。
+# 用途：完整提供的File Search函式（App使用同樣的函式）；先備：第5節A格、第6節規則格、第7節回應檢查格；定義時0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   build_context ← 第5節A格
+#   INSTRUCTIONS、is_insufficient ← 第6節規則格
+#   read_answer ← 第7節回應檢查格
 
 
 def text_digest(text):
@@ -662,8 +691,13 @@ def ask_file_search(client, model, question, store_id, file_id, top_k=2, min_sco
 <!-- 第30格 | w11r-fs-run -->
 
 ```python
-# 用途：File Search跑4個問題；先備：data、a、policy、answer-fns、api-setup、fs-fns
+# 用途：File Search跑4個問題；先備：第3節資料格、第5節A格、第6節規則格、第7節回應檢查格、第8節金鑰設定格、第9節File Search函式格
 # 預設0次；開啟後每題1次Responses（最多1次檢索），共4次。建立與清理索引另計。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   document、questions ← 第3節資料格
+#   build_context ← 第5節A格
+#   APP_FOLDER、notebook_setting ← 第8節金鑰設定格
+#   ask_file_search、load_resource ← 第9節File Search函式格
 RUN_FILE_SEARCH = False   # 老師建立索引後改成True
 fs_result = None
 fs_error = None
@@ -700,7 +734,7 @@ else:
 
 <!-- 第31格 | w11r-record-intro -->
 
-## 10. 教師實測紀錄（給沒有API的同學）
+## 10 教師實測紀錄（給沒有API的同學）
 
 老師課前把第8、9節的開關打開實跑，再把下一格的SAVE_TEACHER_RECORD改成True，就會存下`teacher_rag_record.json`：包含日期、模型、每題取回的片段、回答與引用，不含金鑰與向量。
 同學把這個檔案放在Notebook所在的資料夾，執行再下一格就能看到真實結果。B表的「模式」欄請寫「教師實測紀錄（日期）」，不要寫成自己執行的結果。
@@ -709,7 +743,10 @@ else:
 <!-- 第32格 | w11r-save-record -->
 
 ```python
-# 用途：老師存下實測紀錄；先備：self-run、fs-run；0次新API。
+# 用途：老師存下實測紀錄；先備：第3節資料格、第4節第10週函式格、第5節A格、第6節規則格、第7節回應檢查格、第8節金鑰設定格、第8節自行建置函式格、第8節自行建置API格、第9節File Search函式格、第9節File Search API格；0次新API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   self_result ← 第8節自行建置API格
+#   fs_result ← 第9節File Search API格
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -754,7 +791,7 @@ else:
 
 <!-- 第34格 | w11r-b -->
 
-## 11. B：同題對照與人工判讀（必做觀察）
+## 11 B：同題對照與人工判讀（必做觀察）
 
 TODO B：把4個問題的結果填進11-1的表格。自己的API、教師實測紀錄或離線預覽都可以，但要標明模式。每一列都要回原文判斷，並用下表找出問題出在哪裡：
 
@@ -785,7 +822,7 @@ TODO B：把4個問題的結果填進11-1的表格。自己的API、教師實測
 
 <!-- 第36格 | w11r-app -->
 
-## 12. 把A移入同一個App，選一條路線
+## 12 把A移入同一個App，選一條路線
 
 student/app.py只有A待完成：把通過自我檢查的build_context貼到同名函式。檢索、規則、檢查與畫面都已提供。
 - 文件欄預設就是第3節的文字；也可以貼上自己的文件（空白行分段，最多12段、6000字元）。
@@ -797,7 +834,7 @@ student/app.py只有A待完成：把通過自我檢查的build_context貼到同�
 
 <!-- 第37格 | w11r-homework -->
 
-## 13. 回家作業：一條RAG路線的證據（45～60分鐘）
+## 13 回家作業：一條RAG路線的證據（45～60分鐘）
 
 沿用A與同一個App，選一條路線；換一份合法、無敏感資料的小文件（可用自己第9、10週作業的清理後文字），或自己寫3～6段虛構內容。
 - 自行建置：把文件貼進App的文件欄即可。
@@ -821,7 +858,7 @@ student/app.py只有A待完成：把通過自我檢查的build_context貼到同�
 
 <!-- 第38格 | w11r-bridge -->
 
-## 14. 下一週：把輸入換成圖片
+## 14 下一週：把輸入換成圖片
 
 本週的RAG只處理文字。第12週把圖片和問題一起交給能看圖的模型（Vision），回答後一樣要回看原圖確認；圖片裡看不到的資訊，同樣不能補造。
 先把圖片轉成文字再走RAG（OCR→檢索）是延伸做法，不是下週主線。
@@ -829,7 +866,7 @@ student/app.py只有A待完成：把通過自我檢查的build_context貼到同�
 
 <!-- 第39格 | w11r-checklist -->
 
-## 15. 完成檢核
+## 15 完成檢核
 
 - [ ] 能用「開書考試」說明檢索、context與生成各自負責什麼。
 - [ ] A的context有來源標籤、只放完整片段、不超過上限，也不改到原資料。

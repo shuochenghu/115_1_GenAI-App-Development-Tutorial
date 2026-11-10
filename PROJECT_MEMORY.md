@@ -2,6 +2,23 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第9～13週修訂版：程式格標註前面變數出處（2026-11-10，Claude Code依使用者要求）
+
+- 使用者要求：code cell 若用到前面的變數或函式，要在該 cell 標註清楚；先在第10週做，再「一起套用」到第9、11、12、13週。
+- 共用模組：新增 scripts/notebook_cell_notes.py。
+  - annotate_dependencies 用 symtable 找出每格用到、但沒有自己定義的名稱（函式內用到的全域名稱也算），對應到前面最後定義它的格子。
+  - 在格首列出「名稱 ← 第N節○○格」；匯入的模組另列「模組：」一行。
+  - 「先備」由內部代號改成格名，並包含間接需要的格子；requires 自動補齊。
+  - 前面找不到定義時，重建會停止。
+  - check_dependency_notes 供 verify 使用。
+- 各週套用：
+  - 五個 build 都有 CELL_NOUNS 與 TAG_ALIASES，在 cells_for 最後呼叫 annotate_dependencies。
+  - 五個 verify 都有 check_dependency_notes。
+  - 第1節（第13週為第3節）加一句說明註解讀法，五份教師導讀加「格首標註」小節。
+- 標題編號：使用者發現Colab目錄不顯示「## 2. 標題」的「2.」（推測被當成有序清單編號），「### 4-1」則正常。notebook_cell_notes.normalize_headings（在annotate_dependencies開頭執行）把主節標題改成「## 2 標題」；check_dependency_notes也檢查不再出現「N.」。五週重建與verify通過，五份導讀已補一句。
+- 第11、12週 verify 的原檔保留檢查改用 core.quotepath=false，並忽略修訂版與 _revised/ 檔案。原因：使用者已提交修訂版（commit 37fda88、7d6b825、d7c5b91），重建後修訂版顯示 M 屬正常。
+- 結果：五週 verify 全數通過；原版檔案沒有變動；目前尚未 commit 這批修改。
+
 ## 第12週課堂簡化版修訂版（2026-11-10，Claude Code依使用者要求另存）
 
 - 使用者說「接著修改第12周」，Claude依相同原則另存修訂版。原版雙版Notebook／Markdown、week12_vision_simple、導讀與build／verify_week12_simple.py未改（git確認week12只新增檔案）。
@@ -32,12 +49,23 @@
 
 ## 第10週課堂簡化版修訂版（2026-11-10，Claude Code依使用者要求另存）
 
+- 後續補充（同日，使用者要求「若某個code cell使用前面的變數或函式，要在該cell標註清楚」）：
+  - build_week10_revised.py新增cell_names（symtable分析，函式內用到的全域名稱也算）、cell_labels與annotate_dependencies。
+  - 每個程式格首行的「先備：data、A」改為看得懂的格名，例如「先備：第2節資料格、第5節A格」。
+  - 第二行起逐行列出「用到前面格子定義的變數／函式 ← 出處」，例如`chunks、questions ← 第2節資料格`。
+  - 前面找不到定義時，重建會直接停止。
+  - 第1節加一句說明註解的讀法；ranking表的執行順序改用格名。
+  - verify新增check_dependency_notes：每個用到的名稱都要標出處，出處（含間接）都要在requires與先備內。全數通過。
+  - 其他週尚未套用。
+
 - 使用者請Claude依相同原則檢視第10週課堂簡化版並「另存修訂版」。原版雙版Notebook／Markdown、week10_semantic_search_simple、導讀與build／verify_week10_simple.py未改（git無變更；原verify功能檢查全過，僅11/03舊雜湊快照因之後的記憶檔與第8、9週提交而不符）。
 - 新增：week10/…_課堂簡化版_修訂版_學生版／教師版.ipynb與.md（各32格；ID前綴w10r-）、week10/第10週_課堂簡化版修訂版_教師導讀與修訂紀錄.md、week10/week10_semantic_search_revised/（student／teacher app.py、README、sample_data/week09_cleaned_text.txt與questions.json、.env.example、Secrets範本、requirements、.gitignore），以及scripts/build_week10_revised.py、verify_week10_revised.py。
 - 修訂內容：資料改為第9週sample.txt以第9週clean_text規則清理後的3段（build直接讀week09/sample_tata/sample.txt產生），Notebook與App共用4題（原句「活動地點在哪裡？」、改寫「這場讀書交流辦在哪個空間？」、資訊未提供「參加費用是多少？」、文件外「火星的平均氣溫是多少？」）。第3節補「意思相近→向量方向接近」，手寫2維向量標明地點／費用維度並在第4節計算；離線規則4題對照（改寫題全零找不到）；新增7-2教師實測紀錄（SAVE_TEACHER_RECORD存teacher_ranking_record.json，不含向量，不隨教材附）；B表預填5列加模式欄；語法改表格；A規格表格化並加門檻assert；每格首行用途＋先備；真實API錯誤顯示訊息；.env改放App資料夾一層。cosine／rank邏輯、上限、請求次數與40／30／20／10不變；demo_vector僅加討論室、每組、網址關鍵字。
 - 驗證：.venv CPython3.14.0／Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1，verify_week10_revised.py全數通過（預設文字等於第9週修訂版clean_text結果、雙版32格、AST一致、離線結果[[0],[],[2],[]]、MockTransport 7筆合批與各失敗、教師紀錄存讀、AppTest、重建與連結）。0次真實API；未測真實排名、權限、費用、瀏覽器、Colab、Cloud與試教。未commit／push。
 
 ## 第9週課堂簡化版修訂版（2026-11-10，Claude Code依使用者要求另存）
+
+- 後續補充（同日，使用者問作業第2項「人工回查」怎麼完成後要求補進教材）：作業後新增7-1「作業第2項怎麼做：人工回查範例」（五步驟＋sample.txt、chunk_size=60的兩組對照：overlap=0時截止日期切在chunk 0、1之間，overlap=20時chunk 1（40–100）含完整日期）。範例數字由build的homework_example()以實際函式計算並assert敘述成立。紀錄表改為7-2，該列附格式提示。雙版改為50格（33文字、17程式），verify_week09_revised.py全數通過。
 
 - 使用者請Claude依第13週同樣原則檢視第9週課堂簡化版並「另存修訂版」。原版雙版Notebook／Markdown、week09_document_simple、sample_tata、導讀與build／verify_week09_simple.py全部未改（原verify通過，23份原檔SHA-256不變）。
 - 新增：week09/…_課堂簡化版_修訂版_學生版／教師版.ipynb與.md（各49格：32文字、17程式；ID前綴w09r-）、week09/第09週_課堂簡化版修訂版_教師導讀與修訂紀錄.md、week09/week09_document_revised/（student／teacher app.py、README、sample_data四範例與README、requirements、requirements-api、.gitignore），以及scripts/build_week09_revised.py、verify_week09_revised.py。四個範例檔由build從sample_tata逐位元複製。
@@ -653,6 +681,14 @@
 8. **實驗與檢查條件明確。** 比較時固定資料與規則，指出操弄因素，測試題不混入few-shot範例。區分格式／標籤合法、答案正確、契約錯誤與API／回應失敗；不預設few-shot一定改善，也不以偶然回答證明記憶或reset。說清楚程式檢查、人工核對與測試限制。
 9. **執行開關放在使用位置。** 真實API旗標與對應if操作放在同一code cell，預設False；同格標示先備、開啟方式與請求數。不同活動可獨立開啟與重跑，避免集中在環境cell宣告。互動CLI預設不啟動，先提供離線示範與檢查；新增解說不應無故增加付費呼叫。
 10. **驗證、繳交與紀錄一致。** 列明交件、實際input／輸出、測試證據與反思；交付前檢查JSON、唯一ID、輸出、語法、執行順序、版本分工及必要的成功／失敗行為。區分靜態、離線、真實API、Colab與試教，未執行項目明確標記；假回應不能充當真實成果。保留原始教材，首次修訂另存，後續在使用者指定修訂版繼續修改；同步修訂紀錄及本專案記憶，不自動改動其他週次。
+
+### Notebook 說明文字（2026-11-10使用者確認，後續生成教材沿用）
+
+第9～13週 Claude 另存修訂版的 Notebook 文字格作為說明寫法的參考。用自然、可直接口述的繁體中文，每格聚焦一個重點。
+
+- **先用短例建立直覺，再對照正式名詞與程式。** 例如用手寫二維向量說明方向相近，用「開書考試」帶出 RAG 的檢索、組資料、回答與核對四步。沿用前週的資料或情境，讓學生把注意力放在本週的新觀念。
+- **寫清楚資料怎麼走、每一步由誰做。** 多角色流程可用編號和角色表，例如第13週依序呈現模型提案、程式驗證並執行、搜尋工具查找、人工核對原文。規格或對照項目適合用表格，解釋因果則用短段落。
+- **把操作與判讀寫在相鄰格。** 執行前說清楚要先跑哪一格、修改哪裡、預期看到什麼。執行後用具體例子或填寫欄位引導比對正常、缺資料與錯誤結果。學生版的示範保留推理空間，教師版補上預期結果與講解提示。
 
 ### 程式教材簡化原則（2026-10-19使用者確認，後續設計與修改預設沿用）
 

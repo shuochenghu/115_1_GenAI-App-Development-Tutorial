@@ -5,6 +5,7 @@
 離線模式依問題取證據、引用檢查容許全形括號與不足句變化、教師實測紀錄、B紀錄表預填列、
 Notebook與App共用.env與資源紀錄、用語與排版。
 """
+from notebook_cell_notes import annotate_dependencies
 import json
 import runpy
 from pathlib import Path
@@ -525,6 +526,11 @@ REQUEST_TABLE = """
 """
 
 
+# 程式格的口語名稱；節次由前一個標題自動決定（標註見notebook_cell_notes.py）
+CELL_NOUNS = {"install": "環境格", "data": "資料格", "week10-fns": "第10週函式格", "offline-retrieve": "離線找證據格", "a": "A格", "a-check": "A自我檢查格", "policy": "規則格", "preview": "送出前預覽格", "answer-fns": "回應檢查格", "answer-demo": "檢查練習格", "api-setup": "金鑰設定格", "self-fns": "自行建置函式格", "self-run": "自行建置API格", "fs-fns": "File Search函式格", "fs-run": "File Search API格", "save-record": "存教師紀錄格", "teacher-record-run": "教師紀錄格"}
+TAG_ALIASES = {"A": "a"}   # 先備裡的舊寫法
+
+
 def cells_for(teacher):
     cells = []
 
@@ -582,6 +588,7 @@ def cells_for(teacher):
         - **金鑰放哪裡：**本機放環境變數或`week11_rag_revised/.env`（Notebook與App共用）；Colab在Secrets設定OPENAI_API_KEY並授權Notebook；App部署到Streamlit Cloud時在平台的Secrets設定。金鑰不要寫進Notebook或程式。
         - **不能放什麼資料：**真實模式會把文件與問題送到OpenAI；File Search還會把文件上傳、保存在平台上。不可放個資、機密或未授權資料。
         - 付費的格子都有自己的開關，預設關閉。
+        - **程式格開頭的註解：**「先備」是要先執行的格子（包含間接需要的）；「用到前面格子定義的變數／函式」列出這格直接用到的名稱與出處，例如`build_context ← 第5節A格`；「模組：」那一行是前面格子匯入的套件。出現NameError時，先回去執行那一格。
     """) + REQUEST_TABLE + "\ntimeout=60是每次網路等待的秒數，不是整個任務的時間上限；SDK自動重試已關閉。\n")
     code("install", """
         # 用途：顯示環境；先備：無；0次API。只有要用真實API或App時才需要安裝。
@@ -1055,7 +1062,7 @@ def cells_for(teacher):
         - [ ] 能分辨「沒找到」（檢索）與「答錯」（生成）。
         - [ ] File Search的索引有清理；模式、請求次數與未測項目都寫在README。
     """)
-    return cells
+    return annotate_dependencies(cells, PREFIX, CELL_NOUNS, TAG_ALIASES)
 
 
 def write_app(teacher):

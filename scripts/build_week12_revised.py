@@ -6,6 +6,7 @@
 抽取結果與人工基準逐欄對照、B表預填列、App收據抽取不顯示問題欄、金鑰本機.env與Cloud Secrets皆可、
 入口同層requirements、用語與排版。
 """
+from notebook_cell_notes import annotate_dependencies
 import json
 import shutil
 from pathlib import Path
@@ -295,6 +296,11 @@ REQUEST_TABLE = """
 """
 
 
+# 程式格的口語名稱；節次由前一個標題自動決定（標註見notebook_cell_notes.py）
+CELL_NOUNS = {"install": "環境格", "prepare": "匯入與圖片函式格", "preview": "範例預覽格", "a": "A格", "a-check": "A自我檢查格", "content-preview": "送出前預覽格", "answer": "規則與送出函式格", "api-setup": "金鑰設定格", "qa-run": "圖片問答格", "schema": "Schema格", "receipt-run": "收據抽取格", "save-record": "存教師紀錄格", "teacher-record-run": "教師紀錄格", "b-compare": "逐欄對照格", "transport-shapes": "送圖形狀格"}
+TAG_ALIASES = {"A": "a"}   # 先備裡的舊寫法
+
+
 def cells_for(teacher):
     cells = []
 
@@ -352,6 +358,7 @@ def cells_for(teacher):
         - **金鑰放哪裡：**本機放環境變數或`week12_vision_revised/.env`（Notebook與App共用）；Colab在Secrets設定OPENAI_API_KEY並授權Notebook；App部署到Streamlit Cloud時在平台的Secrets設定。金鑰不要寫進Notebook或程式。
         - **圖片隱私：**真實模式會把圖片傳到OpenAI。只用自己製作或有授權、沒有個資的圖片；移除拍攝資訊不會移除畫面裡的資料。
         - 付費的格子都有自己的開關，預設關閉。
+        - **程式格開頭的註解：**「先備」是要先執行的格子（包含間接需要的）；「用到前面格子定義的變數／函式」列出這格直接用到的名稱與出處，例如`prepare_image ← 第3節匯入與圖片函式格`；「模組：」那一行是前面格子匯入的套件。出現NameError時，先回去執行那一格。
     """) + REQUEST_TABLE + "\ntimeout=60是每次網路等待的秒數，不是整個任務的時間上限；SDK自動重試已關閉。\n")
     code("install", """
         # 用途：顯示環境；先備：無；0次API。只有要用真實API或App時才需要安裝。
@@ -824,7 +831,7 @@ def cells_for(teacher):
         - [ ] 日期與數字已回看原圖；不以格式通過或模型自信當作證據。
         - [ ] API預設關閉；失敗清掉舊結果，rerun與下載不會多送請求；README寫了請求次數與未測項目。
     """)
-    return cells
+    return annotate_dependencies(cells, PREFIX, CELL_NOUNS, TAG_ALIASES)
 
 
 def write_app(teacher):
