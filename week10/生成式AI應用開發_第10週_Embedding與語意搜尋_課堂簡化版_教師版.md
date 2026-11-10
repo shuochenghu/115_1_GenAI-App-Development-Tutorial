@@ -97,6 +97,10 @@ cosine是內積除以兩個長度的乘積，範圍約-1到1。同方向接近1�
 
 ### 4-1 讀程式需要的短語法
 
+在 cosine_similarity(a, b) 中，a、b 是要比較的兩個數字清單，兩者都必填且維度相同。
+搜尋時通常把片段向量放 a，問題向量放 b；互換順序會得到相同的 cosine。
+例如 cosine_similarity([1.0, 0.0], [2.0, 0.0]) 會回傳 1.0，因為兩個向量方向相同。
+
 下格cosine的zip(a,b)把兩份向量逐對取值；前面的長度檢查避免不同維度被zip悄悄截短。
 sum(x*y for x,y in zip(a,b))把每對乘積加總；這裡括號內是逐一產生數字，不需先建立完整清單。
 all(...)要求每項都通過，math.isfinite排除NaN／無限值；any(vector)判斷是否至少一個分量非零。
@@ -106,6 +110,7 @@ A的dict(item)複製單層來源資料，再加score，避免改到原chunks；r
 <!-- 第11格 | w10s-cosine-fn -->
 
 ```python
+# a、b：兩份非空、等長的有限數字清單；本週通常依序傳入片段向量與問題向量。
 def cosine_similarity(a, b):
     """完整提供：計算方向相似度；零向量回傳0，不能解讀為有語意證據。"""
     import math
@@ -124,7 +129,8 @@ def cosine_similarity(a, b):
 <!-- 第12格 | w10s-cosine-example -->
 
 ```python
-# 用途：只需上格cosine；不依賴前面的手寫向量變數，0次API。
+# 用途：以本格的手寫向量驗證 cosine，0 次 API。
+# 需要：先執行第 4-1 節定義 cosine_similarity 的程式碼格。
 print(cosine_similarity([1.0, 0.0], [2.0, 0.0]))
 print(cosine_similarity([1.0, 0.0], [0.0, 1.0]))
 print(cosine_similarity([0.0, 0.0], [1.0, 0.0]))
@@ -135,7 +141,17 @@ print(cosine_similarity([0.0, 0.0], [1.0, 0.0]))
 
 ## 5. A：把分數變成可回查的結果（必做，約20分鐘含修正）
 
-先跑cosine，再定義A。輸入chunks:list[dict]、同順序vectors、query_vector、top_k與min_score；回傳list[dict]。
+先跑 cosine，再定義 A。前三個參數必填，後兩個可省略；回傳附來源及分數的片段清單。
+
+| 參數 | 傳入什麼 | 作用 |
+|---|---|---|
+| `chunks` | 字典清單。每筆含 `chunk_id`、`source`、`text`，也可帶位置欄位 | 保留片段原文與來源供回查 |
+| `vectors` | 文件向量清單，筆數與 `chunks` 相同 | `vectors[i]` 必須由 `chunks[i]["text"]` 轉成；順序錯了會把分數配到別段 |
+| `query_vector` | 單一問題的數字向量 | 與每段文件向量比較；模型或離線規則必須相同，維度也要相同 |
+| `top_k=3` | 正整數 | 限制最多回傳幾段；合格片段較少時就只回傳那些片段 |
+| `min_score=0.0` | −1 到 1 的分數 | 先排除低於門檻的片段；分數剛好等於門檻也保留 |
+
+下方自測的位置引數 `2, 0.5` 等同於寫 `top_k=2, min_score=0.5`。假設分數是 0.9、0.4、0.2，門檻 0.5 只留下 0.9，因此最多可取 2 段、實際只回傳 1 段。
 已提供筆數、維度、參數檢查與零查詢處理；學生只補計分、來源複製、篩選、排序與取前k筆。
 每筆保留原來源欄位並新增score；不可修改原chunks。原始分數>=min_score才保留，先篩再排序，最後切片。
 沒有合格片段回傳[]；不能只print。下個固定檢查格保存hits_result，App沿用同一函式。
@@ -144,6 +160,11 @@ sorted或list.sort都可；key=lambda item:item['score']指定依分數排，rev
 <!-- 第14格 | w10s-a -->
 
 ```python
+# 需要：呼叫 rank_chunks 前，先執行第 4-1 節定義 cosine_similarity 的程式碼格。
+# chunks：帶 chunk_id、source、text 的片段字典清單；也可帶 start、end 等來源欄位。
+# vectors：文件向量清單；vectors[i] 必須來自 chunks[i]["text"]。
+# query_vector：一個問題的向量，與文件向量使用同一套轉換方式及相同維度。
+# top_k：最多回傳幾筆（正整數，預設 3）。min_score：保留分數的下限（預設 0.0，含等於）。
 def rank_chunks(chunks, vectors, query_vector, top_k=3, min_score=0.0):
     """傳入片段與同順序向量，回傳附score的來源資料；不呼叫API。"""
     if type(top_k) is not int or top_k <= 0:
@@ -175,7 +196,9 @@ def rank_chunks(chunks, vectors, query_vector, top_k=3, min_score=0.0):
 <!-- 第15格 | w10s-a-check -->
 
 ```python
-# 用途：固定資料自測A；先執行cosine與A，不呼叫API。
+# 用途：固定資料自測 A，0 次 API。
+# 需要：先執行第 4-1 節的 cosine_similarity，再執行第 5 節的 rank_chunks 定義格。
+# 學生版完成或修改 TODO A 後，請重跑 rank_chunks 定義格再自測。
 hits_result = None
 try:
     check_chunks = [
@@ -184,6 +207,7 @@ try:
         {"chunk_id": 12, "source": "測試.txt", "text": "第三段"},
     ]
     check_vectors = [[0.0, 1.0], [1.0, 0.0], [0.8, 0.6]]
+    # 前三個引數依序是測試片段、片段向量、問題向量；2 是筆數上限，0.5 是最低分數。
     hits_result = rank_chunks(check_chunks, check_vectors, [1.0, 0.0], 2, 0.5)
     assert [item["chunk_id"] for item in hits_result] == [11, 12]
     assert all(item["source"] == "測試.txt" for item in hits_result)
@@ -204,12 +228,15 @@ A應通過排序與來源檢查。若結果反向，查reverse；原文被改，
 ## 6. 離線流程示範：人工關鍵字規則向量
 
 下格完整提供4組人工關鍵字計數，只為無金鑰時驗證資料流與排序；不是訓練模型、不是語意Embedding。
+demo_vector(text) 的 text 是一段原文或一個問題字串，回傳依固定組別順序排列的 4 個計數。
+例如 demo_vector("圖書館在哪裡？") 會得到 [2.0, 0.0, 0.0, 0.0]，因為「圖書館」與「哪裡」都在第一組。
 「地點」「哪裡」因人工放同組才接近；換句話若沒中規則可能全零。不能用離線排名證明模型懂同義句。
 離線與真實向量不可混用，分數也不可跨模式直接比較。
 
 <!-- 第18格 | w10s-demo-fn -->
 
 ```python
+# text：單段原文或單個查詢字串；每次只處理一筆。
 def demo_vector(text):
     """完整提供：人工指定4組關鍵字計數，不是模型學到的語意向量。"""
     groups = [
@@ -225,6 +252,8 @@ def demo_vector(text):
 <!-- 第19格 | w10s-offline-run -->
 
 ```python
+# 需要：先執行第 4-1 節的 cosine_similarity、第 5 節的 rank_chunks，
+# 以及第 6 節的 demo_vector 定義格。學生版須完成 TODO A 並重跑定義格。
 # 用途：第9週已核對的短片段；每段作一個單位，0次API。
 chunks = [
     {"chunk_id": 0, "source": "活動說明.txt", "text": "工作坊在圖書館討論室舉行。"},
@@ -232,7 +261,7 @@ chunks = [
     {"chunk_id": 2, "source": "活動說明.txt", "text": "本次名額32人，每組4人；沒有提供費用。"},
 ]
 
-# 用途：以A串接人工規則；需要cosine、A、demo_vector，0次API。
+# 用途：以 A 串接人工規則，0 次 API。
 offline_hits = None
 try:
     vectors = [demo_vector(item["text"]) for item in chunks]
@@ -248,7 +277,17 @@ except NotImplementedError as exc:
 ## 7. 真實Embeddings API：同批文件與問題
 
 下格自帶文件與問題，可獨立執行；預設False為0次。改True有效執行1次請求，包含3段文件與3個問題，沒有回答生成API。
-input可是一批字串；response.data每筆index對應輸入位置，embedding是數字清單。依index對齊後才拆文件與問題。
+| 呼叫 | 參數 | 本例代表的意思 |
+|---|---|---|
+| `OpenAI(...)` | `api_key=key` | 用本機環境或 Colab Secrets 讀到的金鑰認證 |
+| `OpenAI(...)` | `max_retries=0` | SDK 失敗後不自動重送；第一次請求仍會送出 |
+| `OpenAI(...)` | `timeout=60.0` | 以秒設定 SDK 的網路逾時 |
+| `client.embeddings.create(...)` | `model=model` | 指定產生向量的模型；本例從設定讀取，未設定時用 `text-embedding-3-small` |
+| `client.embeddings.create(...)` | `input=inputs` | 傳入 `documents + questions`，前三筆是文件，後三筆是問題 |
+| `client.embeddings.create(...)` | `encoding_format="float"` | 回傳每筆向量的浮點數清單，方便直接計算 cosine |
+
+在 `model=model` 中，左側是 API 的參數名稱，右側是本格已設定的變數。
+`sorted(response.data, key=lambda item: item.index)` 的第一個引數是要排序的回應資料，`key` 指定用輸入位置 `index` 排序。對齊後再取各筆的 `embedding`。
 文件與問題使用同一模型。檢查筆數、順序、維度、有限數字與非零後，才保存embedding_result；失敗先清舊資料。
 資料很小，這格合批避免多次請求；實務索引可保存文件向量，新問題只算新問題，不需每次重算文件。
 官方依據：[Embeddings](https://developers.openai.com/api/docs/guides/embeddings)。
@@ -279,6 +318,8 @@ if RUN_REAL_EMBEDDINGS:
             raise ValueError("請先設定並授權OPENAI_API_KEY")
         model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
         inputs = documents + questions
+        # api_key 提供認證；max_retries=0 關閉 SDK 自動重試；timeout=60.0 設定網路逾時秒數。
+        # model 選向量模型；input 傳整批文字；encoding_format="float" 要求數字清單。
         with OpenAI(api_key=key, max_retries=0, timeout=60.0) as client:
             response = client.embeddings.create(model=model, input=inputs, encoding_format="float")
         ordered = sorted(response.data, key=lambda item: item.index)
@@ -301,13 +342,16 @@ print("已保存真實向量" if embedding_result else embedding_error or "已�
 ### 7-1 觀察三個問題的排名
 
 需cosine、A與上一格結果。沒執行真實API只提示未測，不用人工規則冒充。
+假設 count=3，vectors[:count] 取索引 0、1、2 的文件向量。offset 是目前問題在問題清單中的索引，從 0 起算；vectors[count + offset] 因此取到對應的單一問題向量。
 用同一批文件與問題做B：原句、換句話、文件外問題。先記預期證據，再看排名；沒有固定分數或必然正確順序。
 文件外問題仍可能有最高分，必須回原文判斷「找到了字串」是否真的支持問題。
 
 <!-- 第23格 | w10s-real-rank -->
 
 ```python
-# 用途：重用已保存向量做排名，0次新API；先跑cosine、A與real-run。
+# 用途：重用已保存向量做排名，0 次新 API。
+# 需要：先執行第 4-1 節的 cosine_similarity，再執行第 5 節的 rank_chunks 定義格。
+# 再執行第 7 節產生 embedding_result 的程式碼格。API 關閉或執行失敗時，本格會提示未測。
 real_rankings = None
 if embedding_result is None:
     print("尚未取得真實向量，B的真語意觀察未測")
@@ -319,7 +363,12 @@ else:
             real_chunks.append({"chunk_id": index, "source": "固定活動說明", "text": text})
         real_rankings = []
         for offset, question in enumerate(embedding_result["questions"]):
-            hits = rank_chunks(real_chunks, embedding_result["vectors"][:count], embedding_result["vectors"][count + offset], 2, 0.0)
+            hits = rank_chunks(
+                real_chunks,
+                embedding_result["vectors"][:count],  # 文件向量，順序對應 real_chunks
+                embedding_result["vectors"][count + offset],  # 目前這一題的向量
+                2, 0.0,  # top_k 與 min_score
+            )
             real_rankings.append({"query": question, "hits": hits})
             print(question, hits)
     except NotImplementedError as exc:
@@ -334,7 +383,7 @@ TODO B：沿用同一資料，不再寫第二個搜尋器；在紀錄表填實�
 1. 原句問題、同義改寫、文件外問題各一題；指出支持答案的chunk_id與原文，沒有證據就寫不足。
 2. 固定一個問題與向量，只改top_k=1與2，或固定k只改兩個門檻；一次只變一項，回查增加／消失的片段。
 3. 記一次錯誤或邊界與處理，如空問題、規則全零、門檻排光或API失敗，不能補造模型結果。
-Notebook可重用real_rankings的向量，App滑桿在本機重排，均不新增API；改文字／新問題提交才另計。
+Notebook可重用embedding_result保存的向量，App滑桿在本機重排，均不新增API；改文字／新問題提交才另計。
 沒有API權限時可先交離線功能與規則限制紀錄；真語意欄寫未測，教師另安排共看真實示範，不以假結果補齊。
 
 <!-- 第25格 | w10s-b-reference -->
@@ -357,6 +406,7 @@ Notebook可重用real_rankings的向量，App滑桿在本機重排，均不新�
 配套student/app.py只有A待完成；把已驗收的rank_chunks貼入對應位置。cosine、離線規則與UI完整提供，不重寫reader。
 文件直接貼第9週核對後文字，以空白行分成最多12段；保留start/end可回查貼入文字。這不是自動匯入第9週JSON。
 預設離線0次；勾真實模式有效提交最多1次，合批文件與問題。每次新提交都重算；改top_k／門檻只在本機重排，0次新請求。
+App 的滑桿先給標籤，再給最小值、最大值、初始值與步長。top_k 可選 1 到 5、初始為 2；min_score 可選 0.0 到 1.0、初始為 0.0、每格 0.05。滑桿值會傳給 rank_chunks，取代函式簽名中的預設值。
 表單未提交改值時顯示上次成功資料；切模式、清除或新提交失敗清舊結果。先完成A再允許付費請求。
 保存模式、模型、原文、問題與向量；下載只放來源結果，不輸出金鑰或整批向量。這是小文件教學App，不是正式大型索引。
 

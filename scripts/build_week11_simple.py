@@ -320,7 +320,10 @@ A_CHECK = DATA + "\n" + block('''
 ''')
 
 SELF_NOTEBOOK = block('''
-    # 用途：自行建置完整資料流；先跑A、規則、read_answer與retrieve_hits。
+    # 用途：自行建置的完整資料流。
+    # 需要：先執行第 3 節的 build_context 定義格，學生版須先完成 TODO A。
+    # 再執行第 4 節設定 INSTRUCTIONS、INSUFFICIENT 的規則格、第 4-1 節的 read_answer，
+    # 以及第 5 節的 retrieve_hits 定義格。
     # 預設0次；有效開啟最多1次Embedding＋1次Responses，沒證據不生成。
     import os
     RUN_SELF_RAG = False
@@ -364,7 +367,10 @@ SELF_NOTEBOOK = block('''
 ''')
 
 FS_NOTEBOOK = block('''
-    # 用途：以既有索引呼叫File Search；先完成A、規則、read_answer與file_search_evidence。
+    # 用途：以既有索引呼叫 File Search。
+    # 需要：先執行第 3 節的 build_context 定義格，學生版須先完成 TODO A。
+    # 再執行第 4 節設定 INSTRUCTIONS、INSUFFICIENT 的規則格、第 4-1 節的 read_answer，
+    # 以及第 6-1 節的 file_search_evidence 定義格。
     # 預設0次；有效開啟1次Responses＋最多1次工具呼叫，資源建立另計。
     import os
     RUN_FILE_SEARCH = False
@@ -477,7 +483,10 @@ def cells_for(teacher):
         dict(hit)複製來源，len計字元而非token；join把區塊用空白行串接。這不是重新摘要或生成答案。
     """)
     code("a", CONTEXT_TEACHER if teacher else CONTEXT_STUDENT)
-    code("a-check", A_CHECK, ["a"])
+    code("a-check", block("""
+        # 需要：先執行第 3 節定義 build_context 的程式碼格。
+        # 學生版完成或修改 TODO A 後，請重跑定義格再自測。
+    """) + A_CHECK, ["a"])
     md("a-result", """
         A自測通過後，檢查來源編號與原文是否一致。自行建置只可引用sources內的標籤，不能引用因超限而沒送入的片段。
         File Search的A預覽只供人檢查，無法控制平台內部context長度；檔案引用也不等於已證明某句話受某段支持。

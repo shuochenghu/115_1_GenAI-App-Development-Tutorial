@@ -91,6 +91,8 @@ def build_context(hits, max_chars=4000):
 <!-- 第8格 | w11s-a-check -->
 
 ```python
+# 需要：先執行第 3 節定義 build_context 的程式碼格。
+# 學生版完成或修改 TODO A 後，請重跑定義格再自測。
 # 用途：人工挑選的證據供練習A，0次API，不冒充真實檢索。
 sample_hits = [
     {"chunk_id": 0, "source": "activities.txt", "text": "工作坊在圖書館討論室舉行。"},
@@ -211,7 +213,10 @@ def retrieve_hits(client, text, query, model, top_k=2, min_score=0.2):
 <!-- 第17格 | w11s-self-run -->
 
 ```python
-# 用途：自行建置完整資料流；先跑A、規則、read_answer與retrieve_hits。
+# 用途：自行建置的完整資料流。
+# 需要：先執行第 3 節的 build_context 定義格，學生版須先完成 TODO A。
+# 再執行第 4 節設定 INSTRUCTIONS、INSUFFICIENT 的規則格、第 4-1 節的 read_answer，
+# 以及第 5 節的 retrieve_hits 定義格。
 # 預設0次；有效開啟最多1次Embedding＋1次Responses，沒證據不生成。
 import os
 RUN_SELF_RAG = False
@@ -317,7 +322,10 @@ Notebook短例只測既有ID；同文件驗證、SHA檢查與資源管理在App�
 <!-- 第22格 | w11s-fs-run -->
 
 ```python
-# 用途：以既有索引呼叫File Search；先完成A、規則、read_answer與file_search_evidence。
+# 用途：以既有索引呼叫 File Search。
+# 需要：先執行第 3 節的 build_context 定義格，學生版須先完成 TODO A。
+# 再執行第 4 節設定 INSTRUCTIONS、INSUFFICIENT 的規則格、第 4-1 節的 read_answer，
+# 以及第 6-1 節的 file_search_evidence 定義格。
 # 預設0次；有效開啟1次Responses＋最多1次工具呼叫，資源建立另計。
 import os
 RUN_FILE_SEARCH = False

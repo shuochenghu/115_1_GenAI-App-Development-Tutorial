@@ -347,7 +347,8 @@ def cells_for(teacher):
     ''')
     code("prepare", IMPORTS + "\n" + PREPARE)
     code("preview", '''
-        # 先備：prepare；沒有實際圖片就標記未測，不生成假辨識答案。
+        # 需要：先執行第 4 節定義 prepare_image 的程式碼格。
+        # 沒有實際圖片就標記未測，不生成假辨識答案。
         from pathlib import Path
         image = None
         sample_path = Path("receipt_clear.png")
@@ -370,9 +371,12 @@ def cells_for(teacher):
         已提供問題與detail檢查。完成後先跑a-check，再跑本機預覽／問答；App只需移入同一A。
         支援多圖的API不表示本週要求多圖；本版單圖讓證據與請求數較容易核對。
     ''')
-    code("a", CONTENT_TEACHER if teacher else CONTENT_STUDENT)
+    code("a", block("""
+        # 需要：呼叫 build_image_content 前，先執行第 4 節圖片準備格，取得 base64 匯入。
+    """) + (CONTENT_TEACHER if teacher else CONTENT_STUDENT), ["prepare"])
     code("a-check", '''
-        # 先備：A。用人工bytes測傳輸組裝；此資料不是可送模型的圖片。
+        # 需要：先執行第 5 節的 build_image_content 定義格。本格自行匯入 base64。
+        # 學生版完成或修改 TODO A 後，請重跑定義格再自測。人工 bytes 只用來測組裝。
         import base64
         content_result, content_error = None, None
         fake_image = {"bytes": b"classroom-fixture", "mime_type": "image/png"}
@@ -409,7 +413,9 @@ def cells_for(teacher):
     ''')
     code("answer", READ_ANSWER + "\n" + POLICY)
     code("qa-run", '''
-        # 先備：prepare、A、answer；目前目錄有receipt_clear.png。
+        # 需要：先執行第 4 節定義 prepare_image 並匯入 SDK 的程式碼格，
+        # 再執行第 5 節的 build_image_content 與第 7 節的 read_answer、INSTRUCTIONS 定義格。
+        # 學生版須完成 TODO A 並重跑定義格。開啟 API 時，將 receipt_clear.png 放在目前目錄。
         # 預設0次API；開啟後一次提交最多1次，不自動重試。
         RUN_VISION_API = False
         qa_result, qa_error = None, None
@@ -445,9 +451,13 @@ def cells_for(teacher):
         缺值須寫warnings；格式合格、日期像日期、數字能解析，都不能證明和原圖一致。
         完整提供Schema與read_receipt，不新增Schema設計作業；學生重點仍是A與B。
     ''')
-    code("schema", SCHEMA + "\n" + READ_RECEIPT)
+    code("schema", block("""
+        # 需要：呼叫 read_receipt 前，先執行第 4 節圖片準備格，取得 json 與 math 匯入。
+    """) + SCHEMA + "\n" + READ_RECEIPT, ["prepare"])
     code("receipt-run", '''
-        # 先備：prepare、A、answer、schema；不依賴前一格API結果。
+        # 需要：先執行第 4 節的 prepare_image 與匯入、第 5 節的 build_image_content，
+        # 第 7 節的 read_answer、INSTRUCTIONS、RECEIPT_PROMPT，以及第 8 節的 RECEIPT_SCHEMA、read_receipt 定義格。
+        # 學生版須完成 TODO A 並重跑定義格。本格從 receipt_clear.png 讀圖，可跳過第 7 節的問答 API 格。
         # 預設0次；開啟後同圖抽取最多1次Responses。
         RUN_RECEIPT_API = False
         receipt_result, receipt_error = None, None
