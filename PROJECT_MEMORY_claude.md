@@ -229,6 +229,14 @@
 
 ## 最近工作進度（新→舊，同步自 Codex；細節見 `PROJECT_MEMORY.md` 與各週紀錄）
 
+- 2026-11-10：Claude 另存第 12 週「圖片理解與Vision_課堂簡化版_修訂版」（雙版各 33 格、`week12_vision_revised/`、修訂版導讀、build／verify_week12_revised.py）。
+  - 內容：接第 11 週，方法比較改選讀；Notebook 自動找到範例圖；送出前預覽與共用 ask_vision；示範改為問答 2 題＋抽取 2 張；教師實測紀錄；B 逐欄對照人工基準；App 收據抽取不顯示問題欄；金鑰本機與雲端皆可。
+  - 狀態：原版未改；離線驗證通過，真實 API 0 次。
+- 2026-11-10：依使用者要求補強第 10、11、13 週修訂版金鑰讀取：App 為 Secrets 優先、再讀環境變數，啟動時載入 App 資料夾與入口資料夾的 `.env`；Notebook 先讀 App 資料夾 `.env` 再往上找；第 10、11 週入口同層加 requirements；第 11 週 File Search 無紀錄檔時改讀 Secrets／.env 三個值。三週 verify 通過。
+- 2026-11-10：Claude 依相同原則檢視並另存第 11 週「RAG文件問答_課堂簡化版_修訂版」（雙版各 39 格、`week11_rag_revised/`含 resources.py、修訂版導讀、build／verify_week11_revised.py）；資料與 4 題沿用第 10 週修訂版並重用第 10 週三函式、補 RAG 直覺與送出前預覽、離線依問題取證據、引用接受全形與不足句變化、教師實測紀錄、Notebook 與 App 共用 .env 與資源紀錄、resources.py 加 --document。原版未改；離線驗證通過，真實 API 0 次。
+- 2026-11-10：Claude 依相同原則檢視並另存第 10 週「課堂簡化版_修訂版」（雙版各 32 格、`week10_semantic_search_revised/`、修訂版導讀、build／verify_week10_revised.py）；資料改用第 9 週 sample.txt 清理後文字並統一 4 題、補語意直覺、離線改寫題對照、教師實測紀錄。原版未改；離線驗證通過，真實 API 0 次。
+- 2026-11-10：Claude 依第 13 週相同原則檢視並另存第 9 週「課堂簡化版_修訂版」（雙版各 49 格、`week09_document_revised/`、修訂版導讀、build／verify_week09_revised.py）；更新第 10／11 週銜接、統一範例檔、A 改 re.sub 小示範、新增下載清理後文字。原版未改；離線驗證通過，真實 API 0 次。詳見 `PROJECT_MEMORY.md` 同日段落。
+- 2026-11-10：Claude 檢視 Codex 第 13 週課堂簡化版並依使用者要求另存「課堂簡化版_修訂版」（雙版各 32 格、`week13_web_tools_revised/`、修訂版導讀、build／verify_week13_revised.py）；模型改填 search_query、離線協定範例、Skill 對照、來源比對放寬、用語與排版修正。原版未改；離線驗證通過，真實 API 0 次。詳見 `PROJECT_MEMORY.md` 同日段落。注意：本檔其餘段落仍停在 2026-10-13，尚未與 Codex 11 月記憶全面同步。
 - 2026-10-13：Claude 依使用者要求同步本檔與 auto-memory 至 Codex 記憶（`842f212`）；第 12 週比較文件更新提交狀態。未改動任何教材內容。
 - 2026-10-13：Codex 於 `PROJECT_MEMORY.md` 開頭建立「公司電腦接續摘要」；依使用者指示移除第 5、6 週 150 分鐘雙版的語音銜接預告（code cells 完全不變，各只改一格 Markdown），並移除學生教材中的修訂作業說明。
 - 2026-10-12：第 5、6 週 150 分鐘雙版補 Colab 操作、`API_TIMEOUT_SECONDS=60.0`、SDK 版本顯示、Secrets 授權與 runtime 重啟順序；第 5 週 `max_retries=0` 與 `%pip`。第 1 週另存語音增補修訂版（21→23 頁）。第 6 週 150 分鐘修訂版建立（64 cells）後再改善為 70 cells。

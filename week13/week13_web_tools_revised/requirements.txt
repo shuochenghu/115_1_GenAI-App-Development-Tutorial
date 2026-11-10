@@ -1,0 +1,4 @@
+# Python3.14課程直接依賴；實測環境另記於教師導讀。
+streamlit==1.63.0
+openai==2.49.0
+python-dotenv==1.2.3

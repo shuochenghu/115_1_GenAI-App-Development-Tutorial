@@ -1,0 +1,20 @@
+{
+  "kind": "人工製作測試圖片與人工基準，不是模型輸出",
+  "receipt_clear.png": {
+    "merchant": "DEMO CAFE",
+    "date": "2026-11-11",
+    "total": 300,
+    "currency": "TWD"
+  },
+  "receipt_missing_total.png": {
+    "merchant": "DEMO CAFE",
+    "date": "2026-11-11",
+    "total": null,
+    "reason": "沒有總額行；本任務禁止用品項推算"
+  },
+  "not_provided": [
+    "老闆姓名",
+    "店家電話",
+    "店家地址"
+  ]
+}

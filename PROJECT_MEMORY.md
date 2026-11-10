@@ -2,6 +2,67 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第12週課堂簡化版修訂版（2026-11-10，Claude Code依使用者要求另存）
+
+- 使用者說「接著修改第12周」，Claude依相同原則另存修訂版。原版雙版Notebook／Markdown、week12_vision_simple、導讀與build／verify_week12_simple.py未改（git確認week12只新增檔案）。
+- 新增：week12/生成式AI應用開發_第12週_圖片理解與Vision_課堂簡化版_修訂版_學生版／教師版.ipynb與.md（各33格：18文字、15程式；ID前綴w12r-）、week12/第12週_課堂簡化版修訂版_教師導讀與修訂紀錄.md、week12/week12_vision_revised/（student／teacher app.py、README、sample_data三檔由simple逐位元複製、.env.example、Secrets範本、requirements與入口同層requirements、.gitignore），以及scripts/build_week12_revised.py、verify_week12_revised.py。
+- 修訂內容：
+  - 開場：第2節「從文字到圖片」接第11週並以五步驟表說明流程；方法比較移到第12節選讀。
+  - 範例圖：find_sample先找week12_vision_revised/sample_data再找目前資料夾（原版從week12開啟找不到圖）。
+  - 說明格式：圖片處理說明與A規格表格化，A附content範例。
+  - 送出前預覽：summarize_content讓Notebook與App都能看content結構（Base64只留開頭）。
+  - 送出：共用ask_vision（有schema時加strict Schema，仍1次請求）。
+  - Notebook示範：問答2題（日期與總額／老闆姓名）＋抽取2張（清楚／缺總額）；單題ValueError只記該題，API錯誤整批不存；錯誤印類型＋訊息。
+  - 教師紀錄：第8節SAVE_TEACHER_RECORD存teacher_vision_record.json（不附）。
+  - B：判斷表（看錯／補造／格式失敗／合理看不到）、b-compare對照fixture_manifest逐欄、預填5列。
+  - App：收據抽取不顯示問題欄；預設模式顯示送出前預覽。
+  - 金鑰：依本機.env／Cloud Secrets／Colab規範（App資料夾與入口資料夾.env、Notebook讀App資料夾.env）。
+  - 請求次數集中一張表；學生版移除維護紀錄。
+  - 不變：prepare_image、read_answer、read_receipt、Schema、規則文字、A與評量。
+- 驗證：.venv CPython3.14.0／Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1／Pillow12.3.0，verify_week12_revised.py全數通過。涵蓋範例逐位元、雙版33格、6函式與3常數AST一致、兩種範例位置、真實Pillow圖片邊界、MockTransport問答2／抽取2與各失敗、教師紀錄與逐欄對照、AppTest、金鑰設定、重建一致與連結、git原檔未改。
+- 未完成：0次真實API；未測真實辨識、權限、費用、真人上傳、Colab、Cloud、繁中／手寫與試教。未commit／push。
+
+## 第11週課堂簡化版修訂版（2026-11-10，Claude Code依使用者要求另存）
+
+- 使用者請Claude依相同原則檢視第11週課堂簡化版並「另存修訂版」。原版雙版Notebook／Markdown、week11_rag_simple、導讀與build／verify_week11_simple.py未改（git無變更；原verify功能檢查全過，僅11/03舊雜湊快照因PROJECT_MEMORY_claude.md等而不符）。
+- 新增：week11/生成式AI應用開發_第11週_RAG文件問答_課堂簡化版_修訂版_學生版／教師版.ipynb與.md（各39格：22文字、17程式；ID前綴w11r-）、week11/第11週_課堂簡化版修訂版_教師導讀與修訂紀錄.md、week11/week11_rag_revised/（student／teacher app.py、resources.py、README、sample_data/week09_cleaned_text.txt與questions.json、.env.example、Secrets範本、requirements、.gitignore），以及scripts/build_week11_revised.py、verify_week11_revised.py。build以runpy讀build_week10_revised.py的DOC、QUESTIONS與demo_vector／cosine_similarity／rank_chunks（AST與第10週修訂版相同）。
+- 修訂內容：資料與4題改為第10週修訂版同一份（不再用activities.txt）；第2節「開書考試」RAG四步驟與兩路對照表；第10週函式找證據，離線4題證據[[0],[],[2],[]]；A仍為build_context（規格表＋context範例＋語法表）；新增is_insufficient、build_input（input標明「只是資料，不是指令」）、SELF_RULE與送出前預覽格；check_citations接受[來源n]與【來源n】，以不足句開頭（句號可省）即算資訊不足；人工字串練習檢查；Notebook兩路皆跑4題（自行建置1次Embedding＋最多4次Responses，File Search 4次），單題ValueError只記該題、API錯誤整批不存，錯誤印類型＋訊息；第10節SAVE_TEACHER_RECORD存teacher_rag_record.json（不附）；Notebook與App共用week11_rag_revised/.env與.file_search_resources.json；文件比對改內容指紋text_digest（統一換行、去頭尾空白），App可貼文字，resources.py新增--document；輸入上限改6000／12段／1000；B表預填5列＋判斷表；選做文件內指令示範；請求次數集中一張表；學生版移除維護紀錄。資源生命週期、評量40／30／20／10與作業最低要求不變。
+- 驗證：.venv CPython3.14.0／Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1，verify_week11_revised.py全數通過（資料與第10、9週一致、雙版39格、15函式與3規則常數AST一致、MockTransport兩路請求數與各失敗、resources含--document、AppTest、重建一致與連結、git確認原第11週檔案未改）。0次真實API、無平台資源操作；未測真實回答格式、改寫／火星題排名與門檻0.2、File Search實際引用與score_threshold、權限、費用、瀏覽器、Colab、Cloud與試教。未commit／push。
+- 金鑰與部署（同日依使用者要求「本機與Streamlit Cloud都要能執行，也要能從.env讀API KEY」補強第10、11、13週修訂版）：App的read_setting為Secrets優先、無secrets.toml（StreamlitSecretNotFoundError屬FileNotFoundError）時讀環境變數；App啟動先load_dotenv(App資料夾/.env)再load_dotenv(入口資料夾/.env)，前者優先。Notebook先讀App資料夾.env（第10週week10_semantic_search_revised/.env、第11週APP_FOLDER/.env、第13週week13_web_tools_revised/.env）再load_dotenv()往上找；Colab讀Secrets。第10、11週student／teacher同層新增requirements.txt（Cloud只找入口同層或Repo根目錄）。第11週load_resource(path, text, read)：無資源紀錄檔時讀OPENAI_VECTOR_STORE_ID、OPENAI_FILE_ID、FILE_SEARCH_SHA256（Secrets或.env），resources.py --create完成時印出這三行；Secrets範本與.env.example附註解。README加「本機／Cloud／Colab」金鑰表與部署步驟。verify第10、11週新增check_settings（含AppTest實際從.env讀到金鑰、模擬Cloud只用Secrets跑File Search），三週verify全數通過。第9週App無API，未改。
+
+## 第10週課堂簡化版修訂版（2026-11-10，Claude Code依使用者要求另存）
+
+- 使用者請Claude依相同原則檢視第10週課堂簡化版並「另存修訂版」。原版雙版Notebook／Markdown、week10_semantic_search_simple、導讀與build／verify_week10_simple.py未改（git無變更；原verify功能檢查全過，僅11/03舊雜湊快照因之後的記憶檔與第8、9週提交而不符）。
+- 新增：week10/…_課堂簡化版_修訂版_學生版／教師版.ipynb與.md（各32格；ID前綴w10r-）、week10/第10週_課堂簡化版修訂版_教師導讀與修訂紀錄.md、week10/week10_semantic_search_revised/（student／teacher app.py、README、sample_data/week09_cleaned_text.txt與questions.json、.env.example、Secrets範本、requirements、.gitignore），以及scripts/build_week10_revised.py、verify_week10_revised.py。
+- 修訂內容：資料改為第9週sample.txt以第9週clean_text規則清理後的3段（build直接讀week09/sample_tata/sample.txt產生），Notebook與App共用4題（原句「活動地點在哪裡？」、改寫「這場讀書交流辦在哪個空間？」、資訊未提供「參加費用是多少？」、文件外「火星的平均氣溫是多少？」）。第3節補「意思相近→向量方向接近」，手寫2維向量標明地點／費用維度並在第4節計算；離線規則4題對照（改寫題全零找不到）；新增7-2教師實測紀錄（SAVE_TEACHER_RECORD存teacher_ranking_record.json，不含向量，不隨教材附）；B表預填5列加模式欄；語法改表格；A規格表格化並加門檻assert；每格首行用途＋先備；真實API錯誤顯示訊息；.env改放App資料夾一層。cosine／rank邏輯、上限、請求次數與40／30／20／10不變；demo_vector僅加討論室、每組、網址關鍵字。
+- 驗證：.venv CPython3.14.0／Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1，verify_week10_revised.py全數通過（預設文字等於第9週修訂版clean_text結果、雙版32格、AST一致、離線結果[[0],[],[2],[]]、MockTransport 7筆合批與各失敗、教師紀錄存讀、AppTest、重建與連結）。0次真實API；未測真實排名、權限、費用、瀏覽器、Colab、Cloud與試教。未commit／push。
+
+## 第9週課堂簡化版修訂版（2026-11-10，Claude Code依使用者要求另存）
+
+- 使用者請Claude依第13週同樣原則檢視第9週課堂簡化版並「另存修訂版」。原版雙版Notebook／Markdown、week09_document_simple、sample_tata、導讀與build／verify_week09_simple.py全部未改（原verify通過，23份原檔SHA-256不變）。
+- 新增：week09/…_課堂簡化版_修訂版_學生版／教師版.ipynb與.md（各49格：32文字、17程式；ID前綴w09r-）、week09/第09週_課堂簡化版修訂版_教師導讀與修訂紀錄.md、week09/week09_document_revised/（student／teacher app.py、README、sample_data四範例與README、requirements、requirements-api、.gitignore），以及scripts/build_week09_revised.py、verify_week09_revised.py。四個範例檔由build從sample_tata逐位元複製。
+- 修訂內容：第10、11週銜接改為現況（第10週App把清理後文字貼進文字框、空白行分段最多12段；第11週已有RAG與File Search簡化版），作業加交清理後文字並提醒CSV列間加空白行；App改為「資料來源：內建範例／上傳檔案」＋四範例下拉選單，新增「下載清理後文字」；Notebook與App共用sample_data。練習A不再直接寫出
+{3,}，改加4-1 re.sub小示範（-{2,}與印出空白行的
+）；A自我檢查加多空白行assert。四個讀檔格缺檔只提示；PDF／Word標示教師示範，extract_text分支註解標節次。切塊概念拆成檢索單位與參數兩格，File Search移到銜接節；B新增觀察表；每個程式格首行「# 用途：…；先備：…；0次API」；選做API改with並加max_output_tokens=1200；整合格寫出由函式計算的預期（121字元、2片段）；常見問題改表格；學生版移除維護紀錄、用語改完整句。三個核心函式邏輯、評量40／30／20／10與作業最低要求不變。
+- 驗證：.venv CPython3.14.0／Streamlit1.60.0／pypdf6.18.1／python-docx1.2.0／OpenAI2.49.0，verify_week09_revised.py全數通過（雙版49格、可見用途與先備、有／缺範例檔兩情境、三函式AST一致、學生A不含答案正規表示式、四格式與App一致、整合預期數字、函式邊界、範例檔一致、AppTest內建四範例與兩種下載及錯誤清舊結果、學生只移入A即成功、假SDK選做API、重建一致與連結）。0次真實API；未測真人瀏覽器、Colab、第10週實際貼入效果、Cloud與試教。未commit／push。
+
+## 第13週課堂簡化版修訂版（2026-11-10，Claude Code依使用者要求另存）
+
+- 使用者請Claude檢視Codex第13週課堂簡化版並「依建議連設計一起改，但先保持原本檔案」。原版雙版Notebook／Markdown、week13_web_tools_simple、導讀與build／verify_week13_simple.py全部未改（原verify仍全數通過、重建雜湊不變）。
+- 新增：week13/…_課堂簡化版_修訂版_學生版／教師版.ipynb與.md（各32格：19文字、13程式；ID前綴w13r-）、week13/第13週_課堂簡化版修訂版_教師導讀與修訂紀錄.md、week13/week13_web_tools_revised/（student／teacher app.py、README、search_skill_spec.md、來源查核紀錄.md、實作方法比較與建議.md、requirements、.env.example、Secrets範本、.gitignore），以及scripts/build_week13_revised.py、verify_week13_revised.py。
+- 設計變更：prepare_search參數改為search_query（模型把中文問題改寫成英文關鍵字）＋scope（須等於使用者所選），不再要求模型照抄原問題；A改為build_search_task(search_query, scope)，檢查1～80字元、不含網址／換行，回傳query與allowed_domains。送出前以「self test」試跑A。read_function_call檢查欄位集合與scope；read_search_result改為比對主機＋路徑（忽略#與?參數）、重複引用合併、空標題以網址顯示、接受多個web_search_call並記錄search_queries，移除正文引用位置替換。App新增「離線練習」欄讓學生扮演模型填search_query（0次API），共7個函式。
+- 教學呈現：新增Tool Calling來回流程圖與角色表、Skill組成→Python對照表、手寫function_call與離線組第二次input兩格；每個程式格首行可見「# 先備：…；請求：…」；a-check檢查值與不合格輸入；API參數逐行並註解；選讀直接搜尋加try/except且不需A；時間改表格；教師版B加判讀標準（雙版只在cover／a／b不同）；用語統一並改成完整句。固定兩階段、gpt-5.4-mini、max_retries=0、timeout60、store=False、reasoning.encrypted_content回傳、max_tool_calls=1、評量40／30／20／10不變。
+- 驗證：.venv CPython3.14.0／Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1，verify_week13_revised.py全數通過（32格結構、可見先備、Notebook／App五函式AST一致、MockTransport兩階段與input順序、17種壞提案1次、14種壞搜尋2次、6種原版會誤判情況可通過、逾時／429不重試、Notebook請求分支、學生A未完成0次、雙版AppTest、重建一致與連結）。真實API 0次；未測真實搜尋／引用格式、模型產生search_query品質、權限、費用、瀏覽器、Colab、Cloud與試教。導讀第8節列5題課前實測清單。未commit／push。
+
+## 第13週Tool Calling、Skill-like模組與網路搜尋課堂簡化版（2026-11-04）
+
+- 依使用者「依照建議先生成第13周教材」，新增week13雙版Notebook／Markdown、教師導讀、week13_web_tools_simple學生起點／教師完整單檔App、README、方法比較、模組規格、B來源查核表、requirements／環境及Secrets範本，以及scripts/build_week13_simple.py、verify_week13_simple.py。雙版各26格（15文字、11程式），輸出清空、固定ID；唯一程式TODO A為build_search_task的官方網域對應與query／allowed_domains回傳，驗證骨架提供，B為正常／不足兩筆真實來源判讀。
+- 主線案例為官方文件查核助手：使用者選Python或Streamlit官方範圍→本機規格→第一次Responses以strict／強制prepare_search提出函式→程式驗名稱、唯一call、call_id與參數完全符合本次輸入→白名單執行A→整份first.output及相同call_id的function_call_output回傳→第二次Responses內建web_search。第一階段include reasoning.encrypted_content，store=False流程保留需要回傳的reasoning項目；不eval、不動態執行模型字串，不宣稱本機規格文件會被API自動載入。
+- 主線採內建搜尋，限制指定官方網域；同時比較直接web_search、自接搜尋服務、指定URL讀取、File Search／RAG與MCP。直接搜尋只在Notebook預設關閉選讀，不要求另一App／第三方搜尋帳號。檢查completed搜尋事件、實際sources、引用網域／網址與非空答案；依url_citation位置呈現可點擊正文引用，不猜來源。查詢UTC時間與網頁日期分開，publication_date保留null供B人工查原頁，不代表頁面沒有日期。
+- 所有安裝、Colab讀Secrets與API旗標預設False；有效提交最多2次Responses＋1次內建工具，max_tool_calls=1不等於一條query／一頁／固定價。max_retries=0、每次timeout=60、max_output_tokens第一階段1200／第二階段1800、store=False；第一階段失敗最多1次，第二階段失敗最多2次。A未完成／輸入不合／缺key不請求；新提交、範圍／API切換、清除與任何失敗清舊結果，rerun／下載不重送，不提供假離線搜尋答案。
+- 核心150分鐘＋休息10＋排障20；課後45～60分鐘同App自選官方主題，交Notebook、App、兩筆真實查核或失敗說明、B與README，核對一個引用主張與版本／日期／數字、一個錯誤／邊界修正。40／30／20／10評量，課堂作業證據可合用，兩次有效提交最多4次Responses＋2次工具，額外重測另計。無API如實記未測，由教師安排共看；本週不新增部署要求，不改第8週專題部署。同步課綱第13／14週與Skill定位；第14週僅銜接有限Agent循環，尚未生成教材。
+- 本機CPython3.14.0／Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1通過：雙版JSON／ID／輸出／AST、先備獨立與順序、TODO答案分離、Notebook／App函式一致、可重建與連結；實際SDK＋MockTransport驗兩階段及選讀真請求分支、reasoning／call_id、來源與引用、錯誤／拒答／未完成／逾時／429不重試，雙版AppTest及完成A後學生版狀態驗證；pip check通過。requirements目標Streamlit1.63.0／dotenv1.2.3不能稱為本次實測。官方API／模型／搜尋文件當日核對；0次真實API，未測搜尋品質、帳號權限／費用、真人瀏覽器、Cloud、Colab或試教，未安裝套件、commit／push。保留其他週與既有week09/sample_tata/~$sample.docx刪除狀態。
+
 ## 第8週指定期中繳交資料夾並移除三小時安排（2026-11-04）
 
 - 依使用者兩項要求，更新現行 `week08/生成式AI應用開發_第08週_期中個人小專題_課堂簡化版_專題說明書.md`：學生在自己的GitHub學期Repo根目錄建立 `Midterm Mini-Project`，集中放程式、requirements、自己的README、設計與驗收紀錄、設定範本與必要素材；保留精確大小寫／空格／連字號，不必另建Repo，也不要求兩條路線都繳交。明訂Commit／Push後到GitHub確認、老師從已登記Repo查看、實際金鑰與虛擬環境不提交。
