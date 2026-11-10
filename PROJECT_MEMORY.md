@@ -2,7 +2,6 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
-<<<<<<< HEAD
 ## 第12週課堂簡化版修訂版（2026-11-10，Claude Code依使用者要求另存）
 
 - 使用者說「接著修改第12周」，Claude依相同原則另存修訂版。原版雙版Notebook／Markdown、week12_vision_simple、導讀與build／verify_week12_simple.py未改（git確認week12只新增檔案）。
@@ -63,13 +62,11 @@
 - 所有安裝、Colab讀Secrets與API旗標預設False；有效提交最多2次Responses＋1次內建工具，max_tool_calls=1不等於一條query／一頁／固定價。max_retries=0、每次timeout=60、max_output_tokens第一階段1200／第二階段1800、store=False；第一階段失敗最多1次，第二階段失敗最多2次。A未完成／輸入不合／缺key不請求；新提交、範圍／API切換、清除與任何失敗清舊結果，rerun／下載不重送，不提供假離線搜尋答案。
 - 核心150分鐘＋休息10＋排障20；課後45～60分鐘同App自選官方主題，交Notebook、App、兩筆真實查核或失敗說明、B與README，核對一個引用主張與版本／日期／數字、一個錯誤／邊界修正。40／30／20／10評量，課堂作業證據可合用，兩次有效提交最多4次Responses＋2次工具，額外重測另計。無API如實記未測，由教師安排共看；本週不新增部署要求，不改第8週專題部署。同步課綱第13／14週與Skill定位；第14週僅銜接有限Agent循環，尚未生成教材。
 - 本機CPython3.14.0／Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1通過：雙版JSON／ID／輸出／AST、先備獨立與順序、TODO答案分離、Notebook／App函式一致、可重建與連結；實際SDK＋MockTransport驗兩階段及選讀真請求分支、reasoning／call_id、來源與引用、錯誤／拒答／未完成／逾時／429不重試，雙版AppTest及完成A後學生版狀態驗證；pip check通過。requirements目標Streamlit1.63.0／dotenv1.2.3不能稱為本次實測。官方API／模型／搜尋文件當日核對；0次真實API，未測搜尋品質、帳號權限／費用、真人瀏覽器、Cloud、Colab或試教，未安裝套件、commit／push。保留其他週與既有week09/sample_tata/~$sample.docx刪除狀態。
-=======
 ## 第9～12週課堂簡化版 Notebook 補上跨格依賴（2026-11-09）
 
 - 第9週雙版各補3格，標明清理自測、切塊比較與整合所需的函式定義。沿用同一規則檢查第10～12週雙版，每版分別補5、3、6格。補記第10週排序函式對 cosine 的依賴，以及第12週圖片內容組裝與收據驗證使用的前格匯入；第12週組裝自測自行匯入 base64，只須先跑A定義格。
 - 同步各週同名 Markdown、重建來源與適用的 teaching.requires。保留學生 TODO、程式邏輯、文字格、格 ID、執行輸出與 API 開關。已逐格比對 Python AST 與重建內容，並通過第10週排序與離線流程、第11週自測與雙路預設關閉流程、第12週組裝自測及 skill 格式檢查。本次未執行完整 AppTest、呼叫真實 API 或實測 Colab。
 - 通用做法寫入下方「教學程式註解與排版原則」，並同步專案內既有的 course-material-authoring skill。
->>>>>>> ffd0a71f5a2666059aa81f31f033c799b839f27d
 
 ## 第8週指定期中繳交資料夾並移除三小時安排（2026-11-04）
 
