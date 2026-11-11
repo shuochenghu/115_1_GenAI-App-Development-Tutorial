@@ -127,7 +127,7 @@ def extract_text(filename: str, data: bytes, encoding: str = "utf-8-sig") -> str
 
 
 # ---------- 3. 輸入與參數 ----------
-SAMPLE_FOLDER = Path(__file__).resolve().parents[1] / "sample_data"   # 與Notebook相同的四個範例檔
+SAMPLE_FOLDER = Path(__file__).resolve().parents[0] / "sample_data"   # 與Notebook相同的四個範例檔
 st.title("文件抽取、清理與切塊")
 st.caption("全程本機處理，0次API；按「處理文件」才讀取。請使用無敏感資料的小文件。")
 
