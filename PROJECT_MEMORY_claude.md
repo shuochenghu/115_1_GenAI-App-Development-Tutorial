@@ -2,6 +2,10 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 專案CLAUDE.md（2026-11-11，Claude Code依使用者要求建立）
+
+- Repo根目錄新增`CLAUDE.md`：Claude Code每次對話自動讀取的精簡規則，涵蓋開工先讀PROJECT_MEMORY.md與skill、Codex為主線、原版不改另存修訂版、不主動commit／push、不寫金鑰、測試清空OPENAI_*與真實API先問、付費開關預設False、第9～13週build／verify與notebook_cell_notes規則、教學程式精簡與選讀、改完更新兩份PROJECT_MEMORY。詳細內容仍以本檔為準；規則變動時同步更新CLAUDE.md。未commit。
+
 ## 與 Codex 記憶的關係（2026-10-13 同步）
 
 - **`PROJECT_MEMORY.md`（Codex 維護）是專案現況的權威來源**；本檔與其同步現況、講義製作原則與待辦，另外保存 Claude Code 產出的替代版本（`_claude`／`Claude生成`）紀錄。兩檔衝突時以 `PROJECT_MEMORY.md` 與實際檔案為準，並回頭修正本檔。
