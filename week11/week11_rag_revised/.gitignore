@@ -1,5 +1,4 @@
 .venv*/
 .env
-.file_search_resources.json
 **/.streamlit/secrets.toml
 **/__pycache__/
