@@ -2,6 +2,34 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第12週修訂版：12-1語音提問選讀（2026-11-18，Claude Code依使用者要求）
+
+- 使用者問語音要不要加入教材；Claude建議只在第12週修訂版加選讀，先寫規劃（`week12/生成式AI應用開發_第12週_語音提問選讀_教材規劃.md`），使用者再要求「照建議的四項決定開始製作」：放12-1、App不改只改README、範例音檔用Windows本機合成、課綱同步。
+- Notebook（改build／verify後重建）：第12節後新增「### 12-1 選讀：用說的問收據」，第34～39格（雙版41格：22文字、19程式），ID `voice-intro`／`voice-transcribe`／`voice-confirm-note`／`voice-confirm`／`voice-ask`／`voice-tts-note`；CELL_NOUNS加語音轉文字格、確認問題格、語音提問格。
+  - voice-transcribe：讀`sample_data/question_total.wav`，`RUN_TRANSCRIBE=False`時用離線示意文字「這張收據的日期和總鵝是多少？」（刻意同音錯字，transcript_source標「離線示意文字」）；True時`client.audio.transcriptions.create(model="gpt-transcribe", file=..., prompt="收據、日期、總額")`，不送language／languages。
+  - voice-confirm：`FIXES = {"總鵝": "總額"}`修正表，原辨識文字與確認後問題並排印出。
+  - voice-ask：`RUN_VOICE_QA=False`；True時用question_confirmed＋清楚收據，沿用build_image_content／ask_vision，1次Responses；紀錄留transcript_source、原辨識文字、確認後問題，不含音檔／圖片／金鑰。
+  - voice-tts-note：不寫語音合成程式（tts-1／tts-1-hd／gpt-4o-mini-tts 2027-01-06停用，替代只有Realtime），提醒AI生成語音揭露；Realtime列第17週自主學習。
+  - 另改：第0節加一句12-1選讀說明（排障時段示範約10分鐘，課後選做不列必交）、第1節範例音檔說明與請求次數表一列、完成檢核一項。
+- 範例音檔：`scripts/make_week12_voice_sample.ps1`（UTF-8 BOM，PowerShell 5.1才讀得懂中文）用Microsoft Hanhan Desktop（zh-TW）合成，16 kHz單聲道、4.2秒、約134 KB；build不覆蓋。`fixture_manifest.json`必須和簡化版逐位元相同，所以沒改。App資料夾`.gitignore`（由build產生）加`*.wav`、`*.m4a`、`*.mp3`與`!sample_data/question_total.wav`。
+- App：student／teacher `app.py`沒有變動；README加範例音檔列、「選讀：用說的問收據」一節、請求次數一列與音檔產生方式。教師導讀更新格數與格號表、課前準備、驗證內容、未測項目、官方依據，新增第9節。課綱第12週列加「選讀：語音提問」，進階加分加「語音輸入」。第1週語音增補版未改（仍寫「實作教材尚待製作」，語音合成部分本來就沒做）。
+- 官方查核（2026-11-18）：轉文字建議`gpt-transcribe`（約US$0.0045／分鐘，支援prompt、keywords、languages；SDK2.49.0無後兩者，要extra_body）；whisper-1、gpt-4o(-mini)-transcribe 2027-02-26停用。Responses API文件只列文字與圖片輸入；Chat Completions的gpt-audio-1.5可直接聽音檔但看不到中間文字，不採用。
+- 驗證：清空OPENAI_*後build與verify_week12_revised.py全數通過（.venv CPython3.14.0／Streamlit1.60.0／OpenAI2.49.0／httpx0.28.1／Pillow12.3.0）。新增檢查：音檔格式與大小；預設離線示意＋修正表結果；真實SDK＋MockTransport的multipart（音檔bytes、model、prompt，不送language）、缺金鑰0次、空白／429／逾時不保存；語音提問送出確認後問題、缺辨識文字不送出、429／逾時／拒答不保存；.gitignore。git diff --check通過，app.py無變動。
+- 未測：0次真實API；gpt-transcribe實際辨識（合成語音、口音、雜音、繁簡體）、usage內容、Colab上傳音檔、試教。未commit／push。
+
+## 第10～13週修訂版：App下載後回Notebook讀回（2026-11-16，Claude Code依使用者要求）
+
+- 使用者要求：第10週起的教材比照第9週「6-2 下載後重新讀回與回查」，學生跑完Streamlit App後，把App下載的檔案放回Colab／Notebook，用一個程式格檢查。之後第14～16週新教材也要有這一格。
+- 做法（只改build／verify，產物重建）：每週在App節後加一個文字格＋一個程式格（ID `download-check`／`download-run`，CELL_NOUNS「下載回查格」）。讀回格0次API、不依賴前面任何格子；沒有檔案只印提示，不用示意檔；檢查失敗用中文`AssertionError`訊息。文字格說明Colab拖進左側「檔案」窗格，以及第二份下載可能叫`xxx (1).json`要改path。作業與完成檢核各加一句「用N-1讀回」。
+  - 第10週9-1（第30～31格，雙版34格）：`search_record.json`，檢查hit的text＝source[start:end]、分數遞減、不低於min_score、筆數≤top_k。
+  - 第11週10-1（第36～37格，雙版41格）：`rag_record.json`，數context裡A放了幾個`[來源n]`，每段都要等於「[來源n] 來源／chunk_id＋換行＋取回證據原文」；回答與核對只印出（A可能因長度上限少放，只查放進去的）。
+  - 第12週10-1（第29～30格，雙版35格）：`vision_record.json`＋原圖，原圖在就重算SHA-256比對`image.original_sha256`，找不到原圖只讀紀錄；收據抽取確認五欄並逐欄印出，問答印出回答。
+  - 第13週15-1（第29～30格，雙版34格）：`web_search_record.json`，檢查模型scope＝使用者範圍、A的query＝模型search_query、引用在allowed_domains且是consulted_urls中的同一頁。第13週格首沿用「# 先備：…；0次API。…」寫法。
+- verify：四週都新增check_download_cell，把AppTest實際下載（第13週為session record）的紀錄寫入暫存資料夾執行讀回格，確認通過；再竄改（第10週start、第11週證據原文、第12週同檔名換圖、第13週scope／query／未查閱頁／假網域）必須被擋下。Notebook順序執行檢查讀回變數為None。格數斷言與輸出訊息同步更新。
+- 同步：四份修訂版教師導讀（格數、格號表、驗證內容、新增「下載後重新讀回與回查」一節）與四個App README（下載說明後加一句讀回）。App程式沒有變動。
+- 驗證：.venv CPython3.14.0／Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1（第12週Pillow12.3.0），清空OPENAI_*後四週build與verify全數通過，git diff --check通過；後面格子的格首標註未受新格影響。
+- 未測：0次真實API；未在Colab實測上傳與執行讀回格、真人瀏覽器下載檔名、Cloud與試教。未commit／push。
+
 ## 專案CLAUDE.md（2026-11-11，Claude Code依使用者要求建立）
 
 - Repo根目錄新增`CLAUDE.md`：Claude Code每次對話自動讀取的精簡規則，涵蓋開工先讀PROJECT_MEMORY.md與skill、Codex為主線、原版不改另存修訂版、不主動commit／push、不寫金鑰、測試清空OPENAI_*與真實API先問、付費開關預設False、第9～13週build／verify與notebook_cell_notes規則、教學程式精簡與選讀、改完更新兩份PROJECT_MEMORY。詳細內容仍以本檔為準；規則變動時同步更新CLAUDE.md。未commit。

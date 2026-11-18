@@ -30,6 +30,7 @@
 | 20分鐘 | 作業說明、選讀其他做法 |
 
 合計150分鐘，另留休息10分鐘與排障20分鐘。必做A與B；只做一個App。
+第12節之後的12-1「用說的問收據」是選讀：老師在排障時段示範約10分鐘，同學課後選做，不列入必交。
 
 <!-- 第3格 | w12r-setup -->
 
@@ -38,6 +39,7 @@
 - **在哪裡執行：**Notebook看概念與短例子；App在本機VS Code終端機啟動。本機沿用Python 3.14。
 - **需要哪些套件：**openai、python-dotenv、pillow；App另需streamlit。不需要OCR。
 - **範例圖片：**`week12_vision_revised/sample_data/`裡的兩張虛構英文收據。從`week12`資料夾開Notebook會自動找到；Colab請把兩張圖與`fixture_manifest.json`上傳到目前資料夾。
+- **範例音檔（12-1選讀）：**`sample_data/question_total.wav`，約4秒的電腦合成語音（Windows內建中文語音），內容是「這張收據的日期和總額是多少？」。Colab請一起上傳。
 - **金鑰放哪裡：**本機放環境變數或`week12_vision_revised/.env`（Notebook與App共用）；Colab在Secrets設定OPENAI_API_KEY並授權Notebook；App部署到Streamlit Cloud時在平台的Secrets設定。金鑰不要寫進Notebook或程式。
 - **圖片隱私：**真實模式會把圖片傳到OpenAI。只用自己製作或有授權、沒有個資的圖片；移除拍攝資訊不會移除畫面裡的資料。
 - 付費的格子都有自己的開關，預設關閉。
@@ -50,6 +52,7 @@
 | 第7節收據抽取（老師示範2張圖） | 2次Responses |
 | App本機檢查與送出前預覽 | 0次 |
 | App真實模式，每次提交 | 1次Responses |
+| 12-1選讀：語音提問 | 預設0次；兩個開關都打開時，1次語音轉文字＋1次Responses |
 
 timeout=60是每次網路等待的秒數，不是整個任務的時間上限；SDK自動重試已關閉。
 
@@ -688,12 +691,53 @@ student/app.py只有A待完成：把通過自我檢查的build_image_content貼�
 - 下載的紀錄有任務、問題、detail、模型、檔名、兩種SHA-256、結果與usage；不含原圖、Base64與金鑰。原圖請另外保留，供B核對。
 - 金鑰：本機用`.env`；部署到Streamlit Cloud時用Secrets（見README）。
 
-<!-- 第29格 | w12r-homework -->
+<!-- 第29格 | w12r-download-check -->
+
+### 10-1 下載後重新讀回與回查
+
+真實模式成功後按「下載本次紀錄」，把vision_record.json和原圖一起放到Notebook所在的資料夾（Colab：拖進左側「檔案」窗格），再執行下一格。沒有檔案時只會提示，不用示意檔假裝驗證過。
+下一格用SHA-256確認原圖就是這份紀錄送出的那張圖（用範例圖時，從sample_data複製過來），再列出結果。檔名相同、圖不同，就不能拿來核對。
+紀錄通過只代表「紀錄和圖對得上」；日期、數字與缺值是否正確，仍要自己回看原圖，寫進B表。第二份下載檔名可能變成vision_record (1).json，改下一格的path再執行。
+
+<!-- 第30格 | w12r-download-run -->
+
+```python
+# 用途：驗證自己從App下載的紀錄並對回原圖；先備：vision_record.json與原圖在Notebook所在的資料夾；0次API。
+import hashlib
+import json
+from pathlib import Path
+
+vision_record = None
+path = Path("vision_record.json")
+if path.exists():
+    vision_record = json.loads(path.read_text(encoding="utf-8"))
+    print(vision_record["task"], "｜", vision_record["model"], "｜detail =", vision_record["detail"])
+    image_path = Path(vision_record["filename"])
+    if image_path.exists():
+        digest = hashlib.sha256(image_path.read_bytes()).hexdigest()
+        assert digest == vision_record["image"]["original_sha256"], "原圖和紀錄的SHA-256不同：不是同一張圖"
+        print("原圖", image_path, "的SHA-256相同：這份紀錄就是這張圖的結果")
+    else:
+        print("找不到原圖", image_path, "：只讀紀錄；回看核對前請把原圖放進同一個資料夾")
+    if vision_record["task"] == "收據抽取":
+        result = vision_record["result"]
+        assert set(result) == {"merchant", "date", "total", "visible_text", "warnings"}, "抽取欄位不完整"
+        for field in ["merchant", "date", "total"]:
+            print(field, "：", result[field], "← 回看原圖核對")
+        print("warnings：", result["warnings"])
+    else:
+        print("回答：", vision_record["result"])
+    print("實際下載檔回查通過；內容是否正確，仍要回看原圖")
+else:
+    print("尚未找到下載檔：完成App真實模式並下載後再執行本格")
+```
+
+<!-- 第31格 | w12r-homework -->
 
 ## 11 回家作業：一張自己的圖（45～60分鐘）
 
 沿用A與同一個App，選「圖片問答」或「收據抽取」其中一項；換一張自己製作或有授權、沒有個資的圖片（問答可用截圖、海報或物件照；抽取請用虛構收據）。
-1. 正常與資訊不足各一筆，下載兩份紀錄。不足可以用缺資料的圖，或問圖上沒有的事。
+1. 正常與資訊不足各一筆，下載兩份紀錄，各用10-1和原圖讀回一次。不足可以用缺資料的圖，或問圖上沒有的事。
 2. 核對一個日期或數字，以及它在原圖上的位置。
 3. 記錄一個錯誤或邊界的預期、實際、處理與重測。
 
@@ -709,7 +753,7 @@ student/app.py只有A待完成：把通過自我檢查的build_image_content貼�
 
 推送到整學期使用的Repo；老師從既有Google表單登記的Repo查看，不另交連結。不需要部署、OCR或雲端資源。
 
-<!-- 第30格 | w12r-methods -->
+<!-- 第32格 | w12r-methods -->
 
 ## 12 選讀：其他送圖方式與處理方法
 
@@ -731,7 +775,7 @@ student/app.py只有A待完成：把通過自我檢查的build_image_content貼�
 建議先用直接Vision做出一次，再判斷是否真的需要其他做法。File Search的file_id和input_image的file_id用途不同，不能混用。
 下一格只建立網址與file_id兩種content的形狀，不下載、不上傳、不呼叫API。詳細比較見[方法比較](week12_vision_simple/實作方法比較與建議.md)。
 
-<!-- 第31格 | w12r-transport-shapes -->
+<!-- 第33格 | w12r-transport-shapes -->
 
 ```python
 # 用途：網址與file_id兩種content的形狀範本（placeholder不可送出）；先備：無；0次API。
@@ -747,7 +791,150 @@ file_content = [
 print("兩種content已建立；只是閱讀範本，0次API")
 ```
 
-<!-- 第32格 | w12r-bridge -->
+<!-- 第34格 | w12r-voice-intro -->
+
+### 12-1 選讀：用說的問收據
+
+語音只是另一種輸入方式：先把聲音轉成文字，確認無誤後，再當成第6節圖片問答的「問題」。圖片、A與送出函式都不變。
+
+| 步驟 | 誰負責 | 結果 |
+|---|---|---|
+| 1. 錄音 | 你（範例音檔，或手機錄一句） | wav、m4a、mp3等音檔，最多25 MB |
+| 2. 語音轉文字 | 語音模型`gpt-transcribe` | 辨識文字（可能有錯字） |
+| 3. 確認與修正 | 你 | 確認後的問題 |
+| 4. 圖片問答 | 第5節的`ask_vision` | 回答，一樣要回看原圖 |
+
+下一格讀範例音檔。RUN_TRANSCRIBE預設False：不送出音檔，改用一段「離線示意文字」，裡面刻意放了一個同音錯字，讓你練習下一步的確認；它不是模型的辨識結果。
+改成True後送1次語音轉文字（約4秒的音檔，費用約US$0.0003）。`prompt`放幾個這題會出現的詞，幫助模型認出專有名詞。
+想用自己的聲音：用手機錄一句關於收據的問題，放到Notebook所在的資料夾，把VOICE_FILE改成檔名。只錄自己的聲音，句子裡不要有姓名、學號或地址；錄音檔不要推送到GitHub。
+官方說明：[Speech to text](https://developers.openai.com/api/docs/guides/speech-to-text)
+
+<!-- 第35格 | w12r-voice-transcribe -->
+
+```python
+# 用途：語音轉文字（選讀）；先備：第3節匯入與圖片函式格、第5節金鑰設定格
+# 預設0次（使用離線示意文字）；RUN_TRANSCRIBE=True後1次語音轉文字，不自動重試。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   find_sample ← 第3節匯入與圖片函式格
+#   notebook_setting ← 第5節金鑰設定格
+VOICE_FILE = "question_total.wav"   # 換成自己的錄音時改這裡
+TRANSCRIBE_MODEL = "gpt-transcribe"
+OFFLINE_TRANSCRIPT = "這張收據的日期和總鵝是多少？"   # 離線示意：刻意放一個同音錯字，不是模型成果
+RUN_TRANSCRIBE = False   # 改成True才會真的送出音檔
+
+transcript_raw, transcript_source, transcribe_error = None, None, None
+voice_path = find_sample(VOICE_FILE)
+if voice_path is None:
+    transcribe_error = f"找不到{VOICE_FILE}：請確認week12_vision_revised/sample_data，或放到Notebook所在的資料夾"
+elif voice_path.stat().st_size > 25 * 1024 * 1024:
+    transcribe_error = "音檔超過25 MB：請剪短或另存較小的檔案"
+elif not RUN_TRANSCRIBE:
+    transcript_raw, transcript_source = OFFLINE_TRANSCRIPT, "離線示意文字"
+else:
+    try:
+        from openai import OpenAI
+        key = notebook_setting("OPENAI_API_KEY")
+        if not key or key == "your_api_key_here":
+            raise ValueError("請先設定OPENAI_API_KEY（.env或Colab Secrets）")
+        with OpenAI(api_key=key, max_retries=0, timeout=60) as client, voice_path.open("rb") as audio:
+            result = client.audio.transcriptions.create(
+                model=TRANSCRIBE_MODEL,
+                file=audio,                  # 開啟的音檔；SDK會連同檔名一起上傳
+                prompt="收據、日期、總額",     # 提示可能出現的詞，不是要模型回答的問題
+            )
+        if not result.text.strip():
+            raise ValueError("沒有辨識出文字：請換一段較清楚的錄音")
+        transcript_raw, transcript_source = result.text.strip(), TRANSCRIBE_MODEL
+    except Exception as exc:
+        transcribe_error = f"本次未保存：{type(exc).__name__}：{exc}"
+
+if transcript_raw:
+    print("音檔：", voice_path.name, "｜來源：", transcript_source)
+    print("辨識文字：", transcript_raw)
+else:
+    print(transcribe_error)
+```
+
+<!-- 第36格 | w12r-voice-confirm-note -->
+
+辨識文字不一定對。同音字（「總額」聽成「總鵝」）、數字、英文縮寫最容易錯；直接送出，模型就會回答一個錯的問題，而且你很難從回答發現。
+所以先看一遍再送，就像第1週把「A P」改成「API」。下一格用一張「錯 → 對」的修正表，原辨識文字和確認後的問題會並排印出，看得出改了哪裡。
+用自己的錄音時，看到錯字就在FIXES加一組；沒有錯字就保持原樣。
+
+<!-- 第37格 | w12r-voice-confirm -->
+
+```python
+# 用途：確認並修正辨識文字；先備：第3節匯入與圖片函式格、第5節金鑰設定格、第12-1節語音轉文字格；0次API。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   transcript_raw ← 第12-1節語音轉文字格
+FIXES = {"總鵝": "總額"}   # 看到辨識錯字就加一組「錯的字: 對的字」
+
+question_confirmed = None
+if transcript_raw:
+    question_confirmed = transcript_raw
+    for wrong, right in FIXES.items():
+        question_confirmed = question_confirmed.replace(wrong, right)
+    print("原辨識文字：", transcript_raw)
+    print("確認後問題：", question_confirmed)
+    if question_confirmed == transcript_raw:
+        print("沒有修改：確認句子正確再往下")
+else:
+    print("沒有辨識文字：先處理上一格的訊息")
+```
+
+<!-- 第38格 | w12r-voice-ask -->
+
+```python
+# 用途：用確認後的問題問清楚收據；先備：第3節匯入與圖片函式格、第4節A格、第5節規則與送出函式格、第5節金鑰設定格、第12-1節語音轉文字格、第12-1節確認問題格
+# 預設0次；RUN_VOICE_QA=True後1次Responses，和第6節的圖片問答相同。
+# 用到前面格子定義的變數／函式（請先執行那些格子）：
+#   find_sample、prepare_image ← 第3節匯入與圖片函式格
+#   build_image_content ← 第4節A格
+#   ask_vision ← 第5節規則與送出函式格
+#   notebook_setting ← 第5節金鑰設定格
+#   transcript_raw、transcript_source ← 第12-1節語音轉文字格
+#   question_confirmed ← 第12-1節確認問題格
+RUN_VOICE_QA = False   # 改成True才會真的呼叫API
+voice_result, voice_error = None, None
+if RUN_VOICE_QA:
+    try:
+        from openai import OpenAI
+        if not question_confirmed:
+            raise ValueError("沒有確認後的問題：先執行上面兩格")
+        path = find_sample("receipt_clear.png")
+        if path is None:
+            raise ValueError("找不到receipt_clear.png：請確認week12_vision_revised/sample_data，或在Colab上傳")
+        image = prepare_image(path.read_bytes())
+        content = build_image_content(image, question_confirmed)   # A未完成就在這裡停，0次API
+        key = notebook_setting("OPENAI_API_KEY")
+        if not key or key == "your_api_key_here":
+            raise ValueError("請先設定OPENAI_API_KEY（.env或Colab Secrets）")
+        model = notebook_setting("OPENAI_MODEL", "gpt-5.4-mini")
+        with OpenAI(api_key=key, max_retries=0, timeout=60) as client:
+            answer, usage = ask_vision(client, model, content)
+        # 原辨識文字與確認後的問題都留下，回頭查得到改過什麼；不含音檔、圖片或金鑰
+        voice_result = {"transcript_source": transcript_source, "transcript_raw": transcript_raw,
+                        "question": question_confirmed, "image_sha256": image["sent_sha256"],
+                        "model": model, "answer": answer, "usage": usage}
+    except Exception as exc:
+        voice_error = f"本次未保存：{type(exc).__name__}：{exc}"
+
+if voice_result:
+    print("問（", voice_result["transcript_source"], "→確認後）：", voice_result["question"])
+    print("答：", voice_result["answer"])
+else:
+    print(voice_error or "RUN_VOICE_QA=False：未執行圖片問答，0次API")
+```
+
+<!-- 第39格 | w12r-voice-tts-note -->
+
+判讀：回答一樣要回看原圖。若用的是離線示意文字，紀錄裡的transcript_source會寫「離線示意文字」，不能當成語音辨識的成果。
+
+**把回答唸出來（語音合成）本週不寫程式**。OpenAI的語音合成模型`tts-1`、`tts-1-hd`、`gpt-4o-mini-tts`已公告淘汰，2027-01-06停用；官方列的替代是Realtime API，需要另一套連線方式，超出本課範圍。
+這也是一個實際的例子：模型有生命週期，部署後的App要留意淘汰公告，不然到期就會壞掉。期末若想做朗讀功能，先查官方的最新做法，並清楚標示「AI生成語音」。
+即時語音對話（Realtime）可列為第17週自主學習的題目。官方說明：[Text to speech](https://developers.openai.com/api/docs/guides/text-to-speech)｜[Deprecations](https://developers.openai.com/api/docs/deprecations)
+
+<!-- 第40格 | w12r-bridge -->
 
 ## 13 下一週：Tool Calling
 
@@ -755,7 +942,7 @@ print("兩種content已建立；只是閱讀範本，0次API")
 本週沒有自動操作截圖裡的按鈕，也不產生新圖片或語音。
 官方說明：[Images and vision](https://developers.openai.com/api/docs/guides/images-vision)｜[Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)｜[GPT-5.4 mini](https://developers.openai.com/api/docs/models/gpt-5.4-mini)
 
-<!-- 第33格 | w12r-checklist -->
+<!-- 第41格 | w12r-checklist -->
 
 ## 14 完成檢核
 
@@ -765,3 +952,5 @@ print("兩種content已建立；只是閱讀範本，0次API")
 - [ ] 收據抽取看不到就填null並寫原因，不用品項推算總額。
 - [ ] 日期與數字已回看原圖；不以格式通過或模型自信當作證據。
 - [ ] API預設關閉；失敗清掉舊結果，rerun與下載不會多送請求；README寫了請求次數與未測項目。
+- [ ] 下載的紀錄和原圖已放回Notebook，用10-1讀回並確認是同一張圖。
+- [ ] （選讀）語音轉出的文字先確認、修正後才送出；離線示意文字不當成辨識成果。

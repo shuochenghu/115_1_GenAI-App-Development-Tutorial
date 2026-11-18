@@ -10,15 +10,16 @@
 3. 先用預設模式（0次API）：選一張範例並提交，看實際送出的PNG與content結構。這不是辨識結果。
 4. 有金鑰後勾選真實API，每次選一張圖、一項任務。下載正常與資訊不足兩筆紀錄，回看原圖完成B。沒有API時模型欄寫「未測」，或引用老師的實測紀錄（要標明來源）。
 
-## 範例圖片
+## 範例圖片與音檔
 
-`sample_data/`有兩張虛構英文收據與人工基準，和原簡化版逐位元相同：
+`sample_data/`有兩張虛構英文收據與人工基準（和原簡化版逐位元相同），以及12-1選讀用的範例音檔：
 
 | 檔案 | 內容 | 人工基準 |
 |---|---|---|
 | `receipt_clear.png` | DEMO CAFE、Date: 2026-11-11、三個品項、TOTAL TWD 300 | total = 300 |
 | `receipt_missing_total.png` | 同上，但沒有總額那一行 | total = null（不可用品項加總推算） |
 | `fixture_manifest.json` | 上面兩張圖的人工基準；老闆姓名、電話、地址都不在圖上 | — |
+| `question_total.wav` | 約4秒的電腦合成語音（Windows內建中文語音）：「這張收據的日期和總額是多少？」 | 只給Notebook 12-1使用，App不讀 |
 
 Notebook從`week12`資料夾開啟時會自動找到這些檔案；Colab請把它們上傳到目前資料夾。繁中、手寫與複雜版面都需要另外用合法圖片實測。
 
@@ -78,7 +79,15 @@ OPENAI_MODEL = "gpt-5.4-mini"
 - `max_retries=0`、`timeout=60`、`max_output_tokens=1200`、`store=False`。逾時不保證服務端沒處理、沒收費。
 - 新提交先清掉舊結果；切換任務、圖片來源或模式、按清除、送出失敗都會移除結果。表單裡換圖、問題或detail要重新提交。rerun、展開區塊與下載都不會再呼叫API。
 - 下載的`vision_record.json`含任務、問題、detail、模型、檔名、兩種SHA-256、尺寸、結果與usage；不含原圖、Base64或金鑰。原圖請另外保留供B核對。
+- 下載後把`vision_record.json`和原圖一起放到Notebook所在的資料夾（Colab拖進左側「檔案」窗格），執行10-1讀回格：用SHA-256確認原圖就是這份紀錄送出的圖，再列出結果。用範例圖時從`sample_data`複製過去。0次API。
 - 格式通過仍要回看原圖：visible_text也是模型寫的，可能和值一起抄錯。
+
+## 選讀：用說的問收據（Notebook 12-1）
+
+App沒有錄音功能，語音的部分只在Notebook做：範例音檔 → `gpt-transcribe`轉成文字 → 用修正表確認錯字 → 沿用同一個`ask_vision`問清楚收據。
+- 兩個開關`RUN_TRANSCRIBE`、`RUN_VOICE_QA`預設False；預設使用離線示意文字（刻意放一個同音錯字），不是辨識成果。
+- 想用自己的聲音：手機錄一句關於收據的問題（m4a、mp3、wav都可以，最多25 MB），放到Notebook所在的資料夾，改`VOICE_FILE`。只錄自己的聲音，不放個資。本資料夾的`.gitignore`已排除wav／m4a／mp3，避免把錄音推送到GitHub（範例音檔除外）。
+- 把回答唸出來（語音合成）不寫程式：OpenAI現有的語音合成模型將於2027-01-06停用，詳見Notebook 12-1與教師導讀。
 
 ## 請求次數
 
@@ -88,6 +97,7 @@ OPENAI_MODEL = "gpt-5.4-mini"
 | App真實模式，每次提交 | 1次Responses |
 | Notebook第6節圖片問答（老師示範2題） | 2次 |
 | Notebook第7節收據抽取（老師示範2張圖） | 2次 |
+| Notebook 12-1選讀（語音轉文字＋圖片問答） | 預設0次；兩個開關都打開時共2次 |
 
 學生正常與不足兩筆共2次（課堂B與作業可共用）；detail選做加1次，額外重跑另記。
 
@@ -111,6 +121,6 @@ python -X utf8 scripts/build_week12_revised.py
 python -X utf8 scripts/verify_week12_revised.py
 ```
 
-重建會產生雙版Notebook／Markdown、雙版App、設定範本，並從`week12_vision_simple/sample_data`逐位元複製範例圖；不覆蓋本README與教師導讀，也不呼叫API。已測與未測範圍見[教師導讀](../第12週_課堂簡化版修訂版_教師導讀與修訂紀錄.md)；其他送圖方式的詳細比較見原版[方法比較](../week12_vision_simple/實作方法比較與建議.md)。
+重建會產生雙版Notebook／Markdown、雙版App、設定範本，並從`week12_vision_simple/sample_data`逐位元複製範例圖；不覆蓋本README與教師導讀，也不呼叫API。範例音檔由`scripts/make_week12_voice_sample.ps1`另外產生一次，build不會覆蓋。已測與未測範圍見[教師導讀](../第12週_課堂簡化版修訂版_教師導讀與修訂紀錄.md)；其他送圖方式的詳細比較見原版[方法比較](../week12_vision_simple/實作方法比較與建議.md)。
 
 官方說明：[Images and vision](https://developers.openai.com/api/docs/guides/images-vision)、[Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)、[GPT-5.4 mini](https://developers.openai.com/api/docs/models/gpt-5.4-mini)。

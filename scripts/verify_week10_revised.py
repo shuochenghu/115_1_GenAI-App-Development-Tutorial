@@ -78,7 +78,7 @@ def check_notebooks():
             assert s == t, s["id"]
     for teacher, book in zip([False, True], books):
         cells = book["cells"]
-        assert len(cells) == 32 and len(cells) == len({c["id"] for c in cells})
+        assert len(cells) == 34 and len(cells) == len({c["id"] for c in cells})
         by_id = {c["id"].removeprefix(PREFIX): c for c in cells}
         namespace = {}
         with tempfile.TemporaryDirectory(dir=TEMP) as folder:
@@ -108,6 +108,7 @@ def check_notebooks():
                 os.chdir(old)
         assert namespace["embedding_result"] is None and namespace["embedding_error"] is None
         assert namespace["teacher_record"] is None and namespace["real_rankings"] is None
+        assert namespace["search_record"] is None   # 沒有下載檔時只提示
         assert (namespace["hits_result"] is not None) == teacher
         assert namespace["document"] == BUILD["DOC"] and len(namespace["chunks"]) == 3
         if teacher:
@@ -253,6 +254,34 @@ def check_notebook_api():
     print("Notebook API：真實SDK＋MockTransport驗證0／1次、合批7筆、index對齊、回應檢查、缺key、429／逾時無重試、教師紀錄存讀與不含向量通過")
 
 
+def check_download_cell(record):
+    """把App實際下載的紀錄放進暫存資料夾，執行9-1讀回格；竄改後的紀錄必須被擋下。"""
+    code = next("".join(c["source"]) for c in read_book(False)["cells"] if c["id"] == PREFIX + "download-run")
+    with tempfile.TemporaryDirectory(dir=TEMP) as folder:
+        old = Path.cwd()
+        os.chdir(folder)
+        try:
+            path = Path("search_record.json")
+            path.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
+            ns = {}
+            with redirect_stdout(StringIO()) as out:
+                exec(code, ns)
+            assert ns["search_record"] == record and "回查通過" in out.getvalue()
+            if record["hits"]:
+                bad = json.loads(json.dumps(record))
+                bad["hits"][0]["start"] += 1
+                path.write_text(json.dumps(bad, ensure_ascii=False), encoding="utf-8")
+                try:
+                    with redirect_stdout(StringIO()):
+                        exec(code, {})
+                except AssertionError:
+                    pass
+                else:
+                    raise AssertionError("竄改位置的紀錄沒有被擋下")
+        finally:
+            os.chdir(old)
+
+
 def check_apps():
     backend = Backend()
     downloads = []
@@ -274,6 +303,7 @@ def check_apps():
         assert teacher.text_area[0].value.strip() == BUILD["DOC"]
         submit(teacher)
         assert downloads and downloads[-1]["mode"] == "離線規則示範" and not backend.calls
+        check_download_cell(downloads[-1])
         assert [h["chunk_id"] for h in downloads[-1]["hits"]][:1] == [0]
         record = teacher.session_state["record"]
         assert len(record["chunks"]) == 3
@@ -298,6 +328,7 @@ def check_apps():
         teacher.run()
         assert len(backend.calls) == 1 and teacher.session_state["record"] == saved
         assert "vectors" not in downloads[-1] and "api_key" not in downloads[-1]
+        check_download_cell(downloads[-1])
         for mode in ["missing", "dimension", "zero", "bad-number", "429", "timeout"]:
             backend.mode = "good"
             submit(teacher)
@@ -341,7 +372,7 @@ def check_apps():
             assert downloads and not at.error
         finally:
             path.unlink(missing_ok=True)
-    print("AppTest：雙版0請求啟動、預設文字＝第9週清理後文字、A阻擋與移入成功、離線改寫題找不到、模擬真實、滑桿與rerun不重送、來源位置、超限與API失敗清舊結果通過")
+    print("AppTest：雙版0請求啟動、預設文字＝第9週清理後文字、A阻擋與移入成功、離線改寫題找不到、模擬真實、滑桿與rerun不重送、來源位置、超限與API失敗清舊結果、下載紀錄經9-1讀回通過與竄改被擋通過")
 
 
 def check_settings():

@@ -347,7 +347,7 @@ SAMPLE_ARGUMENTS = '{"search_query": "requirements.txt Community Cloud dependenc
 
 
 # 程式格的口語名稱；節次由前一個標題自動決定（標註見notebook_cell_notes.py）
-CELL_NOUNS = {"install": "安裝格", "colab": "Colab金鑰格", "policy": "規格資料格", "sample-call": "手寫function_call格", "a": "A格", "a-check": "A自我檢查格", "call-reader": "提案檢查函式格", "roundtrip": "離線來回格", "first": "第一階段API格", "url": "網址函式格", "reader": "搜尋結果檢查格", "second": "第二階段API格", "direct-code": "選讀直接搜尋格"}
+CELL_NOUNS = {"install": "安裝格", "colab": "Colab金鑰格", "policy": "規格資料格", "sample-call": "手寫function_call格", "a": "A格", "a-check": "A自我檢查格", "call-reader": "提案檢查函式格", "roundtrip": "離線來回格", "first": "第一階段API格", "url": "網址函式格", "reader": "搜尋結果檢查格", "second": "第二階段API格", "direct-code": "選讀直接搜尋格", "download-run": "下載回查格"}
 TAG_ALIASES = {"A": "a"}   # 先備裡的舊寫法
 
 
@@ -748,6 +748,41 @@ def cells_for(teacher):
         - 切換範圍、切換API、按清除或新提交失敗，都會清掉舊結果；表單改字後要再按提交才會請求；一般rerun與下載不會重新呼叫API。
         - 下載紀錄包含問題、範圍、模型提出的參數、A的結果、引用、實際搜尋字詞、查詢UTC時間與usage，不含金鑰。publication_date保留null，由B人工填網頁日期。
     ''')
+    md("download-check", '''
+        ### 15-1 下載後重新讀回與回查
+
+        API啟用並成功後按「下載本筆查核紀錄」，把web_search_record.json放到Notebook所在的資料夾（Colab：拖進左側「檔案」窗格），再執行下一格。沒有檔案時只會提示，不用示意檔假裝驗證過。
+        下一格沿著來回順序檢查：模型提出的scope等於你選的範圍、A的query就是模型提出的search_query、每個引用都在指定官方網域，而且是本次真的查閱過的頁面。
+        通過只代表「這筆紀錄前後接得起來」；引用是否支持答案、網頁日期是什麼，仍要點開原文寫進B表。第二筆下載檔名可能變成web_search_record (1).json，改下一格的path再執行。
+    ''')
+    code("download-run", block('''
+        # 先備：web_search_record.json在Notebook所在的資料夾；0次API。驗證自己從App下載的查核紀錄。
+        import json
+        from pathlib import Path
+        from urllib.parse import urlsplit
+
+        web_record = None
+        path = Path("web_search_record.json")
+        if path.exists():
+            web_record = json.loads(path.read_text(encoding="utf-8"))
+            arguments, task = web_record["function_call"]["arguments"], web_record["task"]
+            print("問題：", web_record["question"], "｜範圍：", web_record["scope"], "｜模型：", web_record["model"])
+            print("模型提出：", arguments, "→ A的結果：", task)
+            assert arguments["scope"] == web_record["scope"], "模型提出的範圍和你選的不同"
+            assert task["query"] == arguments["search_query"].strip(), "A的query不是模型提出的search_query"
+            consulted = {(urlsplit(url).hostname or "").lower() + urlsplit(url).path.rstrip("/")
+                         for url in web_record["consulted_urls"]}
+            for number, source in enumerate(web_record["citations"], 1):
+                part = urlsplit(source["url"])
+                host = (part.hostname or "").lower()
+                assert any(host == d or host.endswith("." + d) for d in task["allowed_domains"]), f"來源{number}不在指定官方網域"
+                assert host + part.path.rstrip("/") in consulted, f"來源{number}不是本次查閱過的頁面"
+                print(f"來源{number}：{source['title']}｜{source['url']}")
+            print("查詢UTC時間：", web_record["queried_at_utc"], "（不是網頁日期；請點開來源，在B記錄網頁日期）")
+            print("實際下載檔回查通過，引用數：", len(web_record["citations"]))
+        else:
+            print("尚未找到下載檔：完成App的API查核並下載後再執行本格")
+    '''))
     md("direct", '''
         ## 16. 選讀：只需要搜尋時，可以省掉第一階段
 
@@ -798,7 +833,7 @@ def cells_for(teacher):
         ## 17. 課後作業與驗收
 
         課後45～60分鐘，沿用同一個App，從Python或Streamlit選一個方向，自訂兩個不含個資或機密的問題（一正常、一可能不足）。
-        繳交：學生Notebook、App、兩筆查核紀錄（失敗也照實記錄）、[B紀錄表](week13_web_tools_revised/來源查核紀錄.md)與自己的README。
+        繳交：學生Notebook、App、兩筆查核紀錄（成功的用15-1讀回；失敗也照實記錄）、[B紀錄表](week13_web_tools_revised/來源查核紀錄.md)與自己的README。
         至少完成：
         - 核對一個版本、日期或數字。
         - 核對一個引用是否真的支持答案。
@@ -822,6 +857,7 @@ def cells_for(teacher):
         - [ ] 我知道arguments是JSON字串，call_id用來對應函式結果。
         - [ ] 我知道「有引用」不等於「答案正確」，查詢時間也不等於網頁日期。
         - [ ] Notebook與App的A相同；API預設關閉，失敗不保留舊結果，沒有隱藏重試。
+        - [ ] 下載的查核紀錄已放回Notebook，用15-1讀回並通過。
 
         第14週會沿用本週的工具，讓模型在有限次數內自己選工具、觀察結果並決定何時停止；本週固定兩階段，不寫無上限的while迴圈。
         官方文件：[Function calling](https://developers.openai.com/api/docs/guides/function-calling)、[Web search](https://developers.openai.com/api/docs/guides/tools-web-search)、[模型頁](https://developers.openai.com/api/docs/models/gpt-5.4-mini)。

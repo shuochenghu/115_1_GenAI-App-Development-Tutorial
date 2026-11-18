@@ -63,7 +63,7 @@ def check_books():
         path = next(WEEK.glob(BOOK_GLOB.format(ending)))
         b = json.loads(path.read_text(encoding="utf-8"))
         books.append(b)
-        assert len(b["cells"]) == len({c["id"] for c in b["cells"]}) == 32
+        assert len(b["cells"]) == len({c["id"] for c in b["cells"]}) == 34
         tags = {c["id"].removeprefix(PREFIX): c for c in b["cells"]}
         namespace = {}
         reading = path.with_suffix(".md").read_text(encoding="utf-8")
@@ -87,6 +87,7 @@ def check_books():
             with redirect_stdout(StringIO()):
                 exec(source, fresh)
         assert namespace["first"] is namespace["search_result"] is namespace["direct_result"] is None
+        assert namespace["web_record"] is None   # 沒有下載檔時只提示
         assert namespace["a_checked"] == (ending == "教師版")
         assert (namespace["demo_followup"] is not None) == (ending == "教師版")
         if ending == "教師版":
@@ -113,7 +114,7 @@ def check_books():
         if role == "teacher":
             assert "raise NotImplementedError" not in source
     assert trees[0] == trees[1]
-    print("PASS Notebook配對／32格／ID／清空輸出／可見先備／AST／先備獨立與順序／Markdown與App對齊")
+    print("PASS Notebook配對／34格／ID／清空輸出／可見先備／AST／先備獨立與順序／Markdown與App對齊")
 
 
 def first_body(query=QUERY, scope="Streamlit"):
@@ -308,6 +309,38 @@ def check_live_branches_offline(state, calls, factory):
     print("PASS Notebook開啟兩階段／前次成功後失敗清空／學生A未完成0次／選讀直接搜尋，各請求均為HTTP模擬")
 
 
+def check_download_cell(record):
+    """App成功後的紀錄（與下載內容相同）放進暫存資料夾，執行15-1讀回格；改掉來回中的任一環必須被擋下。"""
+    book = json.loads(next(WEEK.glob(BOOK_GLOB.format("學生版"))).read_text(encoding="utf-8"))
+    code = next("".join(c["source"]) for c in book["cells"] if c["id"] == PREFIX + "download-run")
+    with tempfile.TemporaryDirectory(dir=TEMP) as folder:
+        old = Path.cwd()
+        os.chdir(folder)
+        try:
+            path = Path("web_search_record.json")
+            path.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
+            ns, out = {}, StringIO()
+            with redirect_stdout(out):
+                exec(code, ns)
+            assert ns["web_record"] == record and "回查通過" in out.getvalue()
+            tampers = [lambda r: r["function_call"]["arguments"].update(scope="Python"),
+                       lambda r: r["task"].update(query="other words"),
+                       lambda r: r["citations"][0].update(url="https://docs.streamlit.io/not-consulted"),
+                       lambda r: r["citations"][0].update(url="https://docs.streamlit.io.evil.example/x")]
+            for tamper in tampers:
+                bad = copy.deepcopy(record)
+                tamper(bad)
+                path.write_text(json.dumps(bad, ensure_ascii=False), encoding="utf-8")
+                try:
+                    with redirect_stdout(StringIO()):
+                        exec(code, {})
+                except AssertionError:
+                    continue
+                raise AssertionError("改過的查核紀錄沒有被擋下")
+        finally:
+            os.chdir(old)
+
+
 def check_apps(state, calls, factory):
     def clean(at):
         assert not at.exception, [x.message for x in at.exception]
@@ -365,6 +398,7 @@ def check_apps(state, calls, factory):
                 assert len(calls) == 2 and record(at)["question"] == TOPIC
                 assert record(at)["function_call"]["arguments"] == {"search_query": QUERY, "scope": "Streamlit"}
                 assert record(at)["search_queries"] == [QUERY]
+                check_download_cell(json.loads(json.dumps(record(at), ensure_ascii=False)))
                 before = len(calls)
                 at.run()
                 assert len(calls) == before and record(at) is not None
@@ -393,7 +427,7 @@ def check_apps(state, calls, factory):
                 assert record(at) is None
                 del os.environ["OPENAI_API_KEY"]
                 del os.environ["OPENAI_MODEL"]
-    print("PASS 雙版AppTest零請求啟動／未完成A／離線練習／缺key／成功／錯誤清舊結果／模式與清除")
+    print("PASS 雙版AppTest零請求啟動／未完成A／離線練習／缺key／成功／錯誤清舊結果／模式與清除／下載紀錄經15-1讀回與竄改被擋")
 
 
 def check_rebuild_and_links():

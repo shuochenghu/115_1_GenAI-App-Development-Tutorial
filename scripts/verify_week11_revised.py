@@ -91,7 +91,7 @@ def check_notebooks():
             assert s == t, s["id"]
     for teacher, book in zip([False, True], books):
         cells = book["cells"]
-        assert len(cells) == 39 and len(cells) == len({c["id"] for c in cells})
+        assert len(cells) == 41 and len(cells) == len({c["id"] for c in cells})
         by_id = {c["id"].removeprefix(PREFIX): c for c in cells}
         namespace, printed = {}, {}
         with tempfile.TemporaryDirectory(dir=TEMP) as folder:
@@ -116,7 +116,7 @@ def check_notebooks():
                     run_quiet(text, fresh)
             finally:
                 os.chdir(old)
-        for name in ["real_evidence", "real_results", "teacher_record"]:
+        for name in ["real_evidence", "real_results", "teacher_record", "rag_record"]:
             assert namespace[name] is None, name
         assert len(namespace["chunks"]) == 3
         for item in namespace["chunks"]:
@@ -151,7 +151,7 @@ def check_notebooks():
                 assert ast.dump(node) == ast.dump(actual), name
         text = json.dumps(book, ensure_ascii=False)
         assert "file_search_evidence" not in text and "resources.py" not in text
-    print("Notebook：雙版各39格，JSON／ID／輸出／用途與先備／Markdown無意外縮排／先備獨立與順序執行／答案分離／"
+    print("Notebook：雙版各41格，JSON／ID／輸出／用途與先備／Markdown無意外縮排／先備獨立與順序執行／答案分離／"
           "離線證據[[0],[],[2],[]]與送出預覽／核對練習四種判斷／Markdown與App函式及規則對齊通過")
 
 
@@ -289,6 +289,31 @@ def check_notebook_api():
           "規則與input分開、四題核對結果、429／逾時不重試、教師紀錄存讀通過")
 
 
+def check_download_cell(record):
+    """把App實際下載的紀錄放進暫存資料夾，執行10-1讀回格；竄改證據原文後必須被擋下。"""
+    code = next("".join(c["source"]) for c in read_book(False)["cells"] if c["id"] == PREFIX + "download-run")
+    with tempfile.TemporaryDirectory(dir=TEMP) as folder:
+        old = Path.cwd()
+        os.chdir(folder)
+        try:
+            path = Path("rag_record.json")
+            path.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
+            ns = {}
+            assert "回查通過" in run_quiet(code, ns) and ns["rag_record"] == record
+            if record["context"]:
+                bad = json.loads(json.dumps(record))
+                bad["hits"][0]["text"] += "（被改過）"
+                path.write_text(json.dumps(bad, ensure_ascii=False), encoding="utf-8")
+                try:
+                    run_quiet(code, {})
+                except AssertionError:
+                    pass
+                else:
+                    raise AssertionError("竄改證據的紀錄沒有被擋下")
+        finally:
+            os.chdir(old)
+
+
 def check_apps():
     backend = Backend()
     downloads = []
@@ -319,6 +344,7 @@ def check_apps():
             record = downloads[-1]
             assert not backend.calls and record["answer"] is None and record["mode"] == "離線"
             assert [h["chunk_id"] for h in record["hits"]] == [0] and "[來源1] 貼入文字／0" in record["context"]
+            check_download_cell(record)
             at.text_input[0].set_value("這場讀書交流辦在哪個空間？")
             submit(at)
             assert downloads[-1]["hits"] == [] and downloads[-1]["context"] == "" and not backend.calls
@@ -332,6 +358,7 @@ def check_apps():
             assert backend.paths() == ["/embeddings", "/responses"]
             assert downloads[-1]["check"] == "有標來源：請回原文核對" and "[來源1]" in downloads[-1]["answer"]
             assert "offline-test-placeholder" not in json.dumps(downloads[-1])
+            check_download_cell(downloads[-1])
             saved = at.session_state["record"]
             at.run()
             assert len(backend.calls) == 2 and at.session_state["record"] == saved   # rerun不重送
@@ -339,6 +366,7 @@ def check_apps():
             before = len(backend.calls)
             submit(at)
             assert len(backend.calls) == before + 1 and downloads[-1]["answer"] == LACK   # 只有Embedding
+            check_download_cell(downloads[-1])
             at.text_input[0].set_value("活動地點在哪裡？")
             for mode in ["429", "timeout"]:
                 backend.mode = mode
@@ -362,7 +390,7 @@ def check_apps():
             submit(done)
             assert downloads[-1]["hits"][0]["chunk_id"] == 0 and not done.error
     print("AppTest：雙版0請求啟動、預設文字＝第10週資料、離線證據與送出預覽、真實1＋1請求、無證據只送Embedding、"
-          "缺金鑰／429／逾時清掉結果、rerun不重送、學生A未完成0請求且只移入A即可通過")
+          "缺金鑰／429／逾時清掉結果、rerun不重送、學生A未完成0請求且只移入A即可、下載紀錄經10-1讀回通過與竄改被擋通過")
 
 
 def check_settings():

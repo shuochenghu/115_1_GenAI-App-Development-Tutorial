@@ -208,7 +208,8 @@ CELL_NOUNS = {"install": "環境格", "data": "資料格", "week10-fns": "第10�
               "a": "A格", "a-check": "A自我檢查格", "policy": "規則格", "preview": "送出前預覽格",
               "check-fns": "核對函式格", "check-demo": "核對練習格", "api-setup": "連線設定格",
               "rag-fns": "真實RAG函式格", "real-retrieve": "真實找證據格", "real-answer": "真實回答格",
-              "save-record": "存教師紀錄格", "teacher-record-run": "教師紀錄格"}
+              "save-record": "存教師紀錄格", "teacher-record-run": "教師紀錄格",
+              "download-run": "下載回查格"}
 TAG_ALIASES = {"A": "a"}   # 先備裡的舊寫法
 DIRECT_PREREQ = True   # 先備只寫直接需要的格子，格首比較短；間接需要的仍記在metadata的requires
 # 格首標註在每個名稱後面加一句短說明，看程式格時不必往回翻（新增被後面用到的名稱要補在這裡）
@@ -652,12 +653,42 @@ def cells_for(teacher):
         - 每次送出都會先清掉舊結果；A還沒完成時，App會停在第一步，不送付費請求。
         - 下載的問答紀錄含模式、問題、證據、context、回答與核對結果，不含金鑰或向量。
     """)
+    md("download-check", """
+        ### 10-1 下載後重新讀回與回查
+
+        在App按「下載問答紀錄」，把rag_record.json放到Notebook所在的資料夾（Colab：拖進左側「檔案」窗格），再執行下一格。沒有檔案時只會提示，不用示意檔假裝驗證過。
+        下一格檢查context裡的每個[來源n]，都是取回的證據原文；回答與核對結果只印出來，內容是否正確仍要自己回原文確認。
+        作業要下載三份紀錄；第二份起檔名可能變成rag_record (1).json，改下一格的path再執行。
+    """)
+    code("download-run", r"""
+        # 用途：驗證自己從App下載的問答紀錄；先備：rag_record.json在Notebook所在的資料夾；0次API。
+        import json
+        import re
+        from pathlib import Path
+
+        rag_record = None
+        path = Path("rag_record.json")
+        if path.exists():
+            rag_record = json.loads(path.read_text(encoding="utf-8"))
+            print(rag_record["mode"], "｜問題：", rag_record["question"])
+            used = len(re.findall(r"\[來源\d+\]", rag_record["context"]))   # A實際放進context的段數
+            assert used <= len(rag_record["hits"]), "context的來源比取回的證據多"
+            for number, hit in enumerate(rag_record["hits"][:used], 1):
+                part = f"[來源{number}] {hit['source']}／{hit['chunk_id']}\n{hit['text']}"
+                assert part in rag_record["context"], f"[來源{number}]和取回的證據對不上"
+                print(f"[來源{number}] chunk {hit['chunk_id']}｜分數 {hit['score']:.3f}｜{hit['text'][:40]}")
+            print("回答：", rag_record["answer"])
+            print("核對：", rag_record["check"])
+            print("實際下載檔回查通過：context有", used, "段，都來自取回的證據")
+        else:
+            print("尚未找到下載檔：完成App下載後再執行本格")
+    """)
     md("homework", """
         ## 11 回家作業：一份自己的文件（45～60分鐘）
 
         沿用A與同一個App，換一份合法、無敏感資料的小文件（可用自己第9、10週作業的清理後文字），或自己寫3～6段虛構內容，貼進App的文件欄。
 
-        1. 問三種問題：正常、資訊不足、文件外，各下載一份問答紀錄。
+        1. 問三種問題：正常、資訊不足、文件外，各下載一份問答紀錄，並用10-1讀回。
         2. 至少核對一個日期或數字，以及一個引用與原文是否相符。
         3. 記錄一個錯誤或邊界的預期、實際、修正與重測，再用3～5句說明自行建置RAG的限制。
 
@@ -704,6 +735,7 @@ def cells_for(teacher):
         - [ ] 會用check_answer的四種判斷；格式通過不等於內容正確。
         - [ ] 資訊不足與文件外的問題能承認不知道，不用常識補造。
         - [ ] 能分辨「沒找到」（檢索）與「答錯」（生成）。
+        - [ ] 下載的問答紀錄已放回Notebook，用10-1讀回並通過。
     """)
     return annotate_dependencies(cells, PREFIX, CELL_NOUNS, TAG_ALIASES, GLOSSARY, DIRECT_PREREQ)
 

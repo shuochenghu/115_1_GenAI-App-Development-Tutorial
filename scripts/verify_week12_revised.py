@@ -34,6 +34,7 @@ TEMP.mkdir(parents=True, exist_ok=True)
 tempfile.tempdir = str(TEMP.resolve())
 REAL_OPENAI = openai.OpenAI
 BUILD = runpy.run_path(str(ROOT / "scripts/build_week12_revised.py"))
+VOICE_TEXT = "這張收據的日期和總額是多少？"   # 範例音檔的內容，也是修正後的問題
 RECEIPT = {"merchant": "DEMO CAFE", "date": "2026-11-11", "total": 300,
            "visible_text": ["Date: 2026-11-11", "TOTAL TWD 300"], "warnings": []}
 for name in [k for k in os.environ if k.startswith("OPENAI_")]:
@@ -77,7 +78,7 @@ def sample_folder(folder):
     """Notebook從week12開啟時的樣子：範例在week12_vision_revised/sample_data。"""
     target = Path(folder) / "week12_vision_revised/sample_data"
     target.mkdir(parents=True, exist_ok=True)
-    for name in BUILD["SAMPLES"]:
+    for name in BUILD["SAMPLES"] + [BUILD["VOICE_SAMPLE"]]:
         shutil.copyfile(PACKAGE / "sample_data" / name, target / name)
 
 
@@ -86,7 +87,13 @@ def check_samples():
         assert (PACKAGE / "sample_data" / name).read_bytes() == (WEEK / "week12_vision_simple/sample_data" / name).read_bytes(), name
     manifest = json.loads((PACKAGE / "sample_data/fixture_manifest.json").read_text(encoding="utf-8"))
     assert manifest["receipt_clear.png"]["total"] == 300 and manifest["receipt_missing_total.png"]["total"] is None
-    print("範例：兩張圖與人工基準和原簡化版逐位元相同通過")
+    import wave
+    voice = PACKAGE / "sample_data" / BUILD["VOICE_SAMPLE"]
+    with wave.open(str(voice)) as audio:
+        seconds = audio.getnframes() / audio.getframerate()
+        assert (audio.getframerate(), audio.getnchannels(), audio.getsampwidth()) == (16000, 1, 2)
+    assert 1 < seconds < 30 and voice.stat().st_size < 25 * 1024 * 1024
+    print(f"範例：兩張圖與人工基準和原簡化版逐位元相同；12-1音檔16 kHz單聲道、{seconds:.1f}秒、低於25 MB通過")
 
 
 SHARED = {
@@ -103,7 +110,7 @@ def check_notebooks():
             assert s == t, s["id"]
     for teacher, book in zip([False, True], books):
         cells = book["cells"]
-        assert len(cells) == 33 and len(cells) == len({c["id"] for c in cells})
+        assert len(cells) == 41 and len(cells) == len({c["id"] for c in cells})
         by_id = {c["id"].removeprefix(PREFIX): c for c in cells}
         namespace = {}
         with tempfile.TemporaryDirectory(dir=TEMP) as folder:
@@ -132,8 +139,12 @@ def check_notebooks():
                             exec("".join(by_id[dependency]["source"]), fresh)
                     with redirect_stdout(StringIO()):
                         exec(text, fresh)
-        for name in ["qa_results", "qa_error", "receipt_results", "receipt_error", "teacher_record", "compare_rows"]:
+        for name in ["qa_results", "qa_error", "receipt_results", "receipt_error", "teacher_record", "compare_rows",
+                     "vision_record", "voice_result", "voice_error", "transcribe_error"]:
             assert namespace[name] is None, name
+        # 12-1預設：離線示意文字（含同音錯字）→ 修正表改好 → 不送出
+        assert namespace["transcript_raw"] == namespace["OFFLINE_TRANSCRIPT"] and namespace["transcript_source"] == "離線示意文字"
+        assert namespace["question_confirmed"] == VOICE_TEXT != namespace["transcript_raw"]
         assert namespace["sample_image"]["width"] == 1000
         assert (namespace["content_result"] is not None) == teacher
         assert (namespace["content_preview"] is not None) == teacher
@@ -239,13 +250,17 @@ class Backend:
         self.mode = "good"
 
     def handle(self, request):
-        assert request.url.path == "/v1/responses", request.url
-        body = json.loads(request.content)
+        path = request.url.path
+        assert path in ("/v1/responses", "/v1/audio/transcriptions"), request.url
+        # 語音轉文字是multipart上傳：保留原始bytes，檢查音檔與欄位
+        body = json.loads(request.content) if path == "/v1/responses" else {"multipart": request.read()}
         self.calls.append(body)
         if self.mode == "429":
             return httpx.Response(429, json={"error": {"message": "offline limit", "type": "rate_limit_error", "code": "rate_limit_exceeded"}})
         if self.mode == "timeout":
             raise httpx.ReadTimeout("offline timeout", request=request)
+        if "multipart" in body:
+            return httpx.Response(200, json={"text": "  " if self.mode == "empty" else VOICE_TEXT})
         result = dict(RECEIPT)
         if self.mode == "missing":
             result.update(total=None, warnings=["圖中未提供總額"])
@@ -285,15 +300,16 @@ def check_notebook_api():
     student_a = "".join(next(c for c in read_book(False)["cells"] if c["id"] == PREFIX + "a")["source"])
     requires = {c["id"].removeprefix(PREFIX): c["metadata"]["teaching"]["requires"] for c in read_book(True)["cells"]}
 
-    def run(tag, mode="good", paid=True, key="offline-test-placeholder", student=False):
+    def run(tag, mode="good", paid=True, key="offline-test-placeholder", student=False, deps_replace=("", "")):
         backend.mode = mode
         backend.calls.clear()
-        flag = {"qa-run": "RUN_VISION_API", "receipt-run": "RUN_RECEIPT_API"}[tag]
+        flag = {"qa-run": "RUN_VISION_API", "receipt-run": "RUN_RECEIPT_API",
+                "voice-transcribe": "RUN_TRANSCRIBE", "voice-ask": "RUN_VOICE_QA"}[tag]
         ns = {}
         with patch.object(openai, "OpenAI", backend.client), patch("dotenv.load_dotenv"), \
                 patch.dict(os.environ, {"OPENAI_API_KEY": key}), redirect_stdout(StringIO()):
             for dep in requires[tag]:
-                exec(student_a if (dep == "a" and student) else teacher[dep], ns)
+                exec(student_a if (dep == "a" and student) else teacher[dep].replace(*deps_replace), ns)
             exec(teacher[tag].replace(f"{flag} = False", f"{flag} = {paid}"), ns)
         return ns
 
@@ -351,6 +367,33 @@ def check_notebook_api():
             assert rows[("receipt_clear.png", "total")] is True
             assert rows[("receipt_missing_total.png", "total")] is False   # 模擬回300：應被標成「不同：回看原圖」
             Path("teacher_vision_record.json").unlink()
+            # 12-1語音轉文字：預設離線示意0次；開啟後1次multipart上傳
+            ns = run("voice-transcribe", paid=False)
+            assert ns["transcript_raw"] == ns["OFFLINE_TRANSCRIPT"] and ns["transcript_source"] == "離線示意文字" and not backend.calls
+            assert "OPENAI_API_KEY" in run("voice-transcribe", key="")["transcribe_error"] and not backend.calls
+            ns = run("voice-transcribe")
+            assert len(backend.calls) == 1 and ns["transcript_raw"] == VOICE_TEXT and ns["transcript_source"] == "gpt-transcribe"
+            sent = backend.calls[0]["multipart"]
+            assert (PACKAGE / "sample_data" / BUILD["VOICE_SAMPLE"]).read_bytes() in sent
+            assert b'name="model"' in sent and b"gpt-transcribe" in sent and "收據、日期、總額".encode() in sent
+            assert b'name="language"' not in sent and b'name="languages"' not in sent
+            for mode in ["empty", "429", "timeout"]:
+                ns = run("voice-transcribe", mode)
+                assert ns["transcript_raw"] is None and ns["transcribe_error"] and len(backend.calls) == 1, mode
+            # 語音提問：送出的是確認後的問題，不是原辨識文字；1次Responses
+            assert run("voice-ask", paid=False)["voice_result"] is None and not backend.calls
+            assert run("voice-ask", student=True)["voice_error"] and not backend.calls
+            ns = run("voice-ask")
+            result = ns["voice_result"]
+            assert len(backend.calls) == 1 and backend.calls[0]["input"][0]["content"][0]["text"] == VOICE_TEXT
+            assert result["question"] == VOICE_TEXT and result["transcript_raw"] == ns["OFFLINE_TRANSCRIPT"]
+            assert result["transcript_source"] == "離線示意文字" and result["answer"] and result["usage"]
+            assert "offline-test-placeholder" not in json.dumps(result, ensure_ascii=False)
+            ns = run("voice-ask", deps_replace=('VOICE_FILE = "question_total.wav"', 'VOICE_FILE = "missing.wav"'))
+            assert ns["question_confirmed"] is None and "沒有確認後的問題" in ns["voice_error"] and not backend.calls
+            for mode in ["429", "timeout", "refusal"]:
+                ns = run("voice-ask", mode)
+                assert ns["voice_result"] is None and ns["voice_error"] and len(backend.calls) == 1, mode
     # 網址與file_id形狀只驗證序列化，不讀網址或檔案
     ns = {}
     with redirect_stdout(StringIO()):
@@ -361,7 +404,32 @@ def check_notebook_api():
             client.responses.create(model="gpt-5.4-mini", input=[{"role": "user", "content": sample}], store=False)
             assert backend.calls[-1]["input"][0]["content"] == sample
     print("Notebook API：真實SDK＋MockTransport驗證問答2題／抽取2張各1次、送出圖與SHA一致、A與缺key付費前阻擋、"
-          "單題檢查失敗只記該題、429／逾時整批不存且不重試、教師紀錄存讀、逐欄對照標出補造、兩種傳輸形狀通過")
+          "單題檢查失敗只記該題、429／逾時整批不存且不重試、教師紀錄存讀、逐欄對照標出補造、兩種傳輸形狀、"
+          "12-1語音轉文字預設離線0次／開啟1次multipart（音檔、模型、prompt，不送language）／空白與429／逾時不保存、"
+          "語音提問送出確認後的問題且缺辨識文字時不送出通過")
+
+
+def check_download_cell(record, samples):
+    """App實際下載的紀錄＋原圖放進暫存資料夾，執行10-1讀回格；沒有原圖只讀紀錄，換成別張圖必須被擋下。"""
+    code = next("".join(c["source"]) for c in read_book(False)["cells"] if c["id"] == PREFIX + "download-run")
+    other = {"receipt_clear.png": "receipt_missing_total.png", "receipt_missing_total.png": "receipt_clear.png"}
+    with tempfile.TemporaryDirectory(dir=TEMP) as folder, in_directory(folder):
+        Path("vision_record.json").write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
+        for image, expected in [(None, "找不到原圖"), (record["filename"], "SHA-256相同")]:
+            if image:
+                shutil.copyfile(samples / image, record["filename"])
+            ns, out = {}, StringIO()
+            with redirect_stdout(out):
+                exec(code, ns)
+            assert ns["vision_record"] == record and expected in out.getvalue() and "回查通過" in out.getvalue()
+        shutil.copyfile(samples / other[record["filename"]], record["filename"])   # 同檔名、不同圖
+        try:
+            with redirect_stdout(StringIO()):
+                exec(code, {})
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("換成別張圖的紀錄沒有被擋下")
 
 
 def check_apps():
@@ -395,6 +463,7 @@ def check_apps():
                 assert at.error and not backend.calls
             submit(at)
             assert len(backend.calls) == 1 and downloads[-1]["task"] == "圖片問答"
+            check_download_cell(downloads[-1], target / "sample_data")
             record = at.session_state["result"]
             sent = at.session_state["preview"]["bytes"]
             assert record["image"]["sent_sha256"] == hashlib.sha256(sent).hexdigest()
@@ -426,6 +495,7 @@ def check_apps():
             at.selectbox[1].select("缺少總額範例").run()
             submit(at)
             assert downloads[-1]["result"]["total"] is None and downloads[-1]["result"]["warnings"]
+            check_download_cell(downloads[-1], target / "sample_data")
             assert backend.calls[-1]["text"]["format"]["strict"] is True
             at.selectbox[0].select("圖片問答").run()
             assert at.session_state["result"] is None
@@ -476,7 +546,7 @@ def check_apps():
             submit(done)
             assert done.session_state["result"] and len(backend.calls) == before + 1
     print("AppTest：雙版預設0次並顯示送出前預覽、收據抽取不顯示問題欄、只移入A即可、兩任務每次1請求、rerun 0次、未知值、"
-          "送出圖與SHA一致、替代上傳、各種失敗／模式／清除移除舊結果與下載通過")
+          "送出圖與SHA一致、替代上傳、各種失敗／模式／清除移除舊結果與下載、下載紀錄經10-1對回原圖與換圖被擋通過")
 
 
 def BUILD_PROMPT():
@@ -532,9 +602,10 @@ def check_settings():
     deps = lambda path: [l for l in path.read_text(encoding="utf-8").splitlines() if l and not l.startswith("#")]
     for folder in ("student", "teacher"):
         assert deps(PACKAGE / folder / "requirements.txt") == deps(PACKAGE / "requirements.txt")
-    assert ".env" in (PACKAGE / ".gitignore").read_text(encoding="utf-8").splitlines()
+    ignore = (PACKAGE / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert ".env" in ignore and "*.wav" in ignore and "!sample_data/" + BUILD["VOICE_SAMPLE"] in ignore
     print("金鑰設定：Secrets優先、無secrets.toml時讀環境變數、App實際讀到App資料夾與入口資料夾的.env（前者優先）、"
-          "Notebook讀App資料夾.env、入口同層requirements通過")
+          "Notebook讀App資料夾.env、入口同層requirements、錄音不推送但保留範例音檔通過")
 
 
 def check_rebuild_and_preservation():
@@ -582,7 +653,7 @@ def main():
     import importlib.metadata as md
     print("Runtime:", sys.version.split()[0],
           {n: md.version(n) for n in ("streamlit", "openai", "python-dotenv", "httpx", "pillow")})
-    print("全部離線驗證通過；0次真實API，未測真實辨識品質、真人瀏覽器上傳、Colab、Cloud或試教。")
+    print("全部離線驗證通過；0次真實API，未測真實辨識與語音轉文字品質、真人瀏覽器上傳、Colab、Cloud或試教。")
 
 
 if __name__ == "__main__":

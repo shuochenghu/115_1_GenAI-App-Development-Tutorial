@@ -252,6 +252,7 @@ CELL_NOUNS = {   # 程式格的口語名稱；節次由前一個標題自動決�
     "install": "環境格", "data": "資料格", "cosine-fn": "cosine函式格", "cosine-example": "手寫向量計算格",
     "a": "A格", "a-check": "A自我檢查格", "demo-fn": "離線規則函式格", "offline-run": "離線對照格",
     "real-run": "真實API格", "real-rank": "真實排名格", "teacher-record-run": "教師紀錄格",
+    "download-run": "下載回查格",
 }
 TAG_ALIASES = {"A": "a"}   # 舊寫法「先備：A」
 
@@ -646,12 +647,40 @@ def cells_for(teacher):
         - 表單改了但沒提交，畫面仍是上次成功結果；切換模式、清除或新提交失敗都會清掉舊結果。A未完成時不會送出付費請求。
         - 下載的搜尋紀錄包含模式、模型、原文、問題與排名，不含金鑰與整批向量。這是小文件教學App，不是正式的大型索引。
     """)
+    md("download-check", """
+        ### 9-1 下載後重新讀回與回查
+
+        在App按「下載搜尋紀錄」，把search_record.json放到Notebook所在的資料夾（Colab：拖進左側「檔案」窗格），再執行下一格。沒有檔案時只會提示，不用示意檔假裝驗證過。
+        下一格檢查：每個片段的text等於source[start:end]、分數由高到低且不低於門檻、筆數不超過top_k。通過只代表紀錄能回到原文，片段是否真的支持答案，仍要自己讀原文判斷。
+        作業要下載兩份紀錄；第二份檔名可能變成search_record (1).json，改下一格的path再執行一次。
+    """)
+    code("download-run", """
+        # 用途：驗證自己從App下載的搜尋紀錄；先備：search_record.json在Notebook所在的資料夾；0次API。
+        import json
+        from pathlib import Path
+
+        search_record = None
+        path = Path("search_record.json")
+        if path.exists():
+            search_record = json.loads(path.read_text(encoding="utf-8"))
+            print(search_record["mode"], "｜", search_record["model"], "｜問題：", search_record["query"])
+            scores = [hit["score"] for hit in search_record["hits"]]
+            assert scores == sorted(scores, reverse=True), "分數沒有由高到低"
+            assert len(scores) <= search_record["top_k"], "筆數超過top_k"
+            for hit in search_record["hits"]:
+                assert hit["text"] == search_record["source"][hit["start"]:hit["end"]], "片段和原文位置對不上"
+                assert hit["score"] >= search_record["min_score"], "有片段低於門檻"
+                print("chunk", hit["chunk_id"], "｜分數", round(hit["score"], 3), "｜", hit["text"][:40])
+            print("實際下載檔回查通過，片段數：", len(search_record["hits"]))
+        else:
+            print("尚未找到下載檔：完成App下載後再執行本格")
+    """)
     md("homework", """
         ## 10. 回家作業：同一個App的搜尋證據（45～60分鐘）
 
         沿用A與同一個App，換一份合法、無敏感資料的小文件（可用自己第9週作業的清理後文字），或自己寫3～6段虛構內容。題目自選，最低要求固定。
         1. 用原句、改寫、文件外三種問題各搜尋一次；至少一題找到支持來源，一題判斷證據不足。
-        2. 固定同一題，比較兩組top_k或門檻，說明理由，並下載兩份搜尋紀錄JSON。
+        2. 固定同一題，比較兩組top_k或門檻，說明理由，並下載兩份搜尋紀錄JSON，各用9-1讀回一次。
         3. 記錄一個錯誤或邊界的預期、實際、修正與重測；人工核對一個日期或數字。
 
         繳交：學生Notebook（A自我檢查＋B紀錄表）、同一個App、文件或貼入文字、兩份搜尋紀錄JSON、README。截圖或文字證據擇一即可。
@@ -688,6 +717,7 @@ def cells_for(teacher):
         - [ ] 知道分數不是機率，也沒有通用門檻；離線規則找不到改寫題是規則限制。
         - [ ] 四種問題都有原文判讀，沒有證據不補造；教師紀錄有標明來源。
         - [ ] App改滑桿不新增API，失敗不留舊結果；README記了模式、版本與請求次數。
+        - [ ] 下載的搜尋紀錄已放回Notebook，用9-1讀回並通過。
     """)
     return annotate_dependencies(cells, PREFIX, CELL_NOUNS, TAG_ALIASES)
 

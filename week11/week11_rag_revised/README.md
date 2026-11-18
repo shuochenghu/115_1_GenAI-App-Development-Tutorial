@@ -62,6 +62,7 @@ OPENAI_EMBEDDING_MODEL = "text-embedding-3-small"
 - 按「找證據並回答」才處理；每次送出先清掉舊結果，失敗時畫面顯示錯誤、不留舊答案。重跑畫面或下載不會再呼叫API。
 - A還沒完成時，App會停在第一步，不送付費請求。
 - 下載的`rag_record.json`含模式、問題、參數、取回片段、context、回答與核對結果；不含金鑰或向量。
+- 下載後把`rag_record.json`放到Notebook所在的資料夾（Colab拖進左側「檔案」窗格），執行10-1讀回格：檢查context裡每個`[來源n]`都是取回的證據原文。第二份起檔名若是`rag_record (1).json`，改格內的path。0次API。
 
 為了讓流程簡單直線，每次送出都重新向量化文件；正式服務會保存文件向量，查詢時只向量化新問題。
 

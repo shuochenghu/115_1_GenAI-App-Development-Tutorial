@@ -2,3 +2,7 @@
 .env
 **/.streamlit/secrets.toml
 **/__pycache__/
+*.wav
+*.m4a
+*.mp3
+!sample_data/question_total.wav

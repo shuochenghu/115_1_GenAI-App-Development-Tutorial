@@ -68,6 +68,7 @@ python -m streamlit run week13/week13_web_tools_revised/student/app.py
 
 - 新提交先清掉舊結果；切換範圍、切換API或按「清除結果」也會清空。表單內改字後要再按提交，畫面只顯示最後一次成功提交。
 - 一般rerun與下載不會重新搜尋。下載的`web_search_record.json`包含問題、範圍、模型、模型提出的參數、A的結果、引用、查閱網址、實際搜尋字詞、UTC時間與兩次usage；不含金鑰與原始reasoning內容。
+- 下載後把`web_search_record.json`放到Notebook所在的資料夾（Colab拖進左側「檔案」窗格），執行15-1讀回格：檢查scope、A的query與模型提案一致，每個引用都在官方網域且是本次查閱過的頁面。0次API。
 - 失敗時沒有可下載的紀錄，請在B表用文字記錄錯誤與預期。不要為了填表反覆呼叫API。
 
 ## 作業與第14週
