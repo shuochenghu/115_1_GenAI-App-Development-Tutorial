@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+.venv/
+__pycache__/
+document_record.json
+rag_record.json

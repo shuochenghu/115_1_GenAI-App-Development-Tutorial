@@ -2,6 +2,26 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第11週整合RAG App：併入切塊選項與向量簡要顯示、刪除Claude版（2026-11-18，Claude Code依使用者要求）
+
+- 背景：同一天Claude Code與Codex各做了一套第9～11週整合App（Claude版`week11_rag_pipeline_revised`、Codex版`week11_rag_integrated_revised`）。Claude比較兩套後，使用者決定「Codex版併入兩項再刪我的」。
+- 併入Codex版（改生成來源後重建，App不手改）：
+  - 切塊方式：`scripts/templates/week11_integrated_rag.py`新增radio「空白行分段（第10、11週）／固定字元（第9週）」（key `split`，預設空白行分段），列入`input_id`。`prepare_document`加參數`by_paragraph=False`：True時用`split_chunks`、每段最多1000字元、`chunk_size`／`overlap`記為None；文件紀錄多`split`欄。`build_week11_integrated_rag_revised.py`多取第11週build的`SPLIT`。內建sample.txt預設3段，離線4題`[[0], [], [2], []]`與第10、11週一致；固定字元120／20仍為2段、`[[0], [], [1, 0], []]`。
+  - 向量顯示：文件向量改表格只列每筆前5個數字；問題向量只列維度與前5個數字。
+  - verify：共用函式10個（加split_chunks）；空白行分段四範例切片／來源、sample.txt等於第11週split_chunks結果、單段超過1000字元擋下；AppTest預設3段與離線4題、切換固定字元清舊文件；App不整串印向量。
+  - 同步：App README（第2節切塊與向量說明、限制）、學生操作與觀察講義（準備文件列、第4節切塊比較）、整合App教師導讀（第1節表、第2節預期結果、新增6-1）。
+- 刪除Claude版：`week11/week11_rag_pipeline_revised/`、`scripts/build_week11_pipeline_app.py`、`scripts/verify_week11_pipeline_app.py`、`output/week11_pipeline_checks/`（皆未追蹤，刪除後無法由git復原）；移除第11週修訂版教師導讀中Claude版的入口與第10節、`week11_rag_revised/README.md`中Claude版的連結。Codex版的入口與Notebook第10節文字保留。
+- 驗證：清空OPENAI_*後build_week11_integrated_rag_revised.py重建，verify_week11_integrated_rag_revised.py與verify_week11_revised.py全數通過；git diff --check通過。0次真實API；未測真實檢索／回答品質、真人瀏覽器選檔、Cloud與試教。未commit／push。
+
+## 第11週新增第9～11週完整整合RAG App（2026-11-18，Codex）
+
+- 使用者先要求規劃並確認「開始製作」。新增`week11/week11_rag_integrated_revised/`完整App、README、四格式範例與問題清單、套件需求、.env／Secrets範本與.gitignore；新增`第11週_第09至11週整合RAG_App_操作與觀察講義_修訂版.md`及配對教師導讀與驗證紀錄。完整示範約40分鐘，原學生TODO與A作業保留，不新增必做程式作業。
+- 單一文件自行上傳（TXT／MD／CSV／PDF／DOCX）或內建範例，逐步顯示抽取／清理／切塊、文件與問題向量、完整排名與門檻／top_k／context實際採用、送出前規則與input、答案與引用回查。1MB／清理後20000字元／100段；沿用第9週文字型PDF與CSV限制；位置指向清理後文字。
+- 生成來源`scripts/build_week11_integrated_rag_revised.py`＋`scripts/templates/week11_integrated_rag.py`；直接沿用三週build的9個函式與規則，生成App不跨週import。原第11週`build_week11_revised.py`只在app文字格加入入口，重建雙版41格Notebook與Markdown，格ID、程式與TODO未改；原README與教師導讀同步連結。沒有修改共用生成模組或第9、10週教材。
+- 文件向量與最近一題向量保存在各使用者session_state，不用跨使用者快取；換檔／切法清所有成果，模式或模型改動清向量與問答，問題變更清問題向量與答案，改檢索參數需按鈕重排且不另送Embedding。真實模式文件合批1次，新問題1次Embedding＋最多1次Responses；三題最多7次，四題最多9次，主動重建／重答另計；無sources不送Responses。離線為活動關鍵字計數，無模型答案。
+- 已通過新`verify_week11_integrated_rag_revised.py`與原`verify_week11_revised.py`：重建／AST／UTF-8與連結、實際各格式與來源切片／讀檔邊界、真實SDK＋MockTransport的index順序／壞向量／失敗與請求數、AppTest向量重用／失敗清舊答案／單段／替代上傳／同名新內容／session隔離、下載透過原10-1讀回與竄改攔截。隔離OPENAI_*與.env並禁止socket連外。靜態語法與原Notebook規格／TODO通過。
+- 實測環境Windows／Python3.14.0／Streamlit1.60.0／OpenAI2.49.0／pypdf6.18.1／python-docx1.2.0／python-dotenv1.2.2／httpx0.28.1；requirements保留課程目標1.63.0／1.2.3，未另安裝或升級。真實付費API0次；未測真實語意／回答品質、模型權限、瀏覽器選檔／畫面、Colab、Cloud、其他平台或試教。未commit／push。工作期間另出現`.claude/`與`week11_rag_pipeline_revised`及其build／verify等其他工作，均未修改或刪除；本紀錄只描述integrated版。
+
 ## 第12週修訂版：12-1語音提問選讀（2026-11-18，Claude Code依使用者要求）
 
 - 使用者問語音要不要加入教材；Claude建議只在第12週修訂版加選讀，先寫規劃（`week12/生成式AI應用開發_第12週_語音提問選讀_教材規劃.md`），使用者再要求「照建議的四項決定開始製作」：放12-1、App不改只改README、範例音檔用Windows本機合成、課綱同步。

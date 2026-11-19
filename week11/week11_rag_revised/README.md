@@ -3,6 +3,8 @@
 流程：**找證據 → A組成context → 交給模型回答 → 核對來源**。本週只做自行建置的RAG。
 搭配上層檔名含「RAG文件問答_課堂簡化版_修訂版」的學生／教師Notebook。原課堂簡化版（`week11_rag_simple/`）保留未改。
 
+**第9～11週整合示範：**另有[完整上傳與RAG App](../week11_rag_integrated_revised/README.md)，可逐步查看文件抽取、清理、切塊、文件／問題向量、排名、context與回答。操作見[學生講義](../第11週_第09至11週整合RAG_App_操作與觀察講義_修訂版.md)；完整示範不增加必做TODO，本資料夾的A與作業要求維持原樣。
+
 ## 學生操作
 
 1. 開啟學生Notebook，完成A的`build_context`並通過自我檢查。
