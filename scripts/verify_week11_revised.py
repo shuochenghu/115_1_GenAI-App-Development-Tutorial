@@ -1,7 +1,7 @@
 """第11週修訂版（重新規劃後：只教自行建置RAG）離線驗證；真實SDK＋MockTransport，不送出網路請求。"""
 import ast
 from contextlib import redirect_stdout
-from io import StringIO
+from io import BytesIO, StringIO
 import json
 import os
 from pathlib import Path
@@ -91,7 +91,7 @@ def check_notebooks():
             assert s == t, s["id"]
     for teacher, book in zip([False, True], books):
         cells = book["cells"]
-        assert len(cells) == 41 and len(cells) == len({c["id"] for c in cells})
+        assert len(cells) == 43 and len(cells) == len({c["id"] for c in cells})
         by_id = {c["id"].removeprefix(PREFIX): c for c in cells}
         namespace, printed = {}, {}
         with tempfile.TemporaryDirectory(dir=TEMP) as folder:
@@ -116,7 +116,7 @@ def check_notebooks():
                     run_quiet(text, fresh)
             finally:
                 os.chdir(old)
-        for name in ["real_evidence", "real_results", "teacher_record", "rag_record"]:
+        for name in ["real_evidence", "real_results", "teacher_record", "rag_record", "integrated_records"]:
             assert namespace[name] is None, name
         assert len(namespace["chunks"]) == 3
         for item in namespace["chunks"]:
@@ -151,7 +151,7 @@ def check_notebooks():
                 assert ast.dump(node) == ast.dump(actual), name
         text = json.dumps(book, ensure_ascii=False)
         assert "file_search_evidence" not in text and "resources.py" not in text
-    print("Notebook：雙版各41格，JSON／ID／輸出／用途與先備／Markdown無意外縮排／先備獨立與順序執行／答案分離／"
+    print("Notebook：雙版各43格，JSON／ID／輸出／用途與先備／Markdown無意外縮排／先備獨立與順序執行／答案分離／"
           "離線證據[[0],[],[2],[]]與送出預覽／核對練習四種判斷／Markdown與App函式及規則對齊通過")
 
 
@@ -312,6 +312,146 @@ def check_download_cell(record):
                     raise AssertionError("竄改證據的紀錄沒有被擋下")
         finally:
             os.chdir(old)
+
+
+def check_integrated_cell():
+    """用AppTest實際操作整合App、收集下載的紀錄，再執行10-2檢查格：用真實API（MockTransport）做完四類問題、
+    參數比較、自己的文件與兩則觀察才通過；只有離線紀錄、缺項、範例改名上傳、手改或冒充真實API的紀錄都要被擋下。"""
+    app = WEEK / "week11_rag_integrated_revised/app.py"
+    code = "".join(next(c for c in read_book(False)["cells"] if c["id"] == PREFIX + "integrated-run")["source"])
+    filled = code.replace('": "待填"', '": "改成門檻0.5後只剩chunk 0，費用那段被擋在門檻外"', 1)
+    filled = filled.replace('": "待填"', '": "工具那題問題向量全零，屬於檢索找不到，不是生成答錯"', 1)
+    backend, downloads, names = Backend(), [], set()
+    own_text = "社區清潔日在河濱公園舉行，集合地點是北側入口。\n\n報名截止日期是12月5日，名額40人。".encode("utf-8")
+    renamed_bytes = (WEEK / "week11_rag_integrated_revised/sample_data/sample.txt").read_bytes()
+
+    class Upload(BytesIO):
+        def __init__(self, name, data):
+            super().__init__(data)
+            self.name = name
+
+    def download(label, data, file_name=None, **kwargs):
+        names.add(file_name)
+        if file_name == "integrated_rag_record.json":
+            downloads.append(json.loads(data))
+        return False
+
+    def click(at, key):
+        at.button(key=key).click().run()
+        assert not at.exception, at.exception
+
+    def collect(real_api):
+        """照講義操作一次：範例四題、同題改門檻、上傳自己的文件2題、範例改名上傳2題；真實模式每題都按回答。"""
+        def ask(at, question):
+            at.text_input(key="question").set_value(question).run()
+            click(at, "retrieve")
+            if real_api:
+                click(at, "answer")
+            return downloads[-1]
+
+        def prepare(at):
+            click(at, "prepare")
+            click(at, "embed_document")
+
+        at = AppTest.from_file(str(app), default_timeout=30).run()
+        if real_api:
+            at.checkbox(key="real_api").check().run()
+        prepare(at)
+        sample = [ask(at, BUILD["QUESTIONS"][0]["query"])]
+        at.slider(key="min_score").set_value(0.5).run()
+        compared = ask(at, BUILD["QUESTIONS"][0]["query"])        # 同一題只改門檻：沿用問題向量，0次Embedding
+        sample += [ask(at, q["query"]) for q in BUILD["QUESTIONS"][1:]]
+        at.radio(key="source").set_value("上傳檔案").run()
+        with patch.object(st, "file_uploader", return_value=Upload("我的公告.md", own_text)):
+            at.run()
+            prepare(at)
+            own = [ask(at, "集合地點在哪裡？"), ask(at, "需要帶什麼工具？")]
+        with patch.object(st, "file_uploader", return_value=Upload("我的文件.txt", renamed_bytes)):
+            at.run()
+            prepare(at)
+            renamed = [ask(at, "活動地點在哪裡？"), ask(at, "報名截止是哪天？")]
+        return sample, compared, own, renamed
+
+    with patch.object(openai, "OpenAI", backend.client), patch("dotenv.load_dotenv"),             patch.object(st, "secrets", {}), patch.object(st, "download_button", download),             patch.dict(os.environ, {"OPENAI_API_KEY": "offline-test-placeholder"}):
+        offline = collect(False)
+        assert not backend.calls
+        sample, compared, own, renamed = collect(True)
+    paths = [p for _, p, _ in backend.calls]
+    # 3份文件各1次＋8個問題各1次Embedding（改門檻重排沿用問題向量）；有證據才回答：範例2題＋改門檻1題＋自己的文件1題＋改名範例2題
+    assert paths.count("/embeddings") == 11 and paths.count("/responses") == 6, paths
+    assert all(r["mode"] == "真實API" and r["answer"] for r in [*sample, compared, *own, *renamed])
+    assert "offline-test-placeholder" not in json.dumps([*sample, compared, *own])
+    assert "rag_record.json" not in names   # 整合App不再用第11週App的檔名，Colab裡不會互相覆蓋
+
+    week11_app_record = {"mode": "離線", "question": "活動地點在哪裡？", "hits": [], "context": "", "answer": None, "check": "x"}
+    good = [*sample, compared, *own]
+    offline_good = [*offline[0], offline[1], *offline[2]]
+
+    def run(records, source=filled):
+        """把紀錄依瀏覽器的命名方式存檔（同資料夾另放兩份第11週App紀錄），再執行檢查格；
+        回傳印出的文字或AssertionError訊息。"""
+        with tempfile.TemporaryDirectory(dir=TEMP) as folder:
+            old = Path.cwd()
+            os.chdir(folder)
+            try:
+                for name in ("rag_record.json", "rag_record (1).json"):   # 第11週App的作業紀錄，10-2不讀
+                    Path(name).write_text(json.dumps(week11_app_record, ensure_ascii=False), encoding="utf-8")
+                for i, record in enumerate(records):
+                    name = "integrated_rag_record.json" if i == 0 else f"integrated_rag_record ({i}).json"
+                    Path(name).write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
+                ns = {}
+                try:
+                    return run_quiet(source, ns), ns
+                except AssertionError as exc:
+                    return "AssertionError:" + str(exc), ns
+            finally:
+                os.chdir(old)
+
+    printed, ns = run([*offline_good, *good])     # 離線練習的紀錄可以留著
+    assert "整合App執行檢查通過" in printed and len(ns["integrated_records"]) == len(offline_good) + len(good), printed
+    assert f"真實API {len(good)}份，離線{len(offline_good)}份" in printed, printed
+    printed, ns = run([])
+    assert "尚未找到整合App的紀錄" in printed and ns["integrated_records"] is None
+    printed, _ = run([*good, week11_app_record])   # 第11週App紀錄被改成整合App的檔名
+    assert printed.startswith("AssertionError:") and "不是整合App下載的紀錄" in printed, printed
+    failures = {
+        "只有離線紀錄": (offline_good, filled),
+        "觀察沒寫": (good, code),
+        "少一類問題": ([*sample[:3], compared, *own], filled),
+        "少的那題只有離線": ([*sample[:3], offline[0][3], compared, *own], filled),
+        "沒有比較參數": ([*sample, *own], filled),
+        "範例改名當自己的文件": ([*sample, compared, *renamed], filled),
+        "只問一題自己的文件": ([*sample, compared, own[0]], filled),
+    }
+    for label, (records, source) in failures.items():
+        assert run(records, source)[0].startswith("AssertionError:還有❌"), label
+
+    def tampered(change, base=None):
+        bad = json.loads(json.dumps(base or sample[0]))
+        change(bad)
+        return run([bad, *good[1:]])[0]
+
+    fake_real = lambda r: r.update(mode="真實API", answer="地點為圖書館討論室[來源1]。")   # 離線紀錄只改模式與回答
+    edits = {
+        "片段原文": lambda r: r["document"]["chunks"][0].update(text=r["document"]["chunks"][0]["text"] + "！"),
+        "證據原文": lambda r: r["hits"][0].update(text="地點為體育館。"),
+        "排名順序": lambda r: r["ranking"].reverse(),
+        "排名少一段": lambda r: r["ranking"].pop(),
+        "多塞一段低分證據": lambda r: r["hits"].append(dict(r["ranking"][-1])),
+        "context被改": lambda r: r.update(context=r["context"].replace("圖書館", "體育館")),
+        "回答被清空": lambda r: r.update(answer=""),
+        "引用不存在的來源": lambda r: r.update(used_labels=["[來源9]"]),
+        "有證據卻沒呼叫模型": lambda r: r.update(answer_model=None),
+    }
+    for label, change in edits.items():
+        message = tampered(change)
+        assert message.startswith("AssertionError:") and "❌" not in message, (label, message)
+    message = tampered(fake_real, offline[0][0])
+    assert "不是真實API回答後下載的紀錄" in message, message
+    print("10-2整合App檢查格：AppTest照講義實際操作整合App兩次（離線、真實API MockTransport：範例四題、改門檻、上傳自己的文件2題），"
+          "真實紀錄全部通過且離線紀錄可並存但不計入；請求數11次Embedding＋6次Responses、改門檻重排0次Embedding；同資料夾的第11週App rag_record*.json不讀、"
+          "改成整合App檔名會擋下；只有離線紀錄、缺觀察、少一類（或只用離線補）、沒比較參數、範例改名、自己的文件只問1題都擋下；"
+          "竄改片段／證據／排名／多塞低分證據／context／回答／引用標籤／回答模型、離線紀錄冒充真實API都擋下；沒有檔案只提示")
 
 
 def check_apps():
@@ -486,6 +626,7 @@ def main():
     check_notebooks()
     check_functions()
     check_notebook_api()
+    check_integrated_cell()
     check_apps()
     check_settings()
     check_rebuild_and_preservation()

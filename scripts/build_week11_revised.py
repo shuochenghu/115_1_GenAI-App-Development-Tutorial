@@ -6,6 +6,7 @@ File Search改成最後的選讀說明；函式只留教學需要的檢查，不
 資料、問題與第10週的三個函式仍直接沿用第10週修訂版。
 """
 from notebook_cell_notes import annotate_dependencies
+import hashlib
 import json
 import runpy
 from pathlib import Path
@@ -209,7 +210,10 @@ CELL_NOUNS = {"install": "環境格", "data": "資料格", "week10-fns": "第10�
               "check-fns": "核對函式格", "check-demo": "核對練習格", "api-setup": "連線設定格",
               "rag-fns": "真實RAG函式格", "real-retrieve": "真實找證據格", "real-answer": "真實回答格",
               "save-record": "存教師紀錄格", "teacher-record-run": "教師紀錄格",
-              "download-run": "下載回查格"}
+              "download-run": "下載回查格", "integrated-run": "整合App檢查格"}
+# 整合App的內建範例（與第9週相同）；10-2用它分辨「自己的文件」和改名上傳的範例檔
+SAMPLE_SHA256 = sorted(hashlib.sha256((ROOT / "week09/sample_tata" / name).read_bytes()).hexdigest()
+                       for name in ("sample.txt", "sample.csv", "sample.pdf", "sample.docx"))
 TAG_ALIASES = {"A": "a"}   # 先備裡的舊寫法
 DIRECT_PREREQ = True   # 先備只寫直接需要的格子，格首比較短；間接需要的仍記在metadata的requires
 # 格首標註在每個名稱後面加一句短說明，看程式格時不必往回翻（新增被後面用到的名稱要補在這裡）
@@ -662,6 +666,7 @@ def cells_for(teacher):
         在App按「下載問答紀錄」，把rag_record.json放到Notebook所在的資料夾（Colab：拖進左側「檔案」窗格），再執行下一格。沒有檔案時只會提示，不用示意檔假裝驗證過。
         下一格檢查context裡的每個[來源n]，都是取回的證據原文；回答與核對結果只印出來，內容是否正確仍要自己回原文確認。
         作業要下載三份紀錄；第二份起檔名可能變成rag_record (1).json，改下一格的path再執行。
+        整合App下載的是integrated_rag_record.json，檔名不同、不會互相覆蓋；它用10-2檢查，不用放進這一格。
     """)
     code("download-run", r"""
         # 用途：驗證自己從App下載的問答紀錄；先備：rag_record.json在Notebook所在的資料夾；0次API。
@@ -686,6 +691,92 @@ def cells_for(teacher):
         else:
             print("尚未找到下載檔：完成App下載後再執行本格")
     """)
+    md("integrated-check", """
+        ### 10-2 整合App：實際操作後的檢查
+
+        使用[第9～11週整合RAG App](week11_rag_integrated_revised/README.md)時（步驟見[操作與觀察講義](第11週_第09至11週整合RAG_App_操作與觀察講義_修訂版.md)），<font color="#C62828"><b>必須勾選「使用真實API」</b></font>：建立文件向量、找證據，再按「依證據回答」，回答出來後按「下載問答紀錄」。離線可以先練習，但離線紀錄不計入。逐步做法、請求次數與❌怎麼修正，見[整合App README第6節](week11_rag_integrated_revised/README.md)。
+        把每一份下載都放到Notebook所在的資料夾（檔名是`integrated_rag_record*.json`），再執行下一格。第二份起檔名會變成`integrated_rag_record (1).json`，不用改名。第11週App下載的是`rag_record.json`，檔名不同，放在同一個資料夾也不會互相覆蓋，下一格也不會讀它。
+
+        | 要做到 | 下一格怎麼確認 |
+        |---|---|
+        | 真實API：內建`sample.txt`問完四題（原句、改寫、資訊未提供、文件外） | 紀錄裡的檔案SHA-256是內建範例，四個問題都出現 |
+        | 真實API：同一題只改top_k、門檻或context上限，重新排名後再回答一次 | 同文件、同切塊、同問題，至少有兩組不同參數 |
+        | 真實API：上傳自己的文件，至少問2題（一題文件有答案、一題沒有） | 檔案SHA-256不是內建範例；範例檔改名上傳也會被認出來 |
+        | 在下一格的`MY_NOTES`寫兩則觀察 | 不是「待填」，各10字以上 |
+
+        每份紀錄也會檢查前後一致：每段都等於清理後文字的切片、排名涵蓋每一段且由高到低、取回的證據符合門檻與top_k、context裡的[來源n]都是取回的原文。真實API紀錄另外要有回答時間、真實向量模型與非空回答，引用標籤都在context內，有證據才呼叫回答模型。手改過的紀錄會被擋下。
+        請求次數：兩份文件各1次Embedding，6個不同問題各1次Embedding，有證據的題目各1次Responses；改參數重新排名0次、再回答1次。全部做完最多約15次，重做另計；Notebook這一格本身0次API。<font color="#C62828"><b>這格只確認「做過、紀錄沒被改」</b></font>，答案對不對仍要自己回原文判斷。
+    """)
+    code("integrated-run", r"""
+        # 用途：檢查整合App下載的紀錄，確認用真實API做完四類問題、參數比較與自己的文件；先備：整合App的integrated_rag_record*.json在Notebook所在的資料夾；0次API。
+        import json
+        from pathlib import Path
+
+        # ---------- 1. 你要填的兩則觀察（各寫一兩句完整的話） ----------
+        MY_NOTES = {
+            "參數比較：改了哪個參數、排名或context哪裡不同、為什麼": "待填",
+            "自己的文件：哪一題找不到或答錯，問題出在檢索還是生成": "待填",
+        }
+        SAMPLE_QUESTIONS = ["活動地點在哪裡？", "這場讀書交流辦在哪個空間？", "參加費用是多少？", "火星的平均氣溫是多少？"]
+        SAMPLE_SHA256 = {   # 內建四個範例檔的SHA-256：範例檔改名上傳，不算自己的文件
+            __SAMPLE_SHA256__
+        }
+
+        # ---------- 2. 讀檔：整合App的下載檔名是integrated_rag_record*.json，和第11週App的rag_record.json分開 ----------
+        records = []
+        for path in sorted(Path(".").glob("integrated_rag_record*.json")):
+            record = json.loads(path.read_text(encoding="utf-8"))
+            assert "ranking" in record and "document" in record, f"{path.name}不是整合App下載的紀錄"
+            records.append((path.name, record))
+
+        integrated_records = None
+        if records:
+            integrated_records = [record for _, record in records]
+
+            # ---------- 3. 每份紀錄前後一致：都來自同一份清理後文字，沒有手改 ----------
+            for name, r in records:
+                doc = r["document"]
+                for chunk in doc["chunks"]:
+                    assert doc["cleaned_text"][chunk["start"]:chunk["end"]] == chunk["text"], f"{name}：chunk {chunk['chunk_id']}和清理後文字對不上"
+                scores = [item["score"] for item in r["ranking"]]
+                assert len(scores) in (0, len(doc["chunks"])), f"{name}：排名沒有涵蓋每一段"
+                assert scores == sorted(scores, reverse=True), f"{name}：排名不是由高到低"
+                for item in r["ranking"] + r["hits"]:
+                    assert item["text"] == doc["chunks"][item["chunk_id"]]["text"], f"{name}：排名或證據的原文被改過"
+                expected = [item["chunk_id"] for item in r["ranking"] if item["score"] >= r["min_score"]][:r["top_k"]]
+                assert [hit["chunk_id"] for hit in r["hits"]] == expected, f"{name}：取回的證據和排名、門檻、top_k對不上"
+                for number, source in enumerate(r["sources"], 1):
+                    part = f"[來源{number}] {source['source']}／{source['chunk_id']}\n{source['text']}"
+                    assert source["chunk_id"] == r["hits"][number - 1]["chunk_id"] and part in r["context"], f"{name}：[來源{number}]和取回的證據對不上"
+                assert len(r["context"]) <= r["max_chars"], f"{name}：context超過上限"
+                if r["mode"] == "真實API":   # 真實API紀錄：要是按了「依證據回答」後下載的
+                    assert r.get("recorded_at_utc") and "人工關鍵字" not in r["embedding_model"], f"{name}：不是真實API回答後下載的紀錄"
+                    assert r["answer"] and set(r["used_labels"]) <= {s["label"] for s in r["sources"]}, f"{name}：回答是空的，或引用了context沒有的來源"
+                    assert (r["answer_model"] is None) == (not r["sources"]), f"{name}：有沒有呼叫回答模型和證據對不上"
+
+            # ---------- 4. 用真實API做過哪些操作：離線紀錄可以留著，但不計入 ----------
+            real = [r for _, r in records if r["mode"] == "真實API"]
+            sample = [r for r in real if r["document"]["file_sha256"] in SAMPLE_SHA256]
+            own = [r for r in real if r["document"]["file_sha256"] not in SAMPLE_SHA256]
+            settings = {}   # 同文件、同切塊、同問題 → 用過哪些檢索參數
+            for r in real:
+                doc = r["document"]
+                key = (doc["file_sha256"], doc.get("split"), doc["chunk_size"], doc["overlap"], r["question"])
+                settings.setdefault(key, set()).add((r["top_k"], r["min_score"], r["max_chars"]))
+            items = [
+                ("真實API：內建範例問完四類問題", set(SAMPLE_QUESTIONS) <= {r["question"] for r in sample}),
+                ("真實API：同一題只改檢索參數，至少比較兩次", any(len(used) >= 2 for used in settings.values())),
+                ("真實API：上傳自己的文件，至少問了2題", len({r["question"] for r in own}) >= 2),
+                ("兩則觀察都寫了（各10字以上）", all(len(note.strip()) >= 10 for note in MY_NOTES.values())),
+            ]
+            for label, ok in items:
+                print("✅" if ok else "❌", label)
+            print(f"共{len(records)}份整合App紀錄：真實API {len(real)}份，離線{len(records) - len(real)}份（離線紀錄不計入）")
+            assert all(ok for _, ok in items), "還有❌的項目：補做後重新下載紀錄，再執行本格"
+            print("整合App執行檢查通過：紀錄前後一致，四類問題、參數比較與自己的文件都用真實API做過")
+        else:
+            print("尚未找到整合App的紀錄：依10-2的步驟下載integrated_rag_record.json後再執行本格")
+    """.replace("__SAMPLE_SHA256__", "\n".join(f'            "{h}",' for h in SAMPLE_SHA256).strip()))
     md("homework", """
         ## 11 回家作業：一份自己的文件（45～60分鐘）
 
@@ -739,6 +830,7 @@ def cells_for(teacher):
         - [ ] 資訊不足與文件外的問題能承認不知道，不用常識補造。
         - [ ] 能分辨「沒找到」（檢索）與「答錯」（生成）。
         - [ ] 下載的問答紀錄已放回Notebook，用10-1讀回並通過。
+        - [ ] （使用整合App時）用真實API做完四類問題、參數比較與自己的文件，紀錄用10-2檢查通過。
     """)
     return annotate_dependencies(cells, PREFIX, CELL_NOUNS, TAG_ALIASES, GLOSSARY, DIRECT_PREREQ)
 

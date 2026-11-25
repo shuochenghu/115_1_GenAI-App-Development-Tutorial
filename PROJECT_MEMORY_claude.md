@@ -2,6 +2,19 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第11週修訂版Notebook：10-2整合App執行檢查（2026-11-25，Claude Code依使用者要求）
+
+- 使用者要求：在ipynb加入針對RAG整合範例（`week11_rag_integrated_revised`）的檢查，確認學生有認真執行。
+- 改`scripts/build_week11_revised.py`後重建：10-1後新增`integrated-check`（文字）與`integrated-run`（程式，CELL_NOUNS「整合App檢查格」），雙版相同；雙版41→43格（25文字、18程式），第38～39格。完成檢核加一項。0次API、不依賴前面格子，沒有檔案只提示（`integrated_records`為None）。
+  - 讀Notebook資料夾所有`integrated_rag_record*.json`；檔內沒有`ranking`與`document`就擋下。
+  - 前後一致：片段＝清理後文字切片；排名涵蓋每段且遞減；排名與證據原文＝片段；hits＝排名中過門檻的前top_k段；[來源n]與hits相同且在context內；context≤max_chars。
+  - 做過哪些操作（✅／❌，全✅才通過）：內建範例四類問題（以檔案SHA-256認範例）；同文件同切塊同題至少兩組top_k／門檻／context上限；自己的文件至少2題（SHA-256非範例，擋改名上傳）；`MY_NOTES`兩則觀察各10字以上。四個範例SHA-256由build從`week09/sample_tata`計算寫入格內。答案正確與否不檢查；真實API只列份數。
+- verify_week11_revised.py：格數43、`integrated_records`為None；新增`check_integrated_cell`：AppTest實際操作整合App（範例四題、改門檻、上傳自己的文件2題、真實API MockTransport 1題）下載紀錄後執行檢查格通過並混入第11週App紀錄；缺觀察、少一類、沒比較參數、範例改名、自己文件只1題都❌；竄改片段／證據／排名順序／排名少一段／多塞低分證據／context都擋下；無檔只提示。
+- 同步：第11週修訂版教師導讀（格數、格號表、驗證、新增第10節）、整合App操作與觀察講義第5節、整合App教師導讀（流程表、新增6-2）、整合App README第5節。整合App程式未改。
+- 後續（同日，使用者問10-1與10-2檔案會不會衝突，決定「改名分開」）：兩個App原本都下載`rag_record.json`，Colab同名上傳可能覆蓋、10-1可能讀到整合App紀錄。整合App template兩個下載按鈕改為`integrated_rag_record.json`（build的.gitignore改`integrated_rag_record*.json`，整合App verify改抓新檔名）；10-2改讀`integrated_rag_record*.json`，10-1說明加一句整合App紀錄不用放進來。verify_week11_revised：整合App不再下載`rag_record.json`、同資料夾兩份第11週App紀錄不被讀入、第11週紀錄改成整合App檔名會擋下。同步整合App README、操作講義、整合App教師導讀6-2、第11週修訂版教師導讀第4、10節。
+- 後續（同日，使用者：「必須規定學生使用真實API」，並要求把通過檢查的指引放在README.md）：10-2只計`mode`為「真實API」的紀錄（離線紀錄可並存不計入），項目名稱加「真實API：」；真實紀錄另檢查`recorded_at_utc`、向量模型不是人工關鍵字、回答非空、`used_labels`都在sources內、有sources才有`answer_model`（離線紀錄只改模式冒充會擋下；逐欄偽造擋不住）。10-2說明加請求次數（最多約15次）並連到整合App README。整合App README新增第6節「怎麼通過Notebook 10-2檢查（必須用真實API）」：開始前、7步驟表（最少7份紀錄）、注意事項、❌與錯誤訊息修正表；原第6、7節改為7、8；順手修正第2節步驟5被說明段落隔開。verify改為照README兩輪實際操作（真實MockTransport與離線），真實輪11次Embedding＋6次Responses，新增只有離線、只用離線補題、清空回答、引用不存在來源、改回答模型、離線冒充真實等負例。同步操作講義（真實回答列改必做、四題表去掉未測）、整合App教師導讀第4節與結尾、第11週修訂版教師導讀第10節。
+- 驗證：清空OPENAI_*後verify_week11_revised.py與verify_week11_integrated_rag_revised.py全數通過；git diff --check通過。0次真實API；未在Colab實測多檔上傳與執行、真人瀏覽器下載命名、試教。未commit／push。
+
 ## 第11週整合RAG App：併入切塊選項與向量簡要顯示、刪除Claude版（2026-11-18，Claude Code依使用者要求）
 
 - 背景：同一天Claude Code與Codex各做了一套第9～11週整合App（Claude版`week11_rag_pipeline_revised`、Codex版`week11_rag_integrated_revised`）。Claude比較兩套後，使用者決定「Codex版併入兩項再刪我的」。

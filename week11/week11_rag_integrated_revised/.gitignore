@@ -5,4 +5,4 @@
 .venv/
 __pycache__/
 document_record.json
-rag_record.json
+integrated_rag_record*.json

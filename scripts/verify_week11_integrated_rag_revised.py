@@ -269,7 +269,7 @@ def check_app(ns):
         at.text_input(key="question").set_value("活動地點在哪裡？").run()
         click(at, "retrieve")
         assert not backend.calls and at.session_state["evidence"]["sources"]
-        check_readback(downloads["rag_record.json"])
+        check_readback(downloads["integrated_rag_record.json"])
         at.text_input(key="question").set_value("這場讀書交流辦在哪個空間？").run()
         assert at.session_state["evidence"] is None and at.session_state["query_cache"] is None
         click(at, "retrieve")
@@ -292,7 +292,7 @@ def check_app(ns):
         click(at, "retrieve")
         click(at, "answer")
         assert [p for p, _ in backend.calls] == ["/embeddings", "/embeddings", "/responses"]
-        record = downloads["rag_record.json"]
+        record = downloads["integrated_rag_record.json"]
         assert record["answer"] and "offline-placeholder" not in json.dumps(record)
         assert "vectors" not in json.dumps(record) and "query_vector" not in record
         check_readback(record)
@@ -309,7 +309,7 @@ def check_app(ns):
         before = len(backend.calls)
         click(at, "answer")
         assert len(backend.calls) == before and at.session_state["record"]["answer"] == ns["INSUFFICIENT"]
-        check_readback(downloads["rag_record.json"])
+        check_readback(downloads["integrated_rag_record.json"])
 
         # 回答錯誤保留證據、清舊答案；未完成／拒答也不保存。
         at.text_input(key="question").set_value("活動地點在哪裡？").run()

@@ -70,7 +70,7 @@ def main():
         'OPENAI_EMBEDDING_MODEL = "text-embedding-3-small"\n', encoding="utf-8")
     (PACKAGE / ".gitignore").write_text(
         ".env\n.env.*\n!.env.example\n.streamlit/secrets.toml\n.venv/\n__pycache__/\n"
-        "document_record.json\nrag_record.json\n", encoding="utf-8")
+        "document_record.json\nintegrated_rag_record*.json\n", encoding="utf-8")
     print("第9～11週整合RAG App已重建；0次API。README與操作講義為手寫檔，不覆蓋。")
 
 

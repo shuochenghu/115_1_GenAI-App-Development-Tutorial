@@ -307,8 +307,9 @@ if document is not None:
                 st.info("離線流程到此完成；下方紀錄不含模型答案。任意文件的語意搜尋與生成需切換真實模式並重建向量。")
                 preview = {k: v for k, v in evidence.items() if k != "query_vector"}
                 preview.update(document=document, answer=None, check="離線預覽：沒有呼叫模型", instructions=INSTRUCTIONS)
+                # 檔名和第11週App的rag_record.json分開：放進同一個Notebook資料夾也不會互相覆蓋
                 st.download_button("下載離線檢索紀錄", json.dumps(preview, ensure_ascii=False, indent=2),
-                                   "rag_record.json", mime="application/json", key="download_preview")
+                                   "integrated_rag_record.json", mime="application/json", key="download_preview")
             elif st.button("依證據回答", type="primary", key="answer"):
                 st.session_state.record = None
                 try:
@@ -331,7 +332,7 @@ if document is not None:
                 st.caption("相似度不是正確機率；引用格式通過不代表答案正確。請逐項回到上面的來源原文確認。")
                 st.header("⑧ 下載問答紀錄")
                 st.download_button("下載問答紀錄", json.dumps(record, ensure_ascii=False, indent=2),
-                                   "rag_record.json", mime="application/json", key="download_answer")
+                                   "integrated_rag_record.json", mime="application/json", key="download_answer")
 
 st.caption("本次連線累積的API送出嘗試（含失敗；不是費用或token數）：")
 st.json(st.session_state.api_attempts)
