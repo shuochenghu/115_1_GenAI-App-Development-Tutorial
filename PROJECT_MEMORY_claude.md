@@ -2,6 +2,34 @@
 
 此檔用來保存可隨專案移動的工作狀態，方便在不同電腦或不同 AI 工具中接續處理。請勿在此檔寫入 API key、密碼、信用卡、學生個資或其他機密資料。
 
+## 第14週修訂版：A改為擋下閘門、說明文字改寫（2026-11-27，Claude Code依使用者要求）
+
+- 使用者先請Claude檢視Codex第14週首版（考量前幾週連貫性與說明文字是否順暢），再要求「做修訂版」。原版Notebook、`week14/week14_agent/`、`build_week14.py`、`verify_week14.py`與Codex教師導讀均未改。
+- 新增：`scripts/build_week14_revised.py`＋`scripts/templates/week14_agent_core_revised.py`＋`scripts/verify_week14_revised.py`；產物`week14/生成式AI應用開發_第14週_Agent基礎與工作流程_修訂版_學生版／教師版.ipynb`與同名Markdown（雙版50格：28文字、22程式，ID前綴`w14r-`，只有cover、a、b-note不同）、`week14/week14_agent_revised/`雙版單檔App、requirements、.env／Secrets範本、sample_data。手寫：App README、工具契約、B觀察與查核紀錄、`week14/第14週_修訂版_教師導讀與修訂紀錄.md`（含與首版差異表）。課綱第14週入口加一句修訂版連結。
+- 主要決策：首版迴圈以`counts["tools"] < 3`預先關閉工具，A的tool_limit永遠不會觸發。修訂版A改為`stop_reason(search_count, max_searches, tool_name, is_repeat)`：搜尋已滿→search_limit，否則重複→repeated_action，其餘None（上限優先），check_a 8筆；A是唯一擋下閘門。擋下後不break：把原因當function_call_output交回、之後`tools=[]`／`tool_choice="none"`，模型用已有資料收尾；擋下後仍提工具→invalid_call。`LIMITS = {"turns": 4, "searches": 2}`（總工具≤3、閱讀≤2、Responses≤6由輪次自然成立），刪碰不到的api_limit／read_limit；STOP_LABELS 11個分三類。Notebook第9節讀`week14_agent_revised/.env`（同第13週），Colab另有LOAD_COLAB_KEY格；開關名沿用第13週INSTALL_PACKAGES／LOAD_COLAB_KEY。requirements對齊第13週修訂版：Streamlit 1.63.0、python-dotenv 1.2.3（另httpx 0.28.1、beautifulsoup4 4.14.3、openai 2.49.0）。
+- 文字與排版：封面改流程句＋前週關係；新增學習目標、3-1兩層請求（三條路徑次數表）；工具介紹移到離線紀錄之前；開場回想第13週題目；各活動加「預期觀察」、A加「已提供／你負責」；`?`參數改稱「網址問號後的參數」避免和search_query混淆；離線紀錄逐列換行、Schema分行、run_agent①～⑤分段並附五段對照表；不足題改「Streamlit 2.0確定發布日期」；App改步驟表格（原始JSON進展開區）；時間A 20分、迴圈30分、App／B／讀回35分。讀回格127→69行（六項核心檢查），完整稽核移到verify的`full_check`。
+- 驗證：清空OPENAI_*後，專案.venv（Streamlit 1.60.0）與scratchpad暫存環境（Streamlit 1.63.0、python-dotenv 1.2.3）各跑`verify_week14_revised.py`全通過：48條SDK模擬路徑、120次MockTransport API、20次MockTransport HTTP、讀回格攔12類竄改＋full_check另2類、錯誤A（只print／順序反／用>）被攔、雙版AppTest、Notebook讀.env分支；暫存環境pip check通過。原版`verify_week14.py`重跑仍全通過；git diff --check通過。
+- 真實付費API 0次、真實網頁HTTP 0次。未測：模型品質、擋下後以tools=[]收尾的真實API行為、真實官方HTML可讀性、Colab、真人瀏覽器、Cloud、150分鐘試教。專案.venv未升級。未commit／push。
+
+## 第14週Agent基礎與工作流程首版（2026-11-26，Codex）
+
+- 使用者依同日規劃要求「開始製作教材」。新增 `week14/生成式AI應用開發_第14週_Agent基礎與工作流程_學生版／教師版.ipynb` 與同名Markdown，雙版48格（26文字、22程式），穩定ID `w14-`、輸出清空。新增 `week14/第14週_教師導讀與驗證紀錄.md`、`week14/week14_agent/`雙版單檔App、README、工具契約、B觀察表、四種手寫trace與HTML、requirements與.env／Secrets／忽略範本；課綱新增第14週入口，原規劃加首版實作狀態。
+- 生成來源：`scripts/build_week14.py`＋`scripts/templates/week14_agent_core.py`；檢查：`scripts/verify_week14.py`。Notebook／App共用函式AST相同，沿用notebook_cell_notes產生跨格名稱來源及先備。手寫README、契約、B表及導讀不由build覆蓋；未修改第9～13週或共用生成模組。
+- 單一Agent選 `search_official`／`read_official_page`／最後答案；前者沿用第13週搜尋規格接一次內建web_search後端，後者只讀本任務登記的精確官方HTTPS主機HTML，1MB／10秒等待／6000字元、不跟轉址與執行JavaScript；來源query保留、fragment去除。搜尋摘要、抓取原文與最後答案分欄。外層完整output及同call_id結果回送，reasoning不顯示不匯出；接受官方範例省略個別function_call.status，但回應整體須完成，明確進行中的call不執行。
+- 上限為外層4輪、總工具3次、搜尋2次、閱讀2次、Responses總6次；最後輪禁工具，重複先擋，至多換一次搜尋詞。SDK max_retries=0／timeout=60／store=False，所有RUN_*、Secrets及保存旗標預設False。搜尋拒答／未完成也保留已回傳工具事件；未知usage保留None。真實成功／不足／失敗可下載本次 `agent_record.json`，新題或失敗不留舊答案；11-1獨立0次API讀回call_id、來源先後、片段雜湊、引用及計數，無檔只提示，不驗真人、語意或防完整偽造。
+- 學生唯一程式A為 `stop_reason(tool_count,max_tools,is_repeat)`，未完成保留NotImplementedError，七筆預檢通過才請求；B人工查核正常／不足與一個主張、版本／日期／數字。核心150分鐘＋休息10＋排障20，課後45～60分鐘沿同App，40／30／20／10評量；兩題最多12次Responses，可沿用課堂紀錄，真實未完成照實列待補。
+- 本次Windows／CPython3.14.0，固定並實測Streamlit1.60.0／OpenAI2.49.0／python-dotenv1.2.2／httpx0.28.1／beautifulsoup4 4.14.3。新增Beautiful Soup及soupsieve至專案.venv，未升級其他教學套件；與前週1.63.0目標版本分開，不聲稱該環境通過。
+- 驗證全通過：雙版JSON／ID／語法／清空輸出／標題與先備／獨立及順序執行／學生答案分離／AST與閱讀稿／重建；真正SDK＋MockTransport 46條路徑，含最大6次、最後禁工具、重查／重複／超額、不合格提案／搜尋／答案、完整output／call_id及429／逾時不重試；HTML中文／抽取／大小／類型／轉址／空本文／逾時；雙版AppTest及只補A的學生版成功、失敗、下載、rerun不重送、清除／切換與session隔離；Notebook實際請求分支模擬；App實際下載回獨立讀回格及15類竄改。整支驗證共113次模擬API、22次模擬網頁HTTP；清空真實OPENAI_*、隔離.env／Secrets並禁止socket連外。pip check、文件UTF-8／連結及git diff --check通過。
+- 真實付費API0次、教材真實網頁HTTP0次；模型品質／帳號組合、真實官方HTML可讀性、Colab、真人瀏覽器、Cloud與150分鐘試教仍未驗證。未commit／push。
+
+## 第14週教材規劃（2026-11-26，Codex）
+
+- 新增 `week14/生成式AI應用開發_第14週_Agent基礎與工作流程_教材規劃.md`，目前只完成規劃，Notebook、App與build／verify均待製作。沿用第13週現行修訂版官方文件情境，不沿用較早會議筆記規劃。
+- 主線：單一Agent自主選搜尋／閱讀／回答；`search_official`沿用第13週搜尋規格與內建web_search後端，`read_official_page`只讀本任務搜尋登記的官方HTML頁面。外層最多4輪、工具總數3次、搜尋2次、閱讀2次，Responses總上限6次；最後輪次禁工具，重複停止，只有搜尋字詞至多修正一次，SDK錯誤不自動重試。
+- 學生唯一程式A為停止規則，B為工具路徑與來源核對；核心150分鐘＋休息10＋排障20。規劃雙版Notebook／Markdown、同核心雙版App、教師導讀、工具契約、B表與離線fixture；下載 `agent_record.json` 後回Notebook獨立0次API讀回，成功／不足／失敗如實分列。
+- 已核對課綱與第13週現況，查閱官方Function Calling、Web search、Reasoning與模型文件；新週規劃不修改前週教材。規劃來源比對保留有意義的query，搜尋摘要與抓取原文分欄；未把上述設計視為已修正第13週現行行為。
+- 本次驗證：規劃文件UTF-8、既有本地來源連結、時間150／180分鐘、評量100%、請求上限與Git差異格式檢查。0次真實API；未做教材程式離線測試、安裝、Colab、真人瀏覽器、Cloud或試教。未commit／push。
+
 ## 第11週修訂版Notebook：10-2整合App執行檢查（2026-11-25，Claude Code依使用者要求）
 
 - 使用者要求：在ipynb加入針對RAG整合範例（`week11_rag_integrated_revised`）的檢查，確認學生有認真執行。
